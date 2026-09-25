@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>睦灵科技（RoboX）生态图谱 · 表格视图</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; background: #f4f6f8; color: #222; }
+  header { background: linear-gradient(135deg, #16324f, #1f4e79); color: #fff; padding: 18px 28px; }
+  header h1 { font-size: 22px; }
+  header .sub { font-size: 13px; opacity: .85; margin-top: 4px; }
+  header .meta { font-size: 12px; opacity: .7; margin-top: 6px; }
+  .bar { display: flex; gap: 8px; background: #fff; padding: 10px 28px; border-bottom: 1px solid #e0e0e0; flex-wrap: wrap; align-items: center; }
+  .bar a, .bar button, .bar label.fl { border: 1px solid #cfd8e3; background: #f8fafc; color: #1f4e79; padding: 7px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; font-family: inherit; text-decoration: none; }
+  .bar a { border-style: dashed; }
+  .bar a:hover, .bar button:hover, .bar label.fl:hover { background: #e9f0f8; }
+  .bar button.on { background: #1f4e79; color: #fff; border-color: #1f4e79; }
+  .bar label.fl input { display: none; }
+  .bar .sp { margin-left: auto; font-size: 12.5px; color: #666; }
+  .bar #saveState { font-size: 12px; color: #3FA66B; opacity: 0; transition: opacity .3s; }
+  .bar #saveState.show { opacity: 1; }
+  section { padding: 16px 28px 40px; }
+  .howto { background: #fff; border: 1px solid #e3e8ee; border-left: 4px solid #1f4e79; border-radius: 8px;
+    padding: 12px 16px; font-size: 12.5px; color: #4b5563; line-height: 1.75; margin-bottom: 14px; }
+  .howto b { color: #1f4e79; }
+  h2.sec { font-size: 16px; color: #1f4e79; margin: 22px 0 10px; }
+  .roleBlock { margin-bottom: 18px; border: 1px solid #e3e8ee; border-radius: 10px; overflow: hidden; background: #fff; }
+  .roleHead { display: flex; align-items: center; gap: 12px; padding: 10px 16px; color: #fff; }
+  .roleHead .no { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,.22); font-size: 12px; font-weight: 700; }
+  .roleHead .nm { font-size: 15px; font-weight: 700; }
+  .roleHead .cnt { font-size: 12px; opacity: .85; }
+  .roleHead .dsc { font-size: 11.5px; opacity: .8; margin-left: auto; max-width: 52%; text-align: right; line-height: 1.4; }
+  .exchRow { display: flex; gap: 0; border-bottom: 1px solid #eef1f5; }
+  .exchRow > div { flex: 1; padding: 7px 16px; font-size: 12.5px; line-height: 1.6; }
+  .exchRow .gv { color: #1f6b3a; background: #f4faf6; border-right: 1px solid #eef1f5; }
+  .exchRow .gt { color: #8f4a12; background: #fdf8f2; }
+  .exchRow b { font-size: 11.5px; opacity: .75; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th { background: #f0f4f9; color: #1f4e79; font-weight: 600; padding: 7px 12px; text-align: left; font-size: 12px; }
+  td { padding: 7px 12px; border-top: 1px solid #eef1f5; vertical-align: top; line-height: 1.6; }
+  tbody tr:hover td { background: #fafcfe; }
+  td.subRow, tr.subRow td { background: #f7f4fb !important; color: #6b4a94; font-weight: 700; font-size: 12px; padding: 4px 12px; }
+  td.name { font-weight: 600; white-space: nowrap; }
+  [contenteditable="true"] { outline: none; border-radius: 4px; padding: 1px 4px; margin: -1px -4px; }
+  [contenteditable="true"]:hover { background: #fffbe6; box-shadow: inset 0 0 0 1px #f0dc82; }
+  [contenteditable="true"]:focus { background: #fffde7; box-shadow: inset 0 0 0 1.5px #e6b800; }
+  .badge { display: inline-flex; align-items: center; justify-content: center; min-width: 17px; height: 17px; border-radius: 50%; background: #1f4e79; color: #fff; font-size: 10px; font-weight: 700; vertical-align: 2px; margin-left: 5px; }
+  .badge.cust { background: #F28E2B; }
+  .subtag { display: inline-block; background: #efe7f8; color: #6b4a94; border-radius: 9px; padding: 0 8px; font-size: 11px; margin: 0 3px 3px 0; white-space: nowrap; }
+  .stg { display: inline-block; border-radius: 9px; padding: 0 9px; font-size: 11.5px; white-space: nowrap; }
+  .tier { font-size: 12px; color: #1f4e79; font-weight: 600; white-space: nowrap; }
+  td.op { width: 34px; text-align: center; }
+  .del { color: #c33; cursor: pointer; font-size: 14px; opacity: 0; transition: opacity .15s; user-select: none; }
+  tr:hover .del { opacity: .65; }
+  .del:hover { opacity: 1; }
+  .addRow td { padding: 5px 12px; }
+  .addBtn { color: #3FA66B; cursor: pointer; font-size: 12.5px; font-weight: 600; }
+  .addBtn:hover { text-decoration: underline; }
+  .blockNote { font-size: 11px; color: #9aa4b0; padding: 4px 14px 8px; }
+  #tableView { display: block; }
+  #ringView { display: none; }
+  #map-scroll { overflow: auto; max-height: 76vh; background: #fff; border: 1px solid #e3e8ee; border-radius: 10px; }
+  #eco-svg { display: block; }
+  .spoke path, .rlink, .collab line { transition: opacity .15s, stroke-width .15s; }
+  .mnode, .rnode { cursor: pointer; }
+  .mnode:hover rect { filter: brightness(.95); }
+  .mnode.on rect, .rnode.on rect { stroke-width: 3.4; }
+  .mnode.on, .rnode.on { filter: drop-shadow(0 0 8px rgba(31,78,121,.55)); }
+  .rlink.on { opacity: .95; stroke-width: 2.4; }
+  .spoke.on path { stroke-width: 2.8; }
+  .dim { opacity: .12; }
+  .clabel { font-size: 10.5px; fill: #7b52ab; paint-order: stroke; stroke: #fff; stroke-width: 4px; stroke-linejoin: round; pointer-events: none; }
+  ul.list { background: #fff; border: 1px solid #e3e8ee; border-radius: 8px; padding: 14px 16px 14px 34px; font-size: 12.5px; line-height: 1.9; }
+  #toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%); background: #16324f; color: #fff;
+    font-size: 13px; padding: 9px 22px; border-radius: 20px; box-shadow: 0 6px 20px rgba(0,0,0,.25); opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 99; }
+  #toast.show { opacity: 1; }
+  #detail { position: fixed; right: 24px; top: 200px; width: 400px; max-height: 68vh; overflow: auto;
+    background: #fff; border: 1px solid #dde4ec; border-radius: 12px; padding: 14px; box-shadow: 0 8px 30px rgba(0,0,0,.14); display: none; z-index: 50; }
+  #detail .close { float: right; cursor: pointer; color: #888; font-size: 16px; line-height: 1; }
+  .rchip { display: inline-block; border-radius: 10px; padding: 1px 8px; margin: 2px 4px 2px 0; font-size: 11px; color: #fff; }
+</style>
+</head>
+<body>
+<header>
+  <h1>睦灵科技（RoboX）生态图谱 · 表格视图</h1>
+  <div class="sub">按生态角色分块 · 双向价值交换 · 表格在线可编辑，可导入本地数据动态刷新</div>
+  <div class="meta">v1.5 · 2026-09-21 · Anson（杜岩松）整理 / 内部使用 · 内部使用</div>
+</header>
+
+<div class="bar">
+  <a href="睦灵科技（RoboX）企业地图_本体图谱.html">🗺 返回本体图谱</a>
+  <button type="button" id="viewTable" class="on">📋 表格视图</button>
+  <button type="button" id="viewRing">🕸 环形全景图</button>
+  <label class="fl">📂 导入本地数据（data.js / JSON）<input type="file" id="importFile" accept=".js,.json"></label>
+  <button type="button" id="exportBtn">⬇ 导出 JSON</button>
+  <button type="button" id="resetBtn">↺ 清除在线编辑</button>
+  <span id="saveState">✓ 已自动保存</span>
+  <span class="sp">以人类操作数据、灵巧末端与具身大脑为核心，构建手眼脑协同的物理智能系统。</span>
+</div>
+
+<section>
+  <div class="howto">
+    <b>说明：</b>本页为生态图谱的<b>表格视图</b>——按 6 类生态角色分块，每块上半部分是<b>睦灵 ⇄ 该角色的双向价值交换</b>（绿色=睦灵给出 / 橙色=睦灵获得），下半部分是成员明细。<b>「本体与部件硬件」按 整机 / 灵巧手 / 机械臂 / 数采装置 细分</b>。<b>在线编辑：</b>浅黄色高亮的单元格（成员名、阶段、梯队、说明、交换内容）可直接点击修改，自动保存在浏览器本地；每块底部可添加成员，行尾 ✕ 删除。<b>导入本地数据：</b>点击「导入本地数据」选择 <code>robox_ontology_data.js</code>（或导出的 JSON），表格即按最新本地数据重渲染（在线编辑保留并叠加）。<b>导出 JSON</b> 可把当前表格状态（含编辑）导出，便于回写数据源。环形全景图切换按钮可查看生成时的全景关系图。
+  </div>
+
+  <div id="tableView">
+    <div id="tableHost"></div>
+    <h2 class="sec">伙伴之间的横向协同（多边关系的另一半）</h2>
+    <ul class="list" id="collabList"><li>Pasontech HK（香港） → <b>三方协议牵头</b> → 云康集团（02325.HK）</li><li>东昇射频 / 星汇智云（集成商） → <b>工程化补位</b> → 天溯检测</li><li>长虹申万 → <b>长虹体系资本</b> → 长虹集团</li><li>新希望机器人（银行柜台） → <b>新希望体系</b> → 新希望集团</li></ul>
+  </div>
+
+  <div id="ringView">
+    <div id="map-scroll">
+      <svg id="eco-svg" width="1890" height="1890" viewBox="0 0 1890 1890" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arw" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f4e79"/>
+          </marker>
+          <radialGradient id="cgrad" cx="50%" cy="35%">
+            <stop offset="0%" stop-color="#2e74b5"/>
+            <stop offset="100%" stop-color="#16324f"/>
+          </radialGradient>
+          <radialGradient id="halo" cx="50%" cy="50%">
+            <stop offset="55%" stop-color="#1f4e79" stop-opacity="0"/>
+            <stop offset="100%" stop-color="#1f4e79" stop-opacity="0.05"/>
+          </radialGradient>
+        </defs>
+        <circle cx="945" cy="945" r="884" fill="url(#halo)"/>
+        <circle class="guide" cx="945" cy="945" r="292" fill="none" stroke="#e6ecf4" stroke-width="1"/>
+        <circle class="guide" cx="945" cy="945" r="470" fill="none" stroke="#eef2f7" stroke-width="1"/>
+        <g id="roleLinks"><line class="rlink" data-role="collect" data-eid="k-changhong" x1="1014.4" y1="635.0" x2="992.7" y2="498.3" stroke="#D45A5A" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="collect" data-eid="k-yunkang" x1="1085.3" y1="647.5" x2="1139.8" y2="564.2" stroke="#D45A5A" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="scene" data-eid="k-changhong" x1="1242.1" y1="868.0" x2="1263.6" y2="632.7" stroke="#E07B39" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="scene" data-eid="k-xinxihope-robot" x1="1281.5" y1="880.0" x2="1327.0" y2="792.6" stroke="#E07B39" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="scene" data-eid="k-luobo" x1="1291.0" y1="914.7" x2="1345.6" y2="967.2" stroke="#E07B39" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="scene" data-eid="k-haier" x1="1259.8" y1="932.5" x2="1326.7" y2="1148.0" stroke="#E07B39" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="scene" data-eid="k-midea" x1="1252.9" y1="869.3" x2="1333.2" y2="547.4" stroke="#E07B39" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="scene" data-eid="k-xinsong" x1="1286.0" y1="883.3" x2="1431.9" y2="748.1" stroke="#E07B39" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="scene" data-eid="k-pasontech" x1="1293.5" y1="910.7" x2="1460.4" y2="977.9" stroke="#E07B39" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="scene" data-eid="k-yunkang" x1="1269.4" y1="929.5" x2="1418.9" y2="1206.6" stroke="#E07B39" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="scene" data-eid="k-tiansu" x1="1258.9" y1="870.6" x2="1408.5" y2="462.1" stroke="#E07B39" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="scene" data-eid="k-xiaoye" x1="1274.4" y1="927.3" x2="1516.4" y2="1264.6" stroke="#E07B39" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="body" data-eid="k-changhong" x1="1035.1" y1="1236.8" x2="1230.9" y2="1246.5" stroke="#3FA66B" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="body" data-eid="k-midea" x1="1014.6" y1="1260.9" x2="1058.8" y2="1367.9" stroke="#3FA66B" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="body" data-eid="k-xinsong" x1="941.2" y1="1264.8" x2="907.2" y2="1388.3" stroke="#3FA66B" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="body" data-eid="k-unitree" x1="912.7" y1="1243.3" x2="721.9" y2="1305.3" stroke="#3FA66B" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="body" data-eid="k-ubtech" x1="1033.8" y1="1242.6" x2="1322.7" y2="1318.4" stroke="#3FA66B" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="body" data-eid="k-zhiyuan" x1="1007.9" y1="1263.8" x2="1107.9" y2="1476.5" stroke="#3FA66B" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="body" data-eid="k-wuji" x1="948.9" y1="1266.9" x2="879.1" y2="1503.2" stroke="#3FA66B" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="body" data-eid="k-sharpa" x1="916.0" y1="1248.8" x2="643.9" y2="1393.3" stroke="#3FA66B" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="body" data-eid="k-tianji" x1="1032.2" y1="1246.0" x2="1415.0" y2="1391.8" stroke="#3FA66B" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="body" data-eid="k-juqiao" x1="1004.4" y1="1265.0" x2="1153.0" y2="1586.3" stroke="#3FA66B" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="body" data-eid="k-linker-hand" x1="952.7" y1="1267.7" x2="855.5" y2="1619.1" stroke="#3FA66B" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="body" data-eid="k-junsheng" x1="918.8" y1="1252.0" x2="566.4" y2="1482.8" stroke="#3FA66B" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="body" data-eid="k-fulai" x1="1030.7" y1="1248.2" x2="1507.1" y2="1466.2" stroke="#3FA66B" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="body" data-eid="k-keli" x1="921.0" y1="1254.0" x2="489.7" y2="1573.2" stroke="#3FA66B" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="compute" data-eid="k-aliyun" x1="650.0" y1="1096.5" x2="618.3" y2="1223.7" stroke="#4E79A7" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="compute" data-eid="k-compute" x1="619.0" y1="1059.4" x2="553.9" y2="1028.5" stroke="#4E79A7" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="channel" data-eid="k-changhong" x1="607.3" y1="871.9" x2="544.8" y2="921.5" stroke="#9467BD" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="channel" data-eid="k-dongsheng" x1="629.0" y1="832.8" x2="589.6" y2="716.1" stroke="#9467BD" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="capital" data-eid="k-changhong-shenwan" x1="750.4" y1="676.2" x2="673.9" y2="629.5" stroke="#B07AA1" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="capital" data-eid="k-xinxihope" x1="780.9" y1="656.2" x2="761.4" y2="549.8" stroke="#B07AA1" stroke-width="1.3" opacity="0.34"/>
+<line class="rlink" data-role="capital" data-eid="k-yunkang" x1="828.3" y1="653.9" x2="852.4" y2="503.2" stroke="#B07AA1" stroke-width="1.3" opacity="0.34"/></g>
+        <g id="spokes"><g class="spoke" data-role="collect">
+    <path d="M 975.6078688674966,872.9156163694928 L 1014.2897062827336,753.0001650957676" fill="none" stroke="#1f4e79" stroke-width="1.6" marker-end="url(#arw)"/>
+    <path d="M 1000.9657672523198,748.7021831607411 L 962.2839298370827,868.6176344344664" fill="none" stroke="#1f4e79" stroke-width="1.6" marker-end="url(#arw)"/>
+    <circle cx="988.2868180599082" cy="810.808899765117" r="12" fill="#fff" stroke="#1f4e79" stroke-width="1.6"/>
+    <text x="988.2868180599082" y="814.808899765117" text-anchor="middle" font-size="11" font-weight="700" fill="#1f4e79">1</text>
+  </g>
+<g class="spoke" data-role="scene">
+    <path d="M 1023.1749867566131,940.3447400068983 L 1147.7792310954485,921.642272449172" fill="none" stroke="#1f4e79" stroke-width="1.6" marker-end="url(#arw)"/>
+    <path d="M 1145.70117914459,907.7973564115237 L 1021.0969348057546,926.49982396925" fill="none" stroke="#1f4e79" stroke-width="1.6" marker-end="url(#arw)"/>
+    <circle cx="1084.4380829506015" cy="924.071048209211" r="12" fill="#fff" stroke="#1f4e79" stroke-width="1.6"/>
+    <text x="1084.4380829506015" y="928.071048209211" text-anchor="middle" font-size="11" font-weight="700" fill="#1f4e79">2</text>
+  </g>
+<g class="spoke" data-role="body">
+    <path d="M 945.5452879201465,1023.3115742472602 L 957.6812569671516,1148.725761065539" fill="none" stroke="#1f4e79" stroke-width="1.6" marker-end="url(#arw)"/>
+    <path d="M 971.6161666136271,1147.3773200603162 L 959.480197566622,1021.9631332420373" fill="none" stroke="#1f4e79" stroke-width="1.6" marker-end="url(#arw)"/>
+    <circle cx="958.5807272668868" cy="1085.3444471537882" r="12" fill="#fff" stroke="#1f4e79" stroke-width="1.6"/>
+    <text x="958.5807272668868" y="1089.3444471537882" text-anchor="middle" font-size="11" font-weight="700" fill="#1f4e79">3</text>
+  </g>
+<g class="spoke" data-role="compute">
+    <path d="M 871.173445309552,971.1273768782535 L 756.6254209998988,1023.6130904273241" fill="none" stroke="#1f4e79" stroke-width="1.6" marker-end="url(#arw)"/>
+    <path d="M 762.4571669497955,1036.3406486839522 L 877.0051912594487,983.8549351348815" fill="none" stroke="#1f4e79" stroke-width="1.6" marker-end="url(#arw)"/>
+    <circle cx="816.8153061296737" cy="1003.7340127811028" r="12" fill="#fff" stroke="#1f4e79" stroke-width="1.6"/>
+    <text x="816.8153061296737" y="1007.7340127811028" text-anchor="middle" font-size="11" font-weight="700" fill="#1f4e79">4</text>
+  </g>
+<g class="spoke" data-role="channel">
+    <path d="M 872.3877325114456,915.6664252064186 L 751.809617747798,879.1025326340374" fill="none" stroke="#1f4e79" stroke-width="1.6" marker-end="url(#arw)"/>
+    <path d="M 747.7469630175335,892.5001009411093 L 868.3250777811811,929.0639935134905" fill="none" stroke="#1f4e79" stroke-width="1.6" marker-end="url(#arw)"/>
+    <circle cx="810.0673477644896" cy="904.0832630737639" r="12" fill="#fff" stroke="#1f4e79" stroke-width="1.6"/>
+    <text x="810.0673477644896" y="908.0832630737639" text-anchor="middle" font-size="11" font-weight="700" fill="#1f4e79">5</text>
+  </g>
+<g class="spoke" data-role="capital">
+    <path d="M 915.0333470348785,872.6467021479464 L 856.6071487556147,761.0116746940503" fill="none" stroke="#1f4e79" stroke-width="1.6" marker-end="url(#arw)"/>
+    <path d="M 844.203256816293,767.5034745028574 L 902.6294550955568,879.1385019567535" fill="none" stroke="#1f4e79" stroke-width="1.6" marker-end="url(#arw)"/>
+    <circle cx="879.6183019255857" cy="820.0750883254019" r="12" fill="#fff" stroke="#1f4e79" stroke-width="1.6"/>
+    <text x="879.6183019255857" y="824.0750883254019" text-anchor="middle" font-size="11" font-weight="700" fill="#1f4e79">6</text>
+  </g></g>
+        <g id="collabs"><g class="collab">
+    <line x1="1531.7" y1="984.3" x2="1200.2" y2="550.3" stroke="#9467BD" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.85"/>
+    <text class="clabel" x="1366.0" y="751.3" text-anchor="middle">三方协议牵头</text>
+  </g>
+<g class="collab">
+    <line x1="545.9" y1="696.8" x2="1438.5" y2="440.2" stroke="#9467BD" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.85"/>
+    <text class="clabel" x="992.2" y="552.5" text-anchor="middle">工程化补位</text>
+  </g>
+<g class="collab">
+    <line x1="603.2" y1="622.4" x2="968.5" y2="475.6" stroke="#9467BD" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.85"/>
+    <text class="clabel" x="785.8" y="533.0" text-anchor="middle">长虹体系资本</text>
+  </g>
+<g class="collab">
+    <line x1="1384.1" y1="777.3" x2="727.1" y2="528.6" stroke="#9467BD" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.85"/>
+    <text class="clabel" x="1055.6" y="636.9" text-anchor="middle">新希望体系</text>
+  </g></g>
+        <g id="roleNodes"><g class="rnode" data-role="collect" transform="translate(1034.6,667.1)">
+    <title>提供训练场/产线/人力执行规模化数采，RoboX 出资采购数采服务与数据；核心公式：数据采购额 ≥ 设备投入（对冲长虹硬底线）。</title>
+    <rect x="-84" y="-30" width="168" height="60" rx="20" fill="#D45A5A" stroke="#D45A5A" stroke-width="2.2"/>
+    <text text-anchor="middle" y="-3" font-size="13.5" font-weight="700" fill="#ffffff">数据采集</text>
+    <text text-anchor="middle" y="16" font-size="11" font-weight="600" fill="#ffffff" fill-opacity="0.82">2 家</text>
+  </g>
+<g class="rnode" data-role="scene" transform="translate(1233.8,901.7)">
+    <title>提供可落地商业场景与渠道入口（酒店/餐饮/文旅/医疗检测/物流/家庭），以真实任务驱动数据回流与收入，多为客户×合作方一体；该角色成员标注合作阶段（洽谈 / MOU / 合作协议）。</title>
+    <rect x="-84" y="-30" width="168" height="60" rx="20" fill="#E07B39" stroke="#E07B39" stroke-width="2.2"/>
+    <text text-anchor="middle" y="-3" font-size="13.5" font-weight="700" fill="#ffffff">场景部署</text>
+    <text text-anchor="middle" y="16" font-size="11" font-weight="600" fill="#ffffff" fill-opacity="0.82">10 家</text>
+  </g>
+<g class="rnode" data-role="body" transform="translate(973.1,1235.6)">
+    <title>提供本体、双臂、灵巧手、触觉部件与电子皮肤；RoboX 输出『大脑+手』增量包，不绑定单一硬件。按整机 / 灵巧手 / 机械臂 / 数采装置四类细分（成员 bodySub 字段）。</title>
+    <rect x="-84" y="-30" width="168" height="60" rx="20" fill="#3FA66B" stroke="#3FA66B" stroke-width="2.2"/>
+    <text text-anchor="middle" y="-3" font-size="13.5" font-weight="700" fill="#ffffff">本体与部件硬件</text>
+    <text text-anchor="middle" y="16" font-size="11" font-weight="600" fill="#ffffff" fill-opacity="0.82">14 家</text>
+  </g>
+<g class="rnode" data-role="compute" transform="translate(679.5,1066.6)">
+    <title>训练算力与云资源（阿里云主供+各地公共算力）；首年需 ≥1000 卡，H200/B30 白名单是当前瓶颈。</title>
+    <rect x="-84" y="-30" width="168" height="60" rx="20" fill="#4E79A7" stroke="#4E79A7" stroke-width="2.2"/>
+    <text text-anchor="middle" y="-3" font-size="13.5" font-weight="700" fill="#ffffff">算力与云</text>
+    <text text-anchor="middle" y="16" font-size="11" font-weight="600" fill="#ffffff" fill-opacity="0.82">2 家</text>
+  </g>
+<g class="rnode" data-role="channel" transform="translate(665.6,860.3)">
+    <title>系统集成商、工程化补位与生态入口（长虹集成、东昇射频/星汇智云）。</title>
+    <rect x="-84" y="-30" width="168" height="60" rx="20" fill="#9467BD" stroke="#9467BD" stroke-width="2.2"/>
+    <text text-anchor="middle" y="-3" font-size="13.5" font-weight="700" fill="#ffffff">渠道 / 集成</text>
+    <text text-anchor="middle" y="16" font-size="11" font-weight="600" fill="#ffffff" fill-opacity="0.82">2 家</text>
+  </g>
+<g class="rnode" data-role="capital" transform="translate(809.6,686.3)">
+    <title>产业资本交叉持股 / SPV 合资候选（长虹申万、新希望、云康），绑定场景与订单。</title>
+    <rect x="-84" y="-30" width="168" height="60" rx="20" fill="#B07AA1" stroke="#B07AA1" stroke-width="2.2"/>
+    <text text-anchor="middle" y="-3" font-size="13.5" font-weight="700" fill="#ffffff">产业资本</text>
+    <text text-anchor="middle" y="16" font-size="11" font-weight="600" fill="#ffffff" fill-opacity="0.82">3 家</text>
+  </g></g>
+        <g id="memberNodes"><g class="mnode" data-eid="k-changhong" data-role="collect" transform="translate(968.5,475.6)">
+    <title>长虹集团 — 多角色深度合作（数采产能/场景/本体/集成） · 合作阶段：合作协议（客户 × 合作方一体）</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#D45A5A" fill-opacity="0.12" stroke="#D45A5A" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">长虹集团</text>
+    <circle cx="66" cy="-21" r="11" fill="#1f4e79"/><text x="66" y="-17" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">4</text>
+    <circle cx="-66" cy="-21" r="9" fill="#F28E2B"/><text x="-66" y="-17.5" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff">客</text>
+  </g>
+<g class="mnode" data-eid="k-yunkang" data-role="collect" transform="translate(1200.2,550.3)">
+    <title>云康集团（02325.HK） — ICL 场景方·三方协议 · 合作阶段：MOU（客户 × 合作方一体）</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#D45A5A" fill-opacity="0.12" stroke="#D45A5A" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">云康集团</text>
+    <circle cx="66" cy="-21" r="11" fill="#1f4e79"/><text x="66" y="-17" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">3</text>
+    <circle cx="-66" cy="-21" r="9" fill="#F28E2B"/><text x="-66" y="-17.5" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff">客</text>
+  </g>
+<g class="mnode" data-eid="k-changhong" data-role="scene" transform="translate(1273.6,608.9)">
+    <title>长虹集团 — 多角色深度合作（数采产能/场景/本体/集成） · 合作阶段：合作协议（客户 × 合作方一体）</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#E07B39" fill-opacity="0.12" stroke="#E07B39" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">长虹集团（合作协议）</text>
+    <circle cx="66" cy="-21" r="11" fill="#1f4e79"/><text x="66" y="-17" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">4</text>
+    <circle cx="-66" cy="-21" r="9" fill="#F28E2B"/><text x="-66" y="-17.5" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff">客</text>
+  </g>
+<g class="mnode" data-eid="k-xinxihope-robot" data-role="scene" transform="translate(1384.1,777.3)">
+    <title>新希望机器人（银行柜台） — 银行柜台场景候选 · 合作阶段：洽谈</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#E07B39" fill-opacity="0.12" stroke="#E07B39" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">新希望机器人（洽谈）</text>
+    
+    
+  </g>
+<g class="mnode" data-eid="k-luobo" data-role="scene" transform="translate(1413.9,976.4)">
+    <title>成都高新区萝卜外卖 — 无人配送外卖场景候选 · 合作阶段：洽谈</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#E07B39" fill-opacity="0.12" stroke="#E07B39" stroke-width="1.8"/>
+    <text text-anchor="middle" y="-2" font-size="11" font-weight="600" fill="#1a1a1a">成都高新区萝卜外卖（洽</text>
+       <text text-anchor="middle" y="13" font-size="11" font-weight="600" fill="#1a1a1a">谈）</text>
+    
+    
+  </g>
+<g class="mnode" data-eid="k-haier" data-role="scene" transform="translate(1357.7,1169.8)">
+    <title>海尔卡奥斯 — P0 首选合作方（场景） · 合作阶段：洽谈</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#E07B39" fill-opacity="0.12" stroke="#E07B39" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">海尔卡奥斯（洽谈）</text>
+    
+    
+  </g>
+<g class="mnode" data-eid="k-midea" data-role="scene" transform="translate(1356.0,524.5)">
+    <title>美的/库卡 — P1 合作方（场景+本体） · 合作阶段：洽谈</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#E07B39" fill-opacity="0.12" stroke="#E07B39" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">美的/库卡（洽谈）</text>
+    <circle cx="66" cy="-21" r="11" fill="#1f4e79"/><text x="66" y="-17" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">2</text>
+    
+  </g>
+<g class="mnode" data-eid="k-xinsong" data-role="scene" transform="translate(1494.3,735.2)">
+    <title>新松机器人 — P1 合作方（工业场景+本体） · 合作阶段：洽谈</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#E07B39" fill-opacity="0.12" stroke="#E07B39" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">新松机器人（洽谈）</text>
+    <circle cx="66" cy="-21" r="11" fill="#1f4e79"/><text x="66" y="-17" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">2</text>
+    
+  </g>
+<g class="mnode" data-eid="k-pasontech" data-role="scene" transform="translate(1531.7,984.3)">
+    <title>Pasontech HK（香港） — 生命健康/资本网络（MOU 0831 版） · 合作阶段：MOU</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#E07B39" fill-opacity="0.12" stroke="#E07B39" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">Pasontech HK（MOU）</text>
+    
+    
+  </g>
+<g class="mnode" data-eid="k-yunkang" data-role="scene" transform="translate(1461.4,1226.3)">
+    <title>云康集团（02325.HK） — ICL 场景方·三方协议 · 合作阶段：MOU（客户 × 合作方一体）</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#E07B39" fill-opacity="0.12" stroke="#E07B39" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">云康集团（MOU）</text>
+    <circle cx="66" cy="-21" r="11" fill="#1f4e79"/><text x="66" y="-17" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">3</text>
+    <circle cx="-66" cy="-21" r="9" fill="#F28E2B"/><text x="-66" y="-17.5" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff">客</text>
+  </g>
+<g class="mnode" data-eid="k-tiansu" data-role="scene" transform="translate(1438.5,440.2)">
+    <title>天溯检测 — 检测行业场景方 · 合作阶段：洽谈（客户 × 合作方一体）</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#E07B39" fill-opacity="0.12" stroke="#E07B39" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">天溯检测（洽谈）</text>
+    
+    <circle cx="-66" cy="-21" r="9" fill="#F28E2B"/><text x="-66" y="-17.5" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff">客</text>
+  </g>
+<g class="mnode" data-eid="k-xiaoye" data-role="scene" transform="translate(1565.0,1282.7)">
+    <title>小野轻煮 — 复合调味料品牌（张不等），炸鸡裹粉联名耗材入口 · 合作阶段：洽谈</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#E07B39" fill-opacity="0.12" stroke="#E07B39" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">小野轻煮（洽谈）</text>
+    
+    
+  </g>
+<g class="mnode" data-eid="k-changhong" data-role="body" transform="translate(1304.9,1247.3)">
+    <title>长虹集团 — 多角色深度合作（数采产能/场景/本体/集成） · 合作阶段：合作协议（客户 × 合作方一体）</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#3FA66B" fill-opacity="0.12" stroke="#3FA66B" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">长虹集团</text>
+    <circle cx="66" cy="-21" r="11" fill="#1f4e79"/><text x="66" y="-17" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">4</text>
+    <circle cx="-66" cy="-21" r="9" fill="#F28E2B"/><text x="-66" y="-17.5" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff">客</text>
+  </g>
+<g class="mnode" data-eid="k-midea" data-role="body" transform="translate(1108.4,1385.7)">
+    <title>美的/库卡 — P1 合作方（场景+本体） · 合作阶段：洽谈</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#3FA66B" fill-opacity="0.12" stroke="#3FA66B" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">美的/库卡</text>
+    <circle cx="66" cy="-21" r="11" fill="#1f4e79"/><text x="66" y="-17" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">2</text>
+    
+  </g>
+<g class="mnode" data-eid="k-xinsong" data-role="body" transform="translate(869.2,1408.8)">
+    <title>新松机器人 — P1 合作方（工业场景+本体） · 合作阶段：洽谈</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#3FA66B" fill-opacity="0.12" stroke="#3FA66B" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">新松机器人</text>
+    <circle cx="66" cy="-21" r="11" fill="#1f4e79"/><text x="66" y="-17" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">2</text>
+    
+  </g>
+<g class="mnode" data-eid="k-unitree" data-role="body" transform="translate(649.8,1310.7)">
+    <title>宇树科技 — 本体+灵巧手全栈（杭州本土）</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#3FA66B" fill-opacity="0.12" stroke="#3FA66B" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">宇树科技</text>
+    
+    
+  </g>
+<g class="mnode" data-eid="k-ubtech" data-role="body" transform="translate(1395.2,1323.2)">
+    <title>优必选 — 人形本体+五指灵巧手</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#3FA66B" fill-opacity="0.12" stroke="#3FA66B" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">优必选</text>
+    
+    
+  </g>
+<g class="mnode" data-eid="k-zhiyuan" data-role="body" transform="translate(1149.4,1496.3)">
+    <title>智元（临港/上海） — 人形本体+OmniHand 灵巧手</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#3FA66B" fill-opacity="0.12" stroke="#3FA66B" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">智元</text>
+    
+    
+  </g>
+<g class="mnode" data-eid="k-wuji" data-role="body" transform="translate(850.1,1525.3)">
+    <title>舞肌（深圳） — 灵巧手主供（送测/定制协同）</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#3FA66B" fill-opacity="0.12" stroke="#3FA66B" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">舞肌</text>
+    
+    
+  </g>
+<g class="mnode" data-eid="k-sharpa" data-role="body" transform="translate(575.7,1402.5)">
+    <title>Sharpa — 灵巧手供应商（新加坡华人创办）</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#3FA66B" fill-opacity="0.12" stroke="#3FA66B" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">Sharpa</text>
+    
+    
+  </g>
+<g class="mnode" data-eid="k-tianji" data-role="body" transform="translate(1485.5,1399.1)">
+    <title>天机（广东天机智能） — 机械臂/双臂供应商（长盈精密旗下）</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#3FA66B" fill-opacity="0.12" stroke="#3FA66B" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">天机</text>
+    
+    
+  </g>
+<g class="mnode" data-eid="k-juqiao" data-role="body" transform="translate(1190.4,1607.0)">
+    <title>举桥（触觉手套） — 触觉手套送测供应商</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#3FA66B" fill-opacity="0.12" stroke="#3FA66B" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">举桥</text>
+    
+    
+  </g>
+<g class="mnode" data-eid="k-linker-hand" data-role="body" transform="translate(831.1,1641.7)">
+    <title>灵心巧手 — 灵巧手调研 ★★★★★（不自研硬件首选）</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#3FA66B" fill-opacity="0.12" stroke="#3FA66B" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">灵心巧手</text>
+    
+    
+  </g>
+<g class="mnode" data-eid="k-junsheng" data-role="body" transform="translate(501.6,1494.4)">
+    <title>均胜电子 — 灵巧手调研 ★★★★★（理念最契合）</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#3FA66B" fill-opacity="0.12" stroke="#3FA66B" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">均胜电子</text>
+    
+    
+  </g>
+<g class="mnode" data-eid="k-fulai" data-role="body" transform="translate(1575.9,1475.1)">
+    <title>福莱新材 — 电子皮肤调研 ★★★★★（触觉互补）</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#3FA66B" fill-opacity="0.12" stroke="#3FA66B" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">福莱新材</text>
+    
+    
+  </g>
+<g class="mnode" data-eid="k-keli" data-role="body" transform="translate(427.4,1586.2)">
+    <title>柯力传感 — 力觉传感调研 ★★★★☆</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#3FA66B" fill-opacity="0.12" stroke="#3FA66B" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">柯力传感</text>
+    
+    
+  </g>
+<g class="mnode" data-eid="k-aliyun" data-role="compute" transform="translate(583.0,1244.8)">
+    <title>阿里云 — 算力主供（单一供应商+单一物理集群策略）</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#4E79A7" fill-opacity="0.12" stroke="#4E79A7" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">阿里云</text>
+    
+    
+  </g>
+<g class="mnode" data-eid="k-compute" data-role="compute" transform="translate(481.6,1023.4)">
+    <title>各地公共算力平台 — 算力补充（算力券/训力补贴）</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#4E79A7" fill-opacity="0.12" stroke="#4E79A7" stroke-width="1.8"/>
+    <text text-anchor="middle" y="-2" font-size="11" font-weight="600" fill="#1a1a1a">各地公共算力平</text>
+       <text text-anchor="middle" y="13" font-size="11" font-weight="600" fill="#1a1a1a">台</text>
+    
+    
+  </g>
+<g class="mnode" data-eid="k-changhong" data-role="channel" transform="translate(475.2,929.8)">
+    <title>长虹集团 — 多角色深度合作（数采产能/场景/本体/集成） · 合作阶段：合作协议（客户 × 合作方一体）</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#9467BD" fill-opacity="0.12" stroke="#9467BD" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">长虹集团</text>
+    <circle cx="66" cy="-21" r="11" fill="#1f4e79"/><text x="66" y="-17" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">4</text>
+    <circle cx="-66" cy="-21" r="9" fill="#F28E2B"/><text x="-66" y="-17.5" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff">客</text>
+  </g>
+<g class="mnode" data-eid="k-dongsheng" data-role="channel" transform="translate(545.9,696.8)">
+    <title>东昇射频 / 星汇智云（集成商） — 检测实验室数字化 + 机器人黑灯实验室（原东昇射频）</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#9467BD" fill-opacity="0.12" stroke="#9467BD" stroke-width="1.8"/>
+    <text text-anchor="middle" y="-2" font-size="11" font-weight="600" fill="#1a1a1a">东昇射频 / 星</text>
+       <text text-anchor="middle" y="13" font-size="11" font-weight="600" fill="#1a1a1a">汇智云</text>
+    
+    
+  </g>
+<g class="mnode" data-eid="k-changhong-shenwan" data-role="capital" transform="translate(603.2,622.4)">
+    <title>长虹申万 — 长虹体系产业资本（交叉持股/SPV 候选）</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#B07AA1" fill-opacity="0.12" stroke="#B07AA1" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">长虹申万</text>
+    
+    
+  </g>
+<g class="mnode" data-eid="k-xinxihope" data-role="capital" transform="translate(727.1,528.6)">
+    <title>新希望集团 — 产业资本候选（物业+医疗场景探索）（客户 × 合作方一体）</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#B07AA1" fill-opacity="0.12" stroke="#B07AA1" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">新希望集团</text>
+    
+    <circle cx="-66" cy="-21" r="9" fill="#F28E2B"/><text x="-66" y="-17.5" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff">客</text>
+  </g>
+<g class="mnode" data-eid="k-yunkang" data-role="capital" transform="translate(874.8,480.3)">
+    <title>云康集团（02325.HK） — ICL 场景方·三方协议 · 合作阶段：MOU（客户 × 合作方一体）</title>
+    <rect x="-70" y="-21" width="140" height="42" rx="12" fill="#B07AA1" fill-opacity="0.12" stroke="#B07AA1" stroke-width="1.8"/>
+    <text text-anchor="middle" y="4" font-size="11.5" font-weight="600" fill="#1a1a1a">云康集团</text>
+    <circle cx="66" cy="-21" r="11" fill="#1f4e79"/><text x="66" y="-17" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">3</text>
+    <circle cx="-66" cy="-21" r="9" fill="#F28E2B"/><text x="-66" y="-17.5" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff">客</text>
+  </g></g>
+        <g id="centerNode" transform="translate(945,945)">
+          <circle r="78" fill="url(#cgrad)" stroke="#0f2438" stroke-width="2"/>
+          <text text-anchor="middle" y="-8" font-size="20" font-weight="800" fill="#fff">睦灵科技</text>
+          <text text-anchor="middle" y="16" font-size="14" font-weight="600" fill="#cfe0f2">RoboX</text>
+        </g>
+        <g id="highlightLayer"></g>
+      </svg>
+    </div>
+    <div class="blockNote" style="margin-top:6px">环形全景图基于生成时的数据快照；导入本地数据后仅刷新表格视图，重新运行 gen_eco_html.js 可同步刷新本图。</div>
+  </div>
+</section>
+
+<div id="toast"></div>
+<div id="detail"></div>
+
+<script>
+const BASE = {"meta":{"version":"v1.5","date":"2026-09-21","author":"Anson（杜岩松）整理 / 内部使用","tagline":"以人类操作数据、灵巧末端与具身大脑为核心，构建手眼脑协同的物理智能系统。"},"partnerRoles":[{"key":"collect","label":"数据采集","desc":"提供训练场/产线/人力执行规模化数采，RoboX 出资采购数采服务与数据；核心公式：数据采购额 ≥ 设备投入（对冲长虹硬底线）。","color":"#D45A5A","showStage":false,"subs":null},{"key":"scene","label":"场景部署","desc":"提供可落地商业场景与渠道入口（酒店/餐饮/文旅/医疗检测/物流/家庭），以真实任务驱动数据回流与收入，多为客户×合作方一体；该角色成员标注合作阶段（洽谈 / MOU / 合作协议）。","color":"#E07B39","showStage":true,"subs":null},{"key":"body","label":"本体与部件硬件","desc":"提供本体、双臂、灵巧手、触觉部件与电子皮肤；RoboX 输出『大脑+手』增量包，不绑定单一硬件。按整机 / 灵巧手 / 机械臂 / 数采装置四类细分（成员 bodySub 字段）。","color":"#3FA66B","showStage":false,"subs":["整机","灵巧手","机械臂","数采装置"]},{"key":"compute","label":"算力与云","desc":"训练算力与云资源（阿里云主供+各地公共算力）；首年需 ≥1000 卡，H200/B30 白名单是当前瓶颈。","color":"#4E79A7","showStage":false,"subs":null},{"key":"channel","label":"渠道 / 集成","desc":"系统集成商、工程化补位与生态入口（长虹集成、东昇射频/星汇智云）。","color":"#9467BD","showStage":false,"subs":null},{"key":"capital","label":"产业资本","desc":"产业资本交叉持股 / SPV 合资候选（长虹申万、新希望、云康），绑定场景与订单。","color":"#B07AA1","showStage":false,"subs":null}],"partnerExchanges":[{"key":"collect","give":"数采装置产品方案 + 数据采购订单（设备对数据对冲；长虹第一阶段 1000 小时真机数采）","get":"训练场 / 产线 / 人力执行的规模化真实操作数据（无本体头戴式数采 0921 首批已启动）"},{"key":"scene","give":"可验收任务结果 + 数据回流与模型进化能力","get":"真实场景入口 + 支付方 + 渠道"},{"key":"body","give":"『大脑+手』模型增量包（UAS 跨本体）+ 触觉数据标准","get":"本体 / 双臂 / 灵巧手 / 触觉部件与电子皮肤"},{"key":"compute","give":"单一物理集群的长期稳定采购承诺","get":"训练算力与云资源（首年 ≥1000 卡）"},{"key":"channel","give":"模型能力与本体方案","get":"工程化补位 + 系统集成入口 + 品牌背书"},{"key":"capital","give":"场景与订单的确定性（可绑定的收入）","get":"产业资本 + 交叉持股 / SPV 锚定"}],"entities":[{"id":"p-mingxiu","type":"person","name":"明修","summary":"创始人兼 CEO","desc":"创始人。技术+战略+融资三角核心，前阿里系背景，主导 System 2/1/0 全栈大脑、TacWM、Unified Action Space 等核心技术方向。","lifecycle":"创始人 → 全职到岗（离职审批中）→ 持续领导","owner":"明修"},{"id":"p-eric","type":"person","name":"Eric","summary":"联合创始人兼 CFO，初始投资人（出资额未定）","desc":"联合创始人、CFO。同时以初始投资人身份出资，出资额尚未确定；也是明修的创业导师。主导财务、融资、合规、IPO 规划。","lifecycle":"联合创始人 → CFO → IPO 规划","owner":"Eric"},{"id":"p-tianming","type":"person","name":"田明","summary":"联合创始人、产品负责人","desc":"联合创始人兼产品负责人，负责产品定义、场景落地与商业化路径。","lifecycle":"联合创始人 → 产品负责人（全职）","owner":"田明"},{"id":"p-xinting","type":"person","name":"信庭","summary":"联合创始人、算法负责人","desc":"联合创始人兼算法负责人，负责 VLA 模型、TacWM、算法团队与受控对比评测。","lifecycle":"联合创始人 → 算法负责人（全职）","owner":"信庭"},{"id":"p-anson","type":"person","name":"Anson（杜岩松）","summary":"GA（核心主责）+ 产业生态（主牵）+ PR（title 未定）","desc":"核心职责：政府事务（GA，第一主责）——明修确定在模型与第一个 demo 出来之前（最快 3 个月、大概率 6 个月）政府沟通须克制，当前尚不具备与余杭签订合作框架协议的条件，克制期重心是『结构布局』而非『消息面』；产业生态主牵，与产品负责人田明、商务负责人 Tony 在有分工的基础上协同；公共关系（PR）。2026 H2 OKR 四条主线：算力供给保障、数据飞轮加速、资本窗口把握（O1 三位一体政府合作 / O2 产教融合×产业生态 / O3 四位一体 PR / O4 多城博弈×政策智库）。","lifecycle":"分工已明确 → title 待定 → 合伙人定位","owner":"Anson"},{"id":"p-tony","type":"person","name":"邹宇（Tony）","summary":"商务负责人（商务 / BD 主责，title 待定）","desc":"商务负责人：主管商务拓展、客户与产业合作方对接、合同谈判（长虹『框架 MOU → 业务子合同 → 订单附件』三段式结构即由 Tony 与田明共同梳理）。经 Eric 引荐加入；阿里系背景，曾负责阿里巴巴 B2B 与大文娱业务，2019 年从阿里离职。与 Anson（产业生态）、田明（产品）在有分工的基础上协同。","lifecycle":"经 Eric 引荐加入 → 商务负责人（在职）→ title 待定","owner":"Tony"},{"id":"c-changhong","type":"customer","name":"长虹集团","summary":"第一梯队客户+本体+资本多重身份","desc":"高端餐饮明档、酒店客房等场景；同时提供本体躯干定制；0921 细化：长虹机器人为独立公司（约 50–60 人，算法约 10 人、系统工程约 20–30 人，硬件团队七八人、核心骨干来自哈工大），预计 10 月正式独立运作，已放弃自研基础模型；双向甲乙方（我方输出模型推理服务+二次开发服务，并采购其 1000 小时数采数据；本体定制仅收成本价）；交叉持股意愿明确；约五六个月后长虹大型展会拟联合发布。","lifecycle":"MOU 版框架 → 9-07 结构会谈 → 9-21 模式细化 → 数采启动/试点 → 联合发布","tier":"T1"},{"id":"c-haier","type":"customer","name":"海尔卡奥斯","summary":"P0 首选，灯塔工厂+智慧家庭","desc":"灯塔工厂 20 座、智慧家庭、日日顺物流；清华校友通道推进中。","lifecycle":"潜在线索 → 清华通道 → 1页纸传递 → 接触","tier":"P0"},{"id":"c-tourism","type":"customer","name":"西湖/洛阳/四川文旅","summary":"文旅场景（高端餐饮明档）","desc":"文旅集团高端餐饮明档场景，作为餐饮明档首场景之一。","lifecycle":"接触评审 → POC → 签约","tier":"T1"},{"id":"c-wangpin","type":"customer","name":"王品集团","summary":"高端餐饮明档场景","desc":"高端餐饮集团，明档服务场景。","lifecycle":"潜在线索 → 接触 → POC","tier":"T1"},{"id":"c-kaiyuan","type":"customer","name":"开元酒店集团","summary":"酒店客房场景","desc":"开元系酒店，客房服务场景。","lifecycle":"潜在线索 → 接触 → POC","tier":"T1"},{"id":"c-huazhu","type":"customer","name":"华住集团","summary":"酒店客房场景","desc":"华住系酒店，客房送物/清扫场景。","lifecycle":"潜在线索 → 接触 → POC","tier":"T2"},{"id":"c-yatu","type":"customer","name":"亚朵集团","summary":"酒店客房场景","desc":"亚朵系酒店，客房服务场景。","lifecycle":"潜在线索 → 接触 → POC","tier":"T2"},{"id":"c-hku","type":"customer","name":"香港大学","summary":"康复辅助科研场景","desc":"康复辅助科研合作场景，康复辅助第一梯队。","lifecycle":"接触 → POC → 科研合作","tier":"T1"},{"id":"c-zhejiang-hospital","type":"customer","name":"浙江医院/省康复医院","summary":"康复医疗场景","desc":"浙江医院、浙江省康复医院，康复辅助场景。","lifecycle":"接触 → POC → 试点","tier":"T1"},{"id":"c-xiangyu","type":"customer","name":"翔宇医疗","summary":"康复设备场景","desc":"康复设备厂商，康复辅助场景合作。","lifecycle":"接触 → 合作评估","tier":"T1"},{"id":"c-taikang","type":"customer","name":"泰康之家","summary":"养老社区场景","desc":"养老社区（CCRC），养老照护场景；注意红线：早期不碰人体（辅助起床等接触类照护暂缓，康复类可并行）。","lifecycle":"潜在线索 → 接触","tier":"T3"},{"id":"c-mealbox","type":"customer","name":"高铁/飞机餐盒产线","summary":"工业装配·现金流底座","desc":"高铁/飞机餐盒装配产线，现金流底座任务，受控环境中易落地、可复制。","lifecycle":"潜在线索 → 场景验证 → 签约","tier":"P0"},{"id":"c-yunkang","type":"customer","name":"云康集团（02325.HK）","summary":"ICL 独立医学检验·账本1 POC","desc":"港交所 02325 独立医学实验室集团；合作：检测分液、样本转运、病理制片（石蜡切片捞片）、IVD 试剂；三方协议（Pasontech+睦灵+云康）数据所有权归云康，睦灵获训练使用许可。0921：PCR 方向先签数据 MOU 做试点（试点成功先宣发一波），前置算清成本/效率/合规临界账（广州周总观点：国内因合规准入不太可能替代人、机会可能在国外——需以专业量化判断回应）。","lifecycle":"战略MOU → 三方协议 → 数据 MOU 试点（0921） → POC → 扩展","tier":"P0"},{"id":"c-tiansu","type":"customer","name":"天溯检测","summary":"电子电器第三方检测场景","desc":"上市公司（新能源电池/储能检测），拓展车联网/机器人/物联网安全检测；三大自动化环节：仓储搬运、拆包/贴标/调试/拆解（切入）、检测执行；高价值单点：接线/插拔、温度传感器粘贴、充电测试、样品拆解。","lifecycle":"MOU 意向 → 拍场景视频 → 算法评估 → POC","tier":"T1"},{"id":"c-chabaidao","type":"customer","name":"茶百道","summary":"餐饮场景（品牌预算+眼球经济）","desc":"茶饮连锁品牌；走品牌预算+眼球经济逻辑（官方采购设备+提供泡茶机供应链）；经李念渠道对接；前三个月窗口期（本体暂无'转身'能力）。","lifecycle":"渠道对接 → 桌面设备 → 数采/演示","tier":"T1"},{"id":"c-xinxihope","type":"customer","name":"新希望集团","summary":"物业+医疗场景探索（0921 线索）","desc":"0921 会议信息：新希望下了很大决心圈定物业与医疗两个具身智能场景（第二个场景为医院术后器械回收配送，服务性质更高），但人力替代、投入、场景能否持续延展均未验证、其自身也无十足把握；暂缺买单方。潜在线索，观察跟进。","lifecycle":"潜在线索 → 观察跟进","tier":"T3"},{"id":"s-restaurant","type":"scenario","name":"高端餐饮明档","summary":"第一梯队商业服务场景","desc":"高端餐饮明档（王品/文旅/长虹等），人工成本高、动作复杂度适中、数据价值高。","lifecycle":"场景识别 → ROI 排序 → POC → 复制扩张","owner":"田明"},{"id":"s-hotel","type":"scenario","name":"酒店客房服务","summary":"第一梯队商业服务场景","desc":"酒店客房送物/清扫（长虹酒店/华住/亚朵/开元），标准化程度高。","lifecycle":"场景识别 → POC → 复制扩张","owner":"田明"},{"id":"s-rehab","type":"scenario","name":"康复辅助","summary":"第一梯队场景","desc":"康复辅助（港大/浙江医院/翔宇医疗），科研+商业双属性；与 Pasontech 康养线协同。","lifecycle":"科研合作 → POC → 商业化","owner":"田明"},{"id":"s-tourism","type":"scenario","name":"文旅服务","summary":"餐饮明档关联场景","desc":"文旅集团场景（西湖/洛阳/四川文旅）。","lifecycle":"接触 → POC","owner":"Anson"},{"id":"s-industrial","type":"scenario","name":"工业装配","summary":"现金流底座","desc":"高铁/飞机餐盒等产线装配，受控环境、易验收、可复制。","lifecycle":"场景验证 → 规模化","owner":"田明"},{"id":"s-lab","type":"scenario","name":"医学检验/实验室检测（ICL）","summary":"账本1：首个可收费任务（云康 POC）","desc":"ICL 独立医学检验：检测分液、样本转运、病理制片（石蜡切片捞片）、样本分拣、IVD 试剂；12 个月概念验证（三阶段）；设备可经云康渠道采购。","lifecycle":"定义 → 数采 → 训练 → 验收 → 收费","owner":"田明"},{"id":"s-bio","type":"scenario","name":"生物实验/液体检测","summary":"高频重复+长时连轴转切入（0921 调研定调）","desc":"0921 调研结论：实验大类含细胞/动物/病理/核酸/蛋白等，手动操作集中在基础制片、分子生物学操作、基础液体处理与样品制备；任务整体分 9 类（高频重复型、精细耐力型、高压型、长时连轴转型、活体交互型等），当前只能切『高频重复+长时连轴转』湿实验环节（移液加样等核酸实验）；市场机会：传统自动化工作站售价高、每次实验需重调参数、无智能，实验室买回去大量落灰；与云康以数据 MOU 先做试点，前置算账（成本降到什么程度、效率/准确率多高才跑通；对『国内合规走不通』以量化推演回应——如灵巧手 12–18 个月后成本、效率达人的 80%）；账算不通则只当 show，算得通再 all in；『秀』的价值=长时稳定+移液等单一灵巧做到极致证明能力（商誉价值），『卖』的价值=长期订单；需前置定向采集按压/精细操作类预训练数据。","lifecycle":"调研 → 任务梳理（0921 完成 9 类分类） → 前置算账 → 数据 MOU 试点 → POC","owner":"田明"},{"id":"s-logistics","type":"scenario","name":"物流分拣","summary":"双手操作场景","desc":"拆包/扫码/分拣（3分钟 Demo：开袋→取试管→放框→扫码→标签朝上上履带）；拆包约 60 元/30 包；必须双手操作。","lifecycle":"Demo 演示 → 优化 → 落地","owner":"田明"},{"id":"s-detection","type":"scenario","name":"电子电器第三方检测","summary":"天溯检测场景","desc":"检测行业三大环节：仓储搬运（夹爪即可）、拆包/贴标/调试/拆解（需灵巧操作，切入点）、检测执行（AI 合规审查）；高价值单点：接线/插拔测试、温度传感器粘贴、充电测试、样品拆解。","lifecycle":"MOU → 场景视频 → POC","owner":"Anson"},{"id":"s-elderly","type":"scenario","name":"养老照护","summary":"远期场景（含红线）","desc":"Pasontech 三方协议（老人辅助起床/辅助进食/个人护理/移动辅助）；红线：早期不碰人体（直接接触类照护暂缓），康复类可并行（实地考察+书面确认后启动）。","lifecycle":"潜在线索 → 三方协议 → 远期","owner":"Anson"},{"id":"s-home","type":"scenario","name":"家庭服务","summary":"终局场景（24-36M+）","desc":"家庭机器人整机/联合品牌 + 长程技能订阅，终局直指家庭；0921 确认为技术复杂度最高、前景最大的终局参照——已按家庭场景拆出原子技能及其使用频率列表，作为能力地图（锤子）的出发点，从高频动作（抓放/捏/翻等）反向映射商业场景。","lifecycle":"远期布局（能力地图参照系）","owner":"明修"},{"id":"t-mealbox","type":"task","name":"高铁餐盒装配","summary":"现金流底座任务","desc":"餐盒装配（摆盘/封膜/质检），受控环境、任务定义清晰、易验收。","lifecycle":"任务定义 → 数采 → 训练 → 验收 → 收费 → 回流","tier":"P0"},{"id":"t-lab","type":"task","name":"医学检验操作（移液/制片/捞片）","summary":"账本1：首个可收费任务","desc":"检测分液（移液枪预设量程）、样本转运、石蜡切片捞片（成功率≥95%、单片≤30秒、无破损≥98%）、样本分拣（准确率≥99.5%、单管≤8秒）；科研/检测付费意愿强。","lifecycle":"任务定义 → 数采 → 训练 → 验收 → 收费","tier":"P0"},{"id":"t-slice","type":"task","name":"石蜡切片捞片","summary":"云康首个 POC 任务","desc":"病理制片：捞片成功率≥95%、单片≤30秒、无破损≥98%、精度±1mm、连续100片无人工干预（项目实施细则）。","lifecycle":"细则确认 → 数采 → 训练 → 验收","tier":"P0"},{"id":"t-sorting","type":"task","name":"样本分拣","summary":"云康 POC 任务","desc":"样本分拣：准确率≥99.5%、单管≤8秒、连续4小时无故障、500管无差错（项目实施细则）。","lifecycle":"细则确认 → 数采 → 训练 → 验收","tier":"P0"},{"id":"t-hotel-deliver","type":"task","name":"酒店客房送物","summary":"商业服务任务","desc":"客房送物/布草/清扫，酒店场景标准化任务。","lifecycle":"定义 → 数采 → 训练 → 验收 → 收费","tier":"T1"},{"id":"t-rehab-assist","type":"task","name":"康复辅助训练","summary":"康复场景任务","desc":"康复训练辅助（上肢/手部功能训练），科研+商业结合。","lifecycle":"定义 → 数采 → 训练 → 验收","tier":"T1"},{"id":"t-elderly-rise","type":"task","name":"老人辅助起床","summary":"养老 POC（红线任务）","desc":"辅助起床/辅助进食/个人护理/移动辅助；属红线任务：需在伦理/安全边界内推进，早期以不碰人体的康复类任务先行。","lifecycle":"三方协议 → 试点评估","tier":"T3"},{"id":"t-detect","type":"task","name":"检测执行（温度粘贴/充电/拆解）","summary":"电子电器检测任务","desc":"接线/插拔测试、温度传感器粘贴（502胶）、充电测试操作、样品拆解；高价值单点场景，需灵巧操作。","lifecycle":"场景视频 → 评估 → POC","tier":"T1"},{"id":"t-dining","type":"task","name":"明档餐饮服务","summary":"餐饮场景任务","desc":"明档出餐/摆盘/收台，餐饮明档场景任务；茶百道走品牌预算+眼球经济。","lifecycle":"定义 → 数采 → 训练 → 验收","tier":"T2"},{"id":"t-future","type":"task","name":"危险环境作业/太空操作","summary":"远期任务","desc":"危险环境特种作业、太空/商业航天操作等远期高价值任务；0921：商业航天与生物、养老并列为有进入门槛的目标行业——不能停留在嘴巴上说，要能回答『机器人发到太空会有什么问题、怎么解决、第一个客户站出来时要什么能力』。","lifecycle":"远期规划","tier":"T4"},{"id":"d-ego","type":"data","name":"Ego 数据","summary":"第一视角操作数据（入口）","desc":"Ego 数据采集装置（手套+App+时间同步）采集第一视角操作数据，是数据入口；需 PIPL 合规；家庭采集漏斗：空镜约 50 元/户筛选，留存用户按小时付费持续采集操作数据。","lifecycle":"采集 → 清洗标注 → 入库 → 训练使用 → 回流更新","tier":"P0"},{"id":"d-sim","type":"data","name":"仿真数据","summary":"低成本大规模数据","desc":"仿真环境生成的数据，用于预训练与泛化，与真机数据 sim/real 同源约束。","lifecycle":"生成 → 校验 → 入库 → 训练","tier":"P1"},{"id":"d-real","type":"data","name":"真机数据","summary":"高价值数据（权属双模式）","desc":"真实场景机器人执行数据。模式A：普通客户场景，所有权归客户，RoboX 拥有模型训练使用权；模式B（三方协议，如云康/养老）：数据所有权归场景方（丙方），甲方/乙方获训练使用许可，不得转让原始数据。","lifecycle":"采集 → 清洗标注 → 入库 → 训练 → 回流","tier":"P0"},{"id":"d-tactile","type":"data","name":"触觉数据","summary":"差异化护城河数据","desc":"通过触觉手套/灵巧手采集的触觉数据，TacWM 的核心原料，行业稀缺。","lifecycle":"采集 → 标注 → 训练","tier":"P0"},{"id":"d-pool","type":"data","name":"数据金字塔（百万级小时）","summary":"规模壁垒：10万→100万→1000万小时","desc":"人类操作数据规模壁垒；无本体数据采集至少百万级小时，不能仅依赖真机数据（'小孩先看仿真、再看真实世界'）；异构训练、每场景 20 小时离散采集。","lifecycle":"10万 → 100万 → 1000万小时","tier":"P0"},{"id":"t-system2","type":"tech","name":"System 2 · RX-Brain（自主推理）","summary":"任务分解与长程进化（对外开源名 Thinker）","desc":"System 2/1/0 三层同源架构：System 0 闭环物理稳定（类比小脑）、System 1 端侧灵巧操作（视觉+无本体数据学习）、System 2 自主推理与长程任务进化；三层数据蒸馏；对外口径 122B 千亿参数、英伟达官方报告全球前三、领先约 3-5 个月。0921：对外开源发布名 Thinker（与 Actor 并列双模型，2026-11 底开源）；发布主打能力点 zero-shot 泛化/跨本体与长程任务，对标 GPT-6（10T 级）与 Gemini Robotics——以显著更小尺寸（如 500B）达到相当物理 AI 效果即为『物理 AI 更强』的证明；长程任务量化指标看成功率、progress、可完成不重复子任务数，展示自主规划动态思考过程。","lifecycle":"研发 → 评测 → 2026-11 底开源 → 迭代","owner":"信庭"},{"id":"t-tacwm","type":"tech","name":"System 1 · TacWM（触觉世界模型）","summary":"核心护城河","desc":"触觉世界模型：无视觉条件下仅靠触觉旋转苹果；煎牛排用'视觉+触觉+时间'三因子判断熟度；sim/real 同源约束、latent state 压缩、跨模型 Dynamics 共享。","lifecycle":"研发 → PCT 专利 → 迭代","owner":"信庭"},{"id":"t-wtam","type":"tech","name":"System 1 · WTAM（触觉增强动作模型）","summary":"动作生成","desc":"跨模态骨干 + 动作专家架构、候选动作块生成，与 TacWM 形成组合专利墙。","lifecycle":"研发 → 迭代","owner":"信庭"},{"id":"t-motion","type":"tech","name":"System 0 · RX-Motion（运动基础模型）","summary":"跨本体运动控制","desc":"跨本体运动基础模型、motion tracking 数据生成方法，从大动作到精细运动可 Scaling。","lifecycle":"研发 → 迭代","owner":"信庭"},{"id":"t-uas","type":"tech","name":"Unified Action Space（统一动作空间）","summary":"最独特差异化：跨本体输出","desc":"跨本体（人形/双臂/灵巧手）统一动作表征方法与 latent space 交互协议，是『机器人界的 ARM/Windows』关键。","lifecycle":"研发 → 专利 → 授权","owner":"信庭"},{"id":"t-vla","type":"tech","name":"RynnBrain-VLA（VLA 模型）","summary":"91.7% vs GR00T 73.3% / π0.5 65%","desc":"VLA 端到端模型，受控对比 91.7% 成功率，跨本体统一动作空间输出；异构训练（不同手/臂/躯干架构）泛化反而更快；0921：灵巧操作侧对外开源名 Actor（与 Thinker 并列，2026-11 底开源），以 PCR 等场景验证灵巧操作能力。","lifecycle":"评测 → 迭代 → 2026-11 底开源","owner":"信庭"},{"id":"t-opensource","type":"tech","name":"Thinker + Actor 双模型开源（2026-11 底）","summary":"11 月底开源发布：物理 AI 基础模型宣发锚点","desc":"0921 战略会定调的近期最大时间锚点：11 月底开源 Thinker（自主推理/规划：zero-shot 泛化、跨本体、长程任务）+ Actor（灵巧操作）双模型。三大发布能力点：① zero-shot 泛化/跨本体（未见本体+未见物体即插即跑，多本体部署）；② 长程任务（连续不重复子任务、自主规划过程可视化）；③ 灵巧操作（PCR 等场景验证）。配套前置：10 月底线上可体验模型服务部署上线、下一代模型出结论；工区高成功率真机 demo（非拍视频，10 次成功 1 次不行）；宣发（公众号/视频/技术访谈）前置准备；模型服务可长期挂在线上接受挑战（对标 GPT-6/Gemini Robotics）；节奏向后：CES（2027-01）与明年 WRC 参展评估，长虹大型展会（约五六个月后）联合发布。","lifecycle":"研发 → 10 月底模型结论 → 10 月底线上服务 → 11 月底开源+宣发","owner":"信庭"},{"id":"t-hw","type":"tech","name":"FOC 驱动器 + 低反向间隙减速器","summary":"触觉末端模组（软硬一体）","desc":"灵巧手 FOC 驱动器、低反向间隙减速器，硬件工艺以商业秘密保护。","lifecycle":"研发 → 模组化","owner":"田明"},{"id":"h-hand","type":"hardware","name":"灵巧手（舞肌5G/Sharpa）","summary":"触觉末端供应商","desc":"舞肌（深圳）、Sharpa（新加坡华人创办）使用效果好，天机的臂；按睦灵要求调整产品（'他们只做手、模型不行'）；舞肌 5G 灵巧手设备调整中。","lifecycle":"供应商评估 → 定制协同","tier":"P0"},{"id":"h-glove","type":"hardware","name":"触觉手套（举桥/巨桥等送测）","summary":"触觉数据采集","desc":"举桥/巨桥等多家送测（优先柔性压电/压阻材料）；举桥可定制舞肌 5G 版本；用于触觉数据采集。","lifecycle":"送测 → 选型 → 定制","tier":"P0"},{"id":"h-humanoid","type":"hardware","name":"人形本体（无极+天机）","summary":"上游本体","desc":"本体选型'无极（公司待核实）＋天机'，先交押金暂不交付，视产品确认再定；双臂搭建优于单臂。","lifecycle":"选型（押金） → 适配","tier":"P1"},{"id":"h-arms","type":"hardware","name":"双臂（天机）","summary":"上游双臂","desc":"天机双臂（广东天机智能系统有限公司，长盈精密旗下/孵化），双臂操作本体；双臂优于单臂。","lifecycle":"选型 → 适配","tier":"P1"},{"id":"h-chassis","type":"hardware","name":"本体躯干定制（长虹）","summary":"定制本体","desc":"长虹提供本体躯干定制（含腰部自由度改装，仅分摊人力成本+硬件原料成本、不赚加价，因基线版本需与我方高度重合贴着走；对比蓝思等代工厂定制需另收研发费用）；手部不在长虹，交由舞肌等专业伙伴；商业化需求已提交其硬件团队（七八人、核心骨干来自哈工大）；腰部自由度改装目标客户持续挖掘（已有高校教授在接触）。","lifecycle":"需求提交 → 联合开发 → 量产","tier":"T1"},{"id":"h-ego","type":"hardware","name":"Ego 数据采集装置（自研）","summary":"数据入口硬件·产品化","desc":"自研手套+App+时间同步的 Ego 采集装置；产品化销售（长虹方反馈希望 RoboX 直接把数采设备产品化销售，很多设备长虹生产不了）；家庭采集漏斗（空镜 50 元/户→操作按小时付费）。","lifecycle":"自研 → 产品化 → 对外销售/租赁","tier":"P0"},{"id":"h-data-device","type":"hardware","name":"无本体数采装置","summary":"数采产品线（含无本体）","desc":"无本体数采装置：RoboX 定义产品方案→产品化→销售给长虹/云康等；联合推进规模化采集并拓展后续商机，形成商业化分润。0921：无本体头戴式数采 2026-09-21 第一批启动（验证产能与价格），真机数采装置推进中；数据先采后卖给长虹；PCR 场景定向预训练数据（按压、精细操作类任务）需求前置提出，大规模采集时间点与小时数由算法侧定后拆解到人。","lifecycle":"方案定义 → 产品化 → 0921 首批采集启动 → 销售 → 数据分润","tier":"P0"},{"id":"k-changhong","type":"partner","name":"长虹集团","summary":"多角色深度合作（数采产能/场景/本体/集成）","desc":"跨四类角色（roles: collect/scene/body/channel）：①数采产能：省级数采场+无本体头戴式数采（2026-09-21 第一批启动）+第一阶段 1000 小时真机数采供应；②本体与工程化：躯干定制（含腰部自由度改装，仅收成本价；手不在此，交由舞肌等专业伙伴）、数采装置工程化/量产；③场景：餐饮/酒店等应用场景联合开发与商业化（其产品团队缺自驱挖掘场景能力，需我方共同看场景）；④渠道/集成：作为下游集成商调用我方模型服务（推理服务+二次开发）完成场景交付，我方可外包的工程化尽量打包给其承接，能力收口在标准化模型服务；资本侧交叉持股/SPV 由长虹申万承接（另见 k-changhong-shenwan）。长虹机器人独立公司约 50–60 人（算法约 10 人、系统工程约 20–30 人），预计 10 月正式独立运作，已放弃自研基础模型（判断西南地区不会被认可做基础大模型公司）；约五六个月后大型展会拟与我方联合发布。","lifecycle":"MOU版 → 六专项起草 → 9-07 结构会谈 → 9-21 模式细化 → 数采启动 → 联合发布","tier":"T1","stage":"合作协议","roles":["collect","scene","body","channel"],"bodySub":["整机","数采装置"]},{"id":"k-changhong-shenwan","type":"partner","name":"长虹申万","summary":"长虹体系产业资本（交叉持股/SPV 候选）","desc":"长虹×申万宏源背景的产业资本，RoboX 产业资本交叉持股 / SPV 合资首选通道；0921 生态图谱调整后列产业资本首位（承接原长虹集团资本角色）；与长虹集团（k-changhong）同一体系、绑定场景与订单。","lifecycle":"对接 → 交叉持股/SPV 谈判","tier":"P1","roles":["capital"]},{"id":"k-xinxihope","type":"partner","name":"新希望集团","summary":"产业资本候选（物业+医疗场景探索）","desc":"0921 列入产业资本候选；集团下大决心圈定物业与医疗两个具身智能场景（医院术后器械回收配送等），但人力替代、投入、场景延展均未验证，暂缺买单方——先以资本与场景双线观察跟进（客户视角详见 c-xinxihope）。","lifecycle":"潜在线索 → 观察跟进","tier":"T3","roles":["capital"]},{"id":"k-xinxihope-robot","type":"partner","name":"新希望机器人（银行柜台）","summary":"银行柜台场景候选","desc":"新希望体系机器人业务，银行柜台场景候选（柜面业务办理/递送协作）；依托新希望金融科技渠道，0921 纳入生态图谱场景部署观察。","lifecycle":"潜在线索 → 观察跟进","tier":"T3","stage":"洽谈","roles":["scene"]},{"id":"k-luobo","type":"partner","name":"成都高新区萝卜外卖","summary":"无人配送外卖场景候选","desc":"成都高新区牵线的萝卜外卖（无人配送）场景，餐饮外卖末端配送候选；与高新区 GA 资源联动。","lifecycle":"潜在线索 → 观察跟进","tier":"T3","stage":"洽谈","roles":["scene"]},{"id":"k-haier","type":"partner","name":"海尔卡奥斯","summary":"P0 首选合作方（场景）","desc":"灯塔工厂、智慧家庭、日日顺物流三大场景入口；海尔智家 2026H1 机器人事件驱动（26.7%/28.8%）；策略：数据价值先于模型价值、生态让利换取数据、防海尔自研；P0 首选（梯队评分 4.6/5），清华校友通道推进。0921 生态图谱调整：不再列入数据采集与产业资本角色。","lifecycle":"接触 → 1页纸 → 合作评估 → 灯塔工厂POC","tier":"P0","stage":"洽谈","roles":["scene"]},{"id":"k-midea","type":"partner","name":"美的/库卡","summary":"P1 合作方（场景+本体）","desc":"家电+机器人本体（库卡）+灯塔工厂；P1 梯队（评分 4.2/5）；可承接部分本体制造（针对长虹产能缺口）。0921 生态图谱调整：不再列入数据采集角色。","lifecycle":"接触 → 1页纸","tier":"P1","stage":"洽谈","roles":["scene","body"],"bodySub":["机械臂"]},{"id":"k-xinsong","type":"partner","name":"新松机器人","summary":"P1 合作方（工业场景+本体）","desc":"工业机器人本体厂商+制造能力；P1 梯队（评分 4.0/5）；本体/制造侧补充候选。","lifecycle":"接触","tier":"P1","stage":"洽谈","roles":["body","scene"],"bodySub":["整机"]},{"id":"k-unitree","type":"partner","name":"宇树科技","summary":"本体+灵巧手全栈（杭州本土）","desc":"调研 ★★★★☆（4.5/5）：Unitree 本体+自研灵巧手（Dex 系列），杭州本土、拟科创板；本体侧生态合作与竞对跟踪双重视角。","lifecycle":"调研 → 接触","tier":"P2","roles":["body"],"bodySub":["整机"]},{"id":"k-ubtech","type":"partner","name":"优必选","summary":"人形本体+五指灵巧手","desc":"调研 ★★★★☆（4.5/5）：Walker 人形本体+第三代五指灵巧手；服务机器人场景先行；本体候选与竞对观察。0921：明修建议团队多与优必选交流——最早做机器人出海的公司，至今仍困于稳定性（人工干预小时数不达标），其拆垛/上下料为行业参照；『人工干预小时数』（多少小时无需人工介入一次，如 10 小时）是真正落地替代岗位的关键指标。","lifecycle":"调研 → 接触（0921 建议多交流）","tier":"P2","roles":["body"],"bodySub":["整机"]},{"id":"k-zhiyuan","type":"partner","name":"智元（临港/上海）","summary":"人形本体+OmniHand 灵巧手","desc":"调研 ★★★（3/5）：本体+OmniHand3 灵巧手；本体竞合观察。","lifecycle":"调研","tier":"P3","roles":["body"],"bodySub":["整机"]},{"id":"k-wuji","type":"partner","name":"舞肌（深圳）","summary":"灵巧手主供（送测/定制协同）","desc":"深圳灵巧手厂商，使用效果好；按睦灵要求调整产品（'只做手、模型不行'）；舞肌 5G 灵巧手设备调整中；可定制配合。","lifecycle":"送测 → 定制协同","tier":"P0","roles":["body"],"bodySub":["灵巧手"]},{"id":"k-sharpa","type":"partner","name":"Sharpa","summary":"灵巧手供应商（新加坡华人创办）","desc":"新加坡华人创办的灵巧手公司；与舞肌并列效果好；上游部件供给+定制协同。","lifecycle":"供应商评估 → 定制协同","tier":"P0","roles":["body"],"bodySub":["灵巧手"]},{"id":"k-tianji","type":"partner","name":"天机（广东天机智能）","summary":"机械臂/双臂供应商（长盈精密旗下）","desc":"广东天机智能系统有限公司（曾用名广东天机工业智能系统有限公司，2015 年成立，法定代表人陈曦），上市公司长盈精密孵化/旗下（公开报道持股约 40%）；主营工业机器人/机械臂（SCARA、六轴等）并切入具身智能本体，2026 年融资密集、媒体报道估值上百亿。睦灵机械臂/双臂供应商，常与舞肌 5G 手组合使用（'天机5G'=天机臂+舞肌5G手）；百亿估值本体厂，需以模型能力深度绑定、防其自研大脑。","lifecycle":"选型 → 适配 → 定制协同","tier":"P0","roles":["body"],"bodySub":["机械臂"]},{"id":"k-juqiao","type":"partner","name":"举桥（触觉手套）","summary":"触觉手套送测供应商","desc":"柔性触觉手套供应商（与巨桥等多家送测，优先柔性压电/压阻材料）；可定制舞肌 5G 版本；用于触觉数据采集。","lifecycle":"送测 → 选型 → 定制","tier":"P0","roles":["body"],"bodySub":["数采装置"]},{"id":"k-linker-hand","type":"partner","name":"灵心巧手","summary":"灵巧手调研 ★★★★★（不自研硬件首选）","desc":"调研 ★★★★★（5/5）：全球高自由度灵巧手龙头、份额约80%、拟港股；'手+脑'不自研硬件路线首选（TacWM+VLA 组合）。","lifecycle":"调研 → 送测候选","tier":"P1","roles":["body"],"bodySub":["灵巧手"]},{"id":"k-junsheng","type":"partner","name":"均胜电子","summary":"灵巧手调研 ★★★★★（理念最契合）","desc":"调研 ★★★★★（5/5）：TeleHand+自研 VTLA 架构+触觉传感（浙江企业）；端侧一体化理念与睦灵最契合，重点送测候选。","lifecycle":"调研 → 送测候选","tier":"P1","roles":["body"],"bodySub":["灵巧手"]},{"id":"k-fulai","type":"partner","name":"福莱新材","summary":"电子皮肤调研 ★★★★★（触觉互补）","desc":"调研 ★★★★★（5/5）：电子皮肤已批量供货、英伟达首家触觉仿真（JetTouch）伙伴；与 TacWM 触觉数据链直接互补。","lifecycle":"调研 → 接触","tier":"P1","roles":["body"],"bodySub":["灵巧手"]},{"id":"k-keli","type":"partner","name":"柯力传感","summary":"力觉传感调研 ★★★★☆","desc":"调研 ★★★★☆（4.5/5）：六维力/力觉传感器，已送样 50+ 客户；触觉（力觉）传感上游候选。","lifecycle":"调研 → 送测","tier":"P1","roles":["body"],"bodySub":["灵巧手"]},{"id":"k-aliyun","type":"partner","name":"阿里云","summary":"算力主供（单一供应商+单一物理集群策略）","desc":"阿里云（6折）为算力主供。供给策略（信庭判断、明修认同）：优先单一一家供应商、所有卡置于同一物理集群——避免维护多套基础设施与数据来回倒腾，且只有同集群才能支撑更大规模训练，即使阿里云提供跨区域 H100 资源也不易接受；待第二个 demo 跑通后再引入其他供应商以分散供应风险。当前卡点：内网共享出口约 200M，数据量至少需 10 倍，约 200 个数据集待上线，下载一批需 7-8 天；计费按量改包干评估中。","lifecycle":"采购 → 调度 → 扩容（单供应商）→ 第二 demo 后多供应商分散","tier":"P0","roles":["compute"]},{"id":"k-compute","type":"partner","name":"各地公共算力平台","summary":"算力补充（算力券/训力补贴）","desc":"各地公共算力平台（深圳罗湖算力券/训力补贴、合肥算力券等政府侧资源），作为阿里云之外的算力补充；首年需 ≥1000 卡，H200/B30 白名单是当前瓶颈。","lifecycle":"政策对接 → 按需接入","tier":"P1","roles":["compute"]},{"id":"k-university","type":"partner","name":"高校产教融合（浙大/杭电/燕山大学）","summary":"人才+科研（生态图谱暂不展示）","desc":"浙大、杭电、燕山大学深圳研究院等产教融合，人才供给与科研合作；OKR：≥2 所高校、≥20 人数采人力池、≥1 个真机数采基地。0921 生态图谱调整：「高校与人才」角色暂时空缺不显示，落地后恢复。","lifecycle":"合作 → 订单/人才","tier":"P1"},{"id":"k-pasontech","type":"partner","name":"Pasontech HK（香港）","summary":"生命健康/资本网络（MOU 0831 版）","desc":"战略合作 MOU（0831 版推进中）：概念验证（实验室检测先行、康养养老跟进，约12个月）→ 香港联合研究院 → 商业化与全球化（养护机器人公司）；'三层绑定'：场景绑定+IP 绑定+数据绑定；健康产业资本与港资渠道。0921 生态图谱调整：不再列入产业资本角色（资本网络价值保留在场景线）。","lifecycle":"MOU 0831 → 概念验证 → 香港研究院 → 全球化","tier":"P0","stage":"MOU","roles":["scene"]},{"id":"k-yunkang","type":"partner","name":"云康集团（02325.HK）","summary":"ICL 场景方·三方协议","desc":"独立医学实验室集团；三方协议（Pasontech+睦灵+云康）：数据所有权归丙方（云康），甲乙获训练使用许可；场景应用方案甲乙共同共有，丙方免费使用权+优先采购权；实验室检测=账本1首个 POC。0921：列入产业资本候选（上市公司产业资本，绑定 ICL 场景与订单）。","lifecycle":"MOU → 三方协议 → POC → 扩展","tier":"P0","stage":"MOU","roles":["scene","collect","capital"]},{"id":"k-tiansu","type":"partner","name":"天溯检测","summary":"检测行业场景方","desc":"上市公司（新能源电池/储能检测）；高价值场地：10米法半电波暗室约 2000 元/小时；电子电器检测三步走：数字化→智能化→机器人（黑灯实验室）；路径：客户拍场景视频→算法评估适配性与周期→POC 放杭州；集成商东昇射频/星汇智云补工程化；送测候选含宇树等。","lifecycle":"MOU 意向 → 场景视频 → POC","tier":"T1","stage":"洽谈","roles":["scene"]},{"id":"k-xiaoye","type":"partner","name":"小野轻煮","summary":"复合调味料品牌（张不等），炸鸡裹粉联名耗材入口","desc":"张不等（花名『不等』）旗下复合调味料品牌，疫情年成立，国内新锐复合调味料赛道数一数二（公司规模约 5 亿，天妇罗粉全国第一）；母体另有蟹主题品牌『不等』（蟹黄面等，全球第一），并长期做预制菜与调味料。09-11 炸鸡场景会谈：现场提出由小野出『炸鸡裹粉 / 炸鸡蘸料』联名 SKU，把机器人后厨当作耗材复购入口 —— 单品牌单月可拉 1,600 万量级。对应评估结论：付费方优先级 品牌方 ≥ 连锁总部 > 单店，本场景宜走 P1 试点轨（数据 / 标杆 / 渠道），详见《炸鸡场景_一页版》。","lifecycle":"接触（09-11） → 洽谈 → 战略合作 → 样板店 POC","tier":"T1","stage":"洽谈","roles":["scene"]},{"id":"k-dongsheng","type":"partner","name":"东昇射频 / 星汇智云（集成商）","summary":"检测实验室数字化 + 机器人黑灯实验室（原东昇射频）","desc":"星汇智云科技（深圳）集团（2017 年成立）旗下『东昇射频』品牌（深圳东昇射频技术有限公司，2013 年成立，国家高新技术企业）：做 EMC/RF 自动化检测系统 + TS+ 智慧实验室平台，并已布局机器人应用（机器人黑灯实验室/值守实验室：搬样/接待/setup 测试/协助测试）；客户含华为/中兴/OPPO/VIVO/小米及华测检测、赛宝、泰尔实验室、广电计量、SGS/UL/TUV 等检测认证机构（官网列 21 家合作品牌、覆盖上千家实验室）。由天溯检测李德健引荐；定位检测赛道集成+渠道入口，补 RoboX 工程化能力（'华为的硬件能力很强，我们的模型能力很强'）。来源：tonscend.com。","lifecycle":"引荐 → 联合方案 → 检测黑灯实验室 POC","tier":"T1","roles":["channel"]},{"id":"g-yuhang","type":"gov","name":"杭州余杭","summary":"办公载体+未来产业先导区","desc":"未科阿里中心办公载体、一事一议、领军人才、AI 首试首用、算力券；未来产业先导区。节奏：模型与第一个 demo 出来前（最快 3 个月、大概率 6 个月）沟通克制，当前尚不具备签订合作框架协议的条件。","lifecycle":"谈判（克制期） → 落地","tier":"P1"},{"id":"g-binjiang","type":"gov","name":"杭州滨江","summary":"国家级具身智能中试基地","desc":"国家级具身智能中试基地，适合中试/数采基地；「以深促杭」谈判筹码。","lifecycle":"谈判","tier":"P1"},{"id":"g-luohu","type":"gov","name":"深圳罗湖","summary":"算力券/训力补贴","desc":"算力券/训力补贴（市区两级各 50%/上限 1000 万）；大湾区供应链协同；润讯低成本技术人员、燕山大学深圳研究院已迁罗湖（Anson 统筹）。","lifecycle":"谈判","tier":"P1"},{"id":"g-qingdao","type":"gov","name":"青岛/山东","summary":"数采基地+政府出资买设备","desc":"数采基地，政府出资购买设备；数据集团协同。","lifecycle":"谈判","tier":"P1"},{"id":"g-chengdu","type":"gov","name":"成都高新区","summary":"3600亿产业基金","desc":"成都高新区 3600 亿产业基金，产业生态资源。","lifecycle":"对接","tier":"P2"},{"id":"g-hefei","type":"gov","name":"合肥高新区","summary":"领军人才+一事一议+研发用地","desc":"领军人才认定、一事一议启动资金（3000万）、研发用地（高新区）、合肥国资酒店/会展首试首用。","lifecycle":"周二会议 → 落地","tier":"P0"},{"id":"g-shanghai","type":"gov","name":"上海（国地中心1+N）","summary":"标准话语权","desc":"国地中心 1+N 体系，标准话语权。","lifecycle":"对接","tier":"P2"},{"id":"g-wuxi","type":"gov","name":"无锡","summary":"工业场景+数据集团","desc":"工业场景、数据集团资源。","lifecycle":"对接","tier":"P3"},{"id":"v-cdh","type":"capital","name":"鼎晖投资","summary":"天使轮领投（TS 已签）","desc":"鼎晖 TS 已签署（8000万）；第一轮投后估值约 20 亿元（8 月即将关闭）；第二轮目标估值约 40 亿元；过桥贷款 500-1000 万可谈。","lifecycle":"TS → 尽调 → SPA/SHA → 交割","tier":"P0"},{"id":"v-hangshi","type":"capital","name":"杭实/杭开（国资）","summary":"预付款/投资意向金","desc":"杭州国资，可谈投资意向金或项目启动款。","lifecycle":"接触 → 投资意向金","tier":"P1"},{"id":"v-ali","type":"capital","name":"阿里系基金","summary":"生态资本","desc":"阿里战投/云锋等阿里系基金，生态协同。","lifecycle":"对接中","tier":"P2"},{"id":"v-industry","type":"capital","name":"产业资本（长虹申万/新希望/云康）","summary":"交叉持股","desc":"长虹申万、新希望、云康等产业资本交叉持股候选，绑定场景与订单（0921 生态图谱调整后名单）。","lifecycle":"交叉持股谈判","tier":"P1"},{"id":"v-others","type":"capital","name":"中金/东方嘉富等","summary":"投资人对接中","desc":"中金、东方嘉富等机构对接中（OKR 路演）；FA（光源/泰合/指数）可拓展红杉/高瓴/蓝驰/深创投/合肥国资。","lifecycle":"对接中","tier":"P2"},{"id":"ct-ts","type":"contract","name":"天使轮 TS（鼎晖）","summary":"融资起点","desc":"鼎晖天使轮 TS，8000 万，第一轮投后估值约 20 亿元（8 月即将关闭）；第二轮目标 40 亿元；交割预期 2026Q4。","lifecycle":"TS → 尽调 → SPA → 交割","tier":"P0"},{"id":"ct-spa","type":"contract","name":"SPA/SHA（股东协议）","summary":"交割核心文件","desc":"含反稀释、优先权、董事会席位（建议3席）、创始人 vesting（4年+1年cliff）、ESOP 10-15%。","lifecycle":"谈判 → 签署 → 交割","tier":"P0"},{"id":"ct-changhong","type":"contract","name":"长虹战略合作框架（MOU版）","summary":"场景+本体+资本框架","desc":"睦灵×长虹 MOU 版：双向甲乙方（数采服务采购+本体/零部件/模型采购）+数采装置产品化销售+数据采购对冲+分润触发条件（数据对外商业化时）；餐饮/酒店场景+本体定制+交叉持股意向；0921 细化交易链路：我方输出模型大脑服务（推理服务+二次开发服务）→ 长虹买真机回去采数据 → 数据再卖给我方（真机订单+数采装置订单+模型服务，最后一起算总账，对方不以赚钱为目的）；本体躯干/腰部自由度定制仅收成本价。","lifecycle":"MOU版 → 具体协议 → 9-21 交易链路细化 → 试点 → 深化","tier":"T1"},{"id":"ct-yunkang","type":"contract","name":"云康战略合作 MOU","summary":"ICL 场景入口","desc":"睦灵科技与云康集团战略合作 MOU：检测分液/样本转运/病理制片/IVD 试剂；12 个月概念验证三阶段；乙方出实验场地+模型+本体，甲方出设备租赁+专业 SOP+场景专家。","lifecycle":"MOU → 三方协议 → POC","tier":"P0"},{"id":"ct-pasontech","type":"contract","name":"Pasontech 战略合作 MOU","summary":"香港生命健康入口","desc":"Pasontech HK×睦灵科技：交流互训→概念验证（实验室先行、康养跟进，12个月）→香港联合研究院→商业化与全球化（养护机器人公司）。","lifecycle":"MOU → 概念验证 → 研究院","tier":"P0"},{"id":"ct-tri-lab","type":"contract","name":"实验室检测三方协议","summary":"Pasontech+睦灵+云康","desc":"底层技术改进归乙方（睦灵），甲方获生命健康领域独家使用权；场景应用方案甲乙共同共有，丙方免费使用权+优先采购权；数据所有权归丙方（云康），甲乙获训练使用许可；验收标准双方共同制定、乙方牵头。","lifecycle":"谈判 → 签署 → POC","tier":"P0"},{"id":"ct-tri-elderly","type":"contract","name":"养老场景三方协议","summary":"Pasontech+睦灵+养老机构","desc":"老人辅助起床/进食/个人护理/移动辅助；数据所有权归丙方（养老机构）；红线：早期不碰人体，需伦理/安全边界确认。","lifecycle":"谈判中（红线评估）","tier":"T3"},{"id":"ct-tiansu","type":"contract","name":"天溯检测 MOU 意向","summary":"检测行业入口","desc":"以 MOU 意向（无法律约束）启动：客户拍场景视频→算法团队评估适配性与研发周期→POC 放杭州；集成商东昇射频/星汇智云补工程化。","lifecycle":"MOU 意向 → 场景视频 → POC","tier":"T1"},{"id":"ct-poc","type":"contract","name":"POC 试点合同","summary":"场景落地抓手","desc":"与场景客户签 POC 试点合同，作为 LOI/订单转化的前站。","lifecycle":"LOI → POC → 订单","tier":"P0"},{"id":"ct-loi","type":"contract","name":"客户意向书（LOI）","summary":"尽调/谈判筹码","desc":"至少准备 2-3 份场景合作 LOI（酒店/餐饮/零售）。","lifecycle":"意向 → 正式","tier":"P0"},{"id":"ct-data","type":"contract","name":"数据采集/使用权协议","summary":"数据权属锚点","desc":"权属双模式：模式A 真机数据所有权归客户、训练使用权归 RoboX；模式B 三方协议数据所有权归场景方、甲乙获训练使用许可（禁转售/自训）；PIPL 合规。","lifecycle":"采集前签署","tier":"P0"},{"id":"ct-escrow","type":"contract","name":"代持/一致行动/ESOP 文件","summary":"股权架构文件","desc":"代持还原（张周东）、一致行动协议、投票权委托、员工期权池（持股平台有限合伙）。","lifecycle":"交割前完成","tier":"P0"},{"id":"pl-base","type":"carrier","name":"数据采集中试基地","summary":"数采核心载体","desc":"500-1000㎡，遥操作工位 20-30，承载 Ego/真机数采与中试；与政府合建方向（青岛/滨江）；OKR：≥1 个真机数采基地（5-10 套本体）。","lifecycle":"选址 → 建设 → 运营","tier":"P0"},{"id":"pl-office","type":"carrier","name":"研发办公场地","summary":"办公载体","desc":"杭州余杭（未科阿里中心）、合肥高新区、深圳南山三城比选。","lifecycle":"比选 → 落地","tier":"P1"},{"id":"pl-esp","type":"carrier","name":"持股平台（有限合伙）","summary":"ESOP 载体","desc":"员工期权池持股平台，10-15% 预留。","lifecycle":"SPA 前设立","tier":"P0"},{"id":"pl-hk-institute","type":"carrier","name":"香港联合研究院（远期）","summary":"生命健康+具身智能","desc":"与 Pasontech 共建：生命健康+具身智能联合研究院（概念验证后启动）；为出海/全球化铺路。","lifecycle":"概念验证后启动","tier":"P2"},{"id":"std-cp","type":"standard","name":"维塔 CP 协议","summary":"任务验收标准","desc":"任务验收标准/协作协议，定义『可验收任务结果』，是卖结果模式的商业锚点。","lifecycle":"定义 → 行业标准","tier":"P0"},{"id":"std-accept","type":"standard","name":"任务验收标准体系","summary":"按结果付费的前提","desc":"每个任务明确验收标准（任务定义 → 验收条件 → 按结果付费），避免『为 Demo 买单』；三方协议验收标准'双方共同制定、乙方牵头'。","lifecycle":"按任务定义","tier":"P0"},{"id":"std-trademark","type":"standard","name":"ROBOX 商标（42/7/9/35类）","summary":"品牌风险项","desc":"第42类奇瑞已注册（致命）、第7类华夏天合已注册、第35类可抢注；对外启用'睦灵科技'品牌名，备选品牌 Plan B。","lifecycle":"P0 法律意见 → 抢注/撤三 → Plan B","tier":"P0"}],"relations":[{"from":"p-mingxiu","to":"p-eric","label":"创业导师→联合创始人"},{"from":"p-mingxiu","to":"p-tianming","label":"领导"},{"from":"p-mingxiu","to":"p-xinting","label":"领导"},{"from":"p-mingxiu","to":"p-anson","label":"领导"},{"from":"p-mingxiu","to":"p-tony","label":"领导"},{"from":"p-eric","to":"p-tony","label":"引荐加入"},{"from":"p-anson","to":"p-tony","label":"产业生态×商务协同"},{"from":"p-anson","to":"p-tianming","label":"产业生态×产品协同"},{"from":"p-eric","to":"v-cdh","label":"主导融资"},{"from":"p-anson","to":"g-hefei","label":"主攻政府"},{"from":"p-anson","to":"g-yuhang","label":"主攻政府"},{"from":"p-anson","to":"g-luohu","label":"主攻政府"},{"from":"p-anson","to":"k-changhong","label":"产业生态协同"},{"from":"p-anson","to":"k-haier","label":"产业生态协同（清华通道）"},{"from":"p-anson","to":"k-pasontech","label":"产业生态协同"},{"from":"p-anson","to":"k-tiansu","label":"产业生态协同"},{"from":"p-anson","to":"k-xiaoye","label":"产业生态协同"},{"from":"p-tianming","to":"s-restaurant","label":"产品负责"},{"from":"p-tianming","to":"s-hotel","label":"产品负责"},{"from":"p-tianming","to":"s-rehab","label":"产品负责"},{"from":"p-tianming","to":"s-industrial","label":"产品负责"},{"from":"p-tianming","to":"s-lab","label":"产品负责"},{"from":"p-xinting","to":"t-tacwm","label":"算法负责"},{"from":"p-xinting","to":"t-vla","label":"算法负责"},{"from":"p-xinting","to":"t-uas","label":"算法负责"},{"from":"c-changhong","to":"s-restaurant","label":"提供场景"},{"from":"c-changhong","to":"s-hotel","label":"提供场景"},{"from":"c-tourism","to":"s-tourism","label":"提供场景"},{"from":"c-wangpin","to":"s-restaurant","label":"提供场景"},{"from":"c-kaiyuan","to":"s-hotel","label":"提供场景"},{"from":"c-huazhu","to":"s-hotel","label":"提供场景"},{"from":"c-yatu","to":"s-hotel","label":"提供场景"},{"from":"c-hku","to":"s-rehab","label":"提供场景"},{"from":"c-zhejiang-hospital","to":"s-rehab","label":"提供场景"},{"from":"c-xiangyu","to":"s-rehab","label":"提供场景"},{"from":"c-taikang","to":"s-elderly","label":"提供场景"},{"from":"c-mealbox","to":"s-industrial","label":"提供场景"},{"from":"c-yunkang","to":"s-lab","label":"提供场景（ICL）"},{"from":"c-tiansu","to":"s-detection","label":"提供场景"},{"from":"c-chabaidao","to":"s-restaurant","label":"提供场景（茶饮连锁）"},{"from":"s-lab","to":"t-lab","label":"产生任务"},{"from":"s-lab","to":"t-slice","label":"产生任务（捞片）"},{"from":"s-lab","to":"t-sorting","label":"产生任务（分拣）"},{"from":"s-bio","to":"t-lab","label":"产生任务（生物实验）"},{"from":"s-logistics","to":"t-sorting","label":"产生任务"},{"from":"s-detection","to":"t-detect","label":"产生任务"},{"from":"s-elderly","to":"t-elderly-rise","label":"产生任务（红线）"},{"from":"s-industrial","to":"t-mealbox","label":"产生任务"},{"from":"s-hotel","to":"t-hotel-deliver","label":"产生任务"},{"from":"s-rehab","to":"t-rehab-assist","label":"产生任务"},{"from":"s-restaurant","to":"t-dining","label":"产生任务"},{"from":"t-lab","to":"d-real","label":"回流真机数据"},{"from":"t-lab","to":"d-tactile","label":"产生触觉数据"},{"from":"t-slice","to":"d-real","label":"回流真机数据"},{"from":"t-sorting","to":"d-real","label":"回流真机数据"},{"from":"t-detect","to":"d-real","label":"回流真机数据"},{"from":"t-mealbox","to":"d-real","label":"回流真机数据"},{"from":"t-hotel-deliver","to":"d-real","label":"回流真机数据"},{"from":"t-rehab-assist","to":"d-tactile","label":"产生触觉数据"},{"from":"t-lab","to":"std-accept","label":"按验收标准付费"},{"from":"t-mealbox","to":"std-accept","label":"按验收标准付费"},{"from":"d-ego","to":"d-pool","label":"汇聚"},{"from":"d-sim","to":"d-pool","label":"汇聚"},{"from":"d-real","to":"d-pool","label":"汇聚"},{"from":"d-tactile","to":"d-pool","label":"汇聚"},{"from":"d-pool","to":"t-vla","label":"训练"},{"from":"d-pool","to":"t-tacwm","label":"训练"},{"from":"d-tactile","to":"t-tacwm","label":"核心原料"},{"from":"t-tacwm","to":"t-wtam","label":"物理引擎校验"},{"from":"t-system2","to":"t-vla","label":"任务分解→动作生成"},{"from":"t-uas","to":"t-vla","label":"跨本体输出"},{"from":"t-motion","to":"t-uas","label":"运动基础"},{"from":"t-vla","to":"t-lab","label":"驱动任务"},{"from":"t-vla","to":"t-mealbox","label":"驱动任务"},{"from":"t-vla","to":"t-hotel-deliver","label":"驱动任务"},{"from":"t-vla","to":"t-rehab-assist","label":"驱动任务"},{"from":"t-vla","to":"t-detect","label":"驱动任务"},{"from":"h-humanoid","to":"t-hotel-deliver","label":"承载执行"},{"from":"h-arms","to":"t-lab","label":"承载执行"},{"from":"h-chassis","to":"t-mealbox","label":"承载执行"},{"from":"h-hand","to":"t-tacwm","label":"提供触觉末端"},{"from":"h-glove","to":"d-tactile","label":"采集触觉数据"},{"from":"h-ego","to":"d-ego","label":"采集Ego数据"},{"from":"h-data-device","to":"d-ego","label":"采集无本体数据"},{"from":"h-data-device","to":"k-changhong","label":"产品化销售"},{"from":"k-unitree","to":"h-humanoid","label":"本体候选"},{"from":"k-ubtech","to":"h-humanoid","label":"本体候选"},{"from":"k-zhiyuan","to":"h-humanoid","label":"本体候选"},{"from":"k-wuji","to":"h-hand","label":"提供灵巧手（5G 主供）"},{"from":"k-sharpa","to":"h-hand","label":"提供灵巧手"},{"from":"k-tianji","to":"h-arms","label":"提供机械臂（双臂）"},{"from":"k-linker-hand","to":"h-hand","label":"灵巧手送测候选（不自研路线）"},{"from":"k-junsheng","to":"h-hand","label":"灵巧手送测候选（理念契合）"},{"from":"k-juqiao","to":"h-glove","label":"提供触觉手套"},{"from":"k-aliyun","to":"t-vla","label":"提供算力（主供）"},{"from":"k-compute","to":"t-vla","label":"提供算力（补充）"},{"from":"k-changhong","to":"h-chassis","label":"联合开发"},{"from":"k-changhong","to":"c-changhong","label":"客户×合作方一体"},{"from":"k-changhong","to":"d-real","label":"供应 1000 小时真机数采"},{"from":"k-changhong","to":"t-opensource","label":"展会联合发布（意向）"},{"from":"t-opensource","to":"t-system2","label":"Thinker（规划/泛化）"},{"from":"t-opensource","to":"t-vla","label":"Actor（灵巧操作）"},{"from":"c-xinxihope","to":"s-lab","label":"医疗场景探索（观察）"},{"from":"k-university","to":"p-anson","label":"人才/科研"},{"from":"k-pasontech","to":"k-yunkang","label":"三方协议牵头"},{"from":"k-pasontech","to":"pl-hk-institute","label":"共建研究院"},{"from":"k-yunkang","to":"c-yunkang","label":"客户×合作方一体"},{"from":"k-tiansu","to":"c-tiansu","label":"客户×合作方一体"},{"from":"k-dongsheng","to":"k-tiansu","label":"工程化补位"},{"from":"g-hefei","to":"pl-office","label":"研发用地"},{"from":"g-yuhang","to":"pl-office","label":"办公载体"},{"from":"g-luohu","to":"k-compute","label":"算力券/训力补贴"},{"from":"g-hefei","to":"k-compute","label":"算力券"},{"from":"g-qingdao","to":"pl-base","label":"数采基地/出资买设备"},{"from":"g-binjiang","to":"pl-base","label":"中试基地"},{"from":"g-hefei","to":"v-hangshi","label":"一事一议资金"},{"from":"v-cdh","to":"ct-ts","label":"签署"},{"from":"ct-ts","to":"ct-spa","label":"推进"},{"from":"ct-spa","to":"v-cdh","label":"交割"},{"from":"v-industry","to":"k-changhong-shenwan","label":"交叉持股"},{"from":"k-changhong-shenwan","to":"k-changhong","label":"长虹体系资本"},{"from":"k-xinxihope","to":"c-xinxihope","label":"客户×合作方一体"},{"from":"k-xinxihope-robot","to":"k-xinxihope","label":"新希望体系"},{"from":"g-chengdu","to":"k-luobo","label":"GA 牵线场景"},{"from":"v-ali","to":"v-cdh","label":"联合投资候选"},{"from":"v-others","to":"v-cdh","label":"多机构竞价"},{"from":"ct-escrow","to":"ct-spa","label":"交割前置条件"},{"from":"ct-data","to":"d-real","label":"约定权属（双模式）"},{"from":"ct-yunkang","to":"c-yunkang","label":"ICL 入口"},{"from":"ct-pasontech","to":"k-pasontech","label":"战略绑定"},{"from":"ct-tri-lab","to":"k-yunkang","label":"三方权属"},{"from":"ct-tri-elderly","to":"s-elderly","label":"养老入口"},{"from":"ct-tiansu","to":"k-tiansu","label":"MOU 意向"},{"from":"ct-poc","to":"c-mealbox","label":"试点"},{"from":"ct-loi","to":"ct-poc","label":"意向→试点"},{"from":"std-cp","to":"std-accept","label":"总纲"},{"from":"std-trademark","to":"p-mingxiu","label":"品牌风险（P0）"},{"from":"t-lab","to":"t-mealbox","label":"账本1→现金流底座"},{"from":"t-mealbox","to":"t-hotel-deliver","label":"扩围"},{"from":"t-hotel-deliver","to":"s-home","label":"终局迁移"},{"from":"d-pool","to":"s-home","label":"数据反哺"}]};
+const SIZE = 1890;
+const LS_KEY = "robox-eco-edits-v1";
+const ENTITIES = BASE.entities;
+const RELATIONS = BASE.relations;
+const TYPE_COLOR = { customer: "#F28E2B", partner: "#FF9DA7", tech: "#76B7B2", hardware: "#EDC948" };
+
+function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function toast(msg){ var t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._tm); t._tm=setTimeout(function(){t.classList.remove("show");},2200); }
+
+// ===== 在线编辑层（localStorage） =====
+let EDITS = { changes:{}, added:[], removed:[], roleChanges:{} };
+try { var saved = JSON.parse(localStorage.getItem(LS_KEY)); if (saved && typeof saved === "object") EDITS = Object.assign(EDITS, saved); } catch(e){}
+var saveTm = null;
+function persist(){
+  clearTimeout(saveTm);
+  saveTm = setTimeout(function(){
+    localStorage.setItem(LS_KEY, JSON.stringify(EDITS));
+    var s = document.getElementById("saveState");
+    s.classList.add("show"); clearTimeout(s._tm); s._tm = setTimeout(function(){ s.classList.remove("show"); }, 1600);
+  }, 500);
+}
+
+// ===== 视图切换 =====
+document.getElementById("viewTable").addEventListener("click", function(){
+  document.getElementById("tableView").style.display="block";
+  document.getElementById("ringView").style.display="none";
+  this.classList.add("on"); document.getElementById("viewRing").classList.remove("on");
+});
+document.getElementById("viewRing").addEventListener("click", function(){
+  document.getElementById("tableView").style.display="none";
+  document.getElementById("ringView").style.display="block";
+  this.classList.add("on"); document.getElementById("viewTable").classList.remove("on");
+  var box = document.getElementById("map-scroll");
+  var k = Math.min(1, (box.clientWidth - 8) / SIZE);
+  var sv = document.getElementById("eco-svg");
+  sv.setAttribute("width", Math.round(SIZE * k));
+  sv.setAttribute("height", Math.round(SIZE * k));
+});
+
+// ===== 合并：基础数据 + 在线编辑 =====
+function merged(){
+  var removed = EDITS.removed || [];
+  var ents = BASE.entities.filter(function(e){ return removed.indexOf(e.id) < 0; }).map(function(e){
+    var c = EDITS.changes && EDITS.changes[e.id];
+    return c ? Object.assign({}, e, c) : e;
+  }).concat((EDITS.added||[]).map(function(a){ return Object.assign({ type:"partner", lifecycle:"新增（在线）" }, a); }));
+  var exch = {};
+  (BASE.partnerExchanges||[]).forEach(function(x){ exch[x.key]=Object.assign({},x); });
+  Object.keys(EDITS.roleChanges||{}).forEach(function(k){
+    exch[k] = Object.assign(exch[k]||{key:k}, EDITS.roleChanges[k]);
+  });
+  var roleCount = {};
+  ents.forEach(function(e){ (e.roles||[]).forEach(function(r){ roleCount[r]=(roleCount[r]||0)+1; }); });
+  return { entities: ents, exch: exch, roleCount: roleCount };
+}
+
+// ===== 渲染表格 =====
+function stageColor(st){
+  if (/合作协议/.test(st)) return "background:#e2f2e8;color:#1f6b3a";
+  if (/MOU/.test(st)) return "background:#fdf0dd;color:#8f4a12";
+  if (/洽谈|意向/.test(st)) return "background:#e8f0f8;color:#1f4e79";
+  return "background:#eef1f5;color:#666";
+}
+function renderTable(){
+  var M = merged();
+  var dual = {};
+  BASE.relations.forEach(function(r){ if (/客户×合作方一体/.test(r.label)) dual[r.from]=1; });
+  var host = document.getElementById("tableHost");
+  var html = "";
+  BASE.partnerRoles.forEach(function(role, idx){
+    var members = M.entities.filter(function(e){ return e.type==="partner" && (e.roles||[]).indexOf(role.key) >= 0; });
+    if (!members.length) return;
+    var ex = M.exch[role.key] || { give:"—", get:"—" };
+    var showStage = !!role.showStage;
+    var isBody = role.key === "body";
+    var cols = ["成员", "阶段", "梯队", "说明", ""];
+    if (isBody) cols = ["成员", "品类", "阶段", "梯队", "说明", ""];
+
+    html += '<div class="roleBlock">';
+    html += '<div class="roleHead" style="background:' + role.color + '">' +
+      '<span class="no">' + (idx+1) + '</span><span class="nm">' + esc(role.label) + '</span>' +
+      '<span class="cnt">' + members.length + ' 家</span>' +
+      '<span class="dsc">' + esc(role.desc) + '</span></div>';
+    html += '<div class="exchRow">' +
+      '<div class="gv" contenteditable="true" data-rolex="' + role.key + '" data-field="give"><b>睦灵给出 → </b>' + esc(ex.give) + '</div>' +
+      '<div class="gt" contenteditable="true" data-rolex="' + role.key + '" data-field="get"><b>← 睦灵获得</b>：' + esc(ex.get) + '</div></div>';
+    html += '<table><thead><tr>' + cols.map(function(c){ return '<th>' + c + '</th>'; }).join("") + '</tr></thead><tbody>';
+
+    // body 角色：按整机/灵巧手/机械臂/数采装置 分组
+    var rows = [];
+    if (isBody) {
+      var subs = role.subs || ["整机","灵巧手","机械臂","数采装置"];
+      var used = {};
+      var others = [];
+      subs.forEach(function(sub){
+        var grp = members.filter(function(m){ return (m.bodySub||[]).indexOf(sub) >= 0 && !used[m.id]; });
+        grp.forEach(function(m){ used[m.id]=1; });
+        if (grp.length) {
+          rows.push({ sub: sub, list: grp });
+        }
+      });
+      members.forEach(function(m){ if (!used[m.id]) others.push(m); });
+      if (others.length) rows.push({ sub: "其他", list: others });
+    } else {
+      rows.push({ sub: null, list: members });
+    }
+
+    rows.forEach(function(grp){
+      if (grp.sub) {
+        html += '<tr class="subRow"><td colspan="' + cols.length + '">— ' + esc(grp.sub) + '（' + grp.list.length + '）—</td></tr>';
+      }
+      grp.list.forEach(function(m){
+        var roleN = (m.roles||[]).length;
+        var subTags = (isBody && m.bodySub && m.bodySub.length)
+          ? m.bodySub.map(function(s){ return '<span class="subtag">' + esc(s) + '</span>'; }).join("") : "";
+        var stg = showStage && m.stage ? '<span class="stg" style="' + stageColor(m.stage) + '">' + esc(m.stage) + '</span>' : '<span style="color:#b6bec7">—</span>';
+        html += '<tr data-eid="' + esc(m.id) + '">' +
+          '<td class="name" contenteditable="true" data-eid="' + esc(m.id) + '" data-field="name">' + esc(m.name) +
+            (roleN>1 ? '<span class="badge" title="横跨 ' + roleN + ' 类角色">' + roleN + '</span>' : "") +
+            (dual[m.id] ? '<span class="badge cust" title="客户 × 合作方一体">客</span>' : "") + '</td>' +
+          (isBody ? '<td>' + subTags + '</td>' : "") +
+          '<td contenteditable="true" data-eid="' + esc(m.id) + '" data-field="stage">' + stg + '</td>' +
+          '<td contenteditable="true" data-eid="' + esc(m.id) + '" data-field="tier"><span class="tier">' + esc(m.tier || "—") + '</span></td>' +
+          '<td contenteditable="true" data-eid="' + esc(m.id) + '" data-field="summary" style="min-width:280px">' + esc(m.summary || "") + '</td>' +
+          '<td class="op"><span class="del" title="移除该成员" data-del="' + esc(m.id) + '">✕</span></td>' +
+        '</tr>';
+      });
+    });
+    html += '<tr class="addRow"><td colspan="' + cols.length + '"><span class="addBtn" data-add="' + role.key + '">＋ 添加成员到「' + esc(role.label) + '」</span></td></tr>';
+    html += '</tbody></table>';
+    var addedHere = (EDITS.added||[]).filter(function(a){ return (a.roles||[]).indexOf(role.key)>=0; }).length;
+    var removedHere = members.length ? 0 : 0;
+    if (addedHere || (EDITS.removed||[]).length) {
+      html += '<div class="blockNote">在线编辑：新增 ' + addedHere + ' · 全图移除 ' + (EDITS.removed||[]).length + '（清除编辑可还原）</div>';
+    }
+    html += '</div>';
+  });
+  host.innerHTML = html;
+  bindTableEvents();
+}
+
+function plainOf(el){
+  // 取单元格纯文本（去掉徽标/标签的文本）
+  var clone = el.cloneNode(true);
+  var strip = clone.querySelectorAll(".badge,.subtag,.stg,.tier");
+  for (var i=0;i<strip.length;i++) strip[i].remove();
+  return clone.textContent.replace(/^—$/,"").trim();
+}
+
+function bindTableEvents(){
+  document.querySelectorAll('[contenteditable][data-eid]').forEach(function(td){
+    td.addEventListener("blur", function(){
+      var eid = td.dataset.eid, field = td.dataset.field;
+      var val = plainOf(td);
+      var isAdded = (EDITS.added||[]).some(function(a){ return a.id===eid; });
+      if (isAdded) {
+        EDITS.added.forEach(function(a){ if (a.id===eid) a[field]=val; });
+      } else {
+        EDITS.changes[eid] = EDITS.changes[eid] || {};
+        var orig = (BASE.entities.find(function(e){ return e.id===eid; }) || {})[field];
+        if (val === (orig==null?"":String(orig))) delete EDITS.changes[eid][field];
+        else EDITS.changes[eid][field] = val;
+        if (!Object.keys(EDITS.changes[eid]).length) delete EDITS.changes[eid];
+      }
+      persist();
+    });
+  });
+  document.querySelectorAll('[contenteditable][data-rolex]').forEach(function(td){
+    td.addEventListener("blur", function(){
+      var key = td.dataset.rolex, field = td.dataset.field;
+      var txt = plainOf(td);
+      // 去掉前缀标签
+      txt = txt.replace(/^睦灵给出s*→?s*/,"").replace(/^←?s*睦灵获得[：:]?s*/,"").trim();
+      var orig = ((BASE.partnerExchanges||[]).find(function(x){ return x.key===key; }) || {})[field];
+      EDITS.roleChanges[key] = EDITS.roleChanges[key] || {};
+      if (txt === (orig==null?"—":orig)) delete EDITS.roleChanges[key][field];
+      else EDITS.roleChanges[key][field] = txt;
+      if (!Object.keys(EDITS.roleChanges[key]).length) delete EDITS.roleChanges[key];
+      persist();
+    });
+  });
+  document.querySelectorAll("[data-del]").forEach(function(x){
+    x.addEventListener("click", function(ev){
+      ev.stopPropagation();
+      var eid = x.dataset.del;
+      if (!confirm("确认从生态图谱移除该成员？（清除在线编辑可还原）")) return;
+      var ai = (EDITS.added||[]).findIndex(function(a){ return a.id===eid; });
+      if (ai >= 0) { EDITS.added.splice(ai,1); }
+      else if ((EDITS.removed||[]).indexOf(eid) < 0) { EDITS.removed.push(eid); }
+      persist(); renderTable(); toast("已移除");
+    });
+  });
+  document.querySelectorAll("[data-add]").forEach(function(b){
+    b.addEventListener("click", function(ev){
+      ev.stopPropagation();
+      var roleKey = b.dataset.add;
+      var nm = prompt("新成员名称：");
+      if (!nm || !nm.trim()) return;
+      var m = { id: "new-" + Date.now(), name: nm.trim(), roles: [roleKey], stage: "洽谈", tier: "T3", summary: "（在线新增，待补充）" };
+      if (roleKey === "body") m.bodySub = [];
+      EDITS.added = EDITS.added || []; EDITS.added.push(m);
+      persist(); renderTable(); toast("已添加「" + nm.trim() + "」");
+    });
+  });
+}
+
+// ===== 导出 / 导入 / 重置 =====
+document.getElementById("exportBtn").addEventListener("click", function(){
+  var M = merged();
+  var out = {
+    _note: "睦灵科技（RoboX）生态图谱·表格数据导出（含在线编辑）。可回写 robox_ontology_data.js 或再次导入本页。",
+    version: BASE.meta.version, date: BASE.meta.date,
+    partnerRoles: BASE.partnerRoles.map(function(r){
+      var ex = M.exch[r.key] || {};
+      var o = { key: r.key, label: r.label, desc: r.desc, give: ex.give, get: ex.get, members: [] };
+      M.entities.filter(function(e){ return e.type==="partner" && (e.roles||[]).indexOf(r.key)>=0; })
+        .forEach(function(e){ o.members.push({ id: e.id, name: e.name, stage: e.stage || "", tier: e.tier || "", summary: e.summary || "", bodySub: e.bodySub || null }); });
+      return o;
+    }),
+    removedIds: EDITS.removed || []
+  };
+  var blob = new Blob([JSON.stringify(out, null, 2)], { type: "application/json" });
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "睦灵生态图谱_表格数据_" + (BASE.meta.date||"").replace(/[^0-9]/g,"") + ".json";
+  a.click(); URL.revokeObjectURL(a.href);
+  toast("已导出 JSON");
+});
+
+document.getElementById("importFile").addEventListener("change", function(ev){
+  var f = ev.target.files && ev.target.files[0];
+  if (!f) return;
+  var rd = new FileReader();
+  rd.onload = function(){
+    var txt = String(rd.result);
+    var obj = null;
+    try {
+      if (/^\s*\{/.test(txt)) { obj = JSON.parse(txt); }
+      else {
+        var mod = { exports: {} };
+        new Function("module","exports", txt)(mod, mod.exports);
+        obj = mod.exports;
+      }
+    } catch(e) { toast("解析失败：" + e.message); return; }
+    if (!obj || !obj.partnerRoles || !obj.entities) { toast("文件缺少 partnerRoles / entities，不是有效的数据文件"); return; }
+    BASE.partnerRoles = obj.partnerRoles;
+    BASE.partnerExchanges = obj.partnerExchanges || [];
+    BASE.entities = obj.entities;
+    BASE.relations = obj.relations || BASE.relations;
+    if (obj.meta) BASE.meta = Object.assign(BASE.meta, obj.meta);
+    renderTable();
+    toast("已按「" + f.name + "」刷新表格（在线编辑已叠加保留）");
+    ev.target.value = "";
+  };
+  rd.readAsText(f, "utf8");
+});
+
+document.getElementById("resetBtn").addEventListener("click", function(){
+  if (!confirm("清除本页所有在线编辑（新增/修改/移除），恢复到生成时的数据？")) return;
+  EDITS = { changes:{}, added:[], removed:[], roleChanges:{} };
+  localStorage.removeItem(LS_KEY);
+  renderTable(); toast("已恢复生成时数据");
+});
+
+renderTable();
+
+// ===== 环形图交互（与 v1 相同） =====
+var ROLES = BASE.partnerRoles;
+var ROLE_OF = {}; ROLES.forEach(function(r){ ROLE_OF[r.key]=r; });
+
+var svg = document.getElementById("eco-svg");
+document.querySelectorAll(".bar button[data-zoom]").forEach(function(btn){
+  btn.addEventListener("click", function(){
+    document.querySelectorAll(".bar button[data-zoom]").forEach(function(b){ b.classList.remove("on"); });
+    btn.classList.add("on");
+    var v = btn.dataset.zoom;
+    var box = document.getElementById("map-scroll");
+    var k = v === "fit" ? Math.min(1, (box.clientWidth - 8) / SIZE) : parseFloat(v);
+    svg.setAttribute("width", Math.round(SIZE * k));
+    svg.setAttribute("height", Math.round(SIZE * k));
+  });
+});
+
+function clearFocus(){
+  document.querySelectorAll(".mnode,.rnode,.rlink,.spoke").forEach(function(n){ n.classList.remove("on"); n.classList.remove("dim"); });
+  document.getElementById("highlightLayer").innerHTML = "";
+}
+function focusRole(key){
+  clearFocus();
+  document.querySelectorAll('.spoke[data-role="'+key+'"]').forEach(function(n){ n.classList.add("on"); });
+  document.querySelectorAll('.rnode[data-role="'+key+'"]').forEach(function(n){ n.classList.add("on"); });
+  document.querySelectorAll('.rlink[data-role="'+key+'"]').forEach(function(n){ n.classList.add("on"); });
+  document.querySelectorAll('.mnode[data-role="'+key+'"]').forEach(function(n){ n.classList.add("on"); });
+}
+function focusEntity(eid){
+  clearFocus();
+  var nodes = Array.prototype.slice.call(document.querySelectorAll('.mnode[data-eid="'+eid+'"]'));
+  nodes.forEach(function(n){ n.classList.add("on"); });
+  if (nodes.length > 1) {
+    var layer = document.getElementById("highlightLayer");
+    var pts = nodes.map(function(n){ var t = n.getAttribute("transform").match(/-?[\d.]+/g); return { x: parseFloat(t[0]), y: parseFloat(t[1]) }; });
+    for (var i=1;i<pts.length;i++){
+      var ln = document.createElementNS("http://www.w3.org/2000/svg","line");
+      ln.setAttribute("x1",pts[0].x); ln.setAttribute("y1",pts[0].y);
+      ln.setAttribute("x2",pts[i].x); ln.setAttribute("y2",pts[i].y);
+      ln.setAttribute("stroke","#1f4e79"); ln.setAttribute("stroke-width","1.6");
+      ln.setAttribute("stroke-dasharray","4 4"); ln.setAttribute("opacity","0.75");
+      layer.appendChild(ln);
+    }
+  }
+}
+document.querySelectorAll(".rnode").forEach(function(n){
+  n.addEventListener("click", function(ev){ ev.stopPropagation(); focusRole(n.dataset.role); });
+});
+document.addEventListener("click", function(ev){
+  var n = ev.target.closest ? ev.target.closest(".mnode") : null;
+  if (n) { focusEntity(n.dataset.eid); showEntity(n.dataset.eid); return; }
+  if (!ev.target.closest(".bar")) clearFocus();
+});
+
+function showEntity(id){
+  var e = ENTITIES.find(function(x){ return x.id===id; }); if(!e) return;
+  var color = TYPE_COLOR[e.type]||"#999";
+  var outR = RELATIONS.filter(function(r){ return r.from===id; });
+  var inR = RELATIONS.filter(function(r){ return r.to===id; });
+  var nm = function(idv){ var o=ENTITIES.find(function(x){ return x.id===idv; }); return o?o.name:idv; };
+  var relHtml = function(arr,dir){ return arr.map(function(r){
+    var other = dir==="out" ? r.to : r.from;
+    return '<li>'+esc(nm(other))+' '+(dir==="out"?"→":"←")+' <b>'+esc(r.label)+'</b></li>';
+  }).join("")||"<li>（暂无）</li>"; };
+  document.getElementById("detail").innerHTML =
+    '<span class="close" onclick="closeDetail()">✕</span>' +
+    '<div style="border-left:5px solid '+color+';padding:6px 10px;margin-bottom:10px">' +
+      '<div style="font-size:16px;font-weight:700">'+esc(e.name)+'</div>' +
+      '<div style="font-size:12px;color:'+color+';font-weight:600;margin-top:2px">'+esc(e.summary)+'</div>' +
+      (e.roles&&e.roles.length?'<div style="margin-top:6px">'+e.roles.map(function(k){var r=ROLE_OF[k];return r?'<span class="rchip" style="background:'+r.color+'">'+esc(r.label)+'</span>':'';}).join('')+'</div>':"") +
+    '</div>' +
+    '<div style="font-size:12.5px;color:#333;line-height:1.6;margin-bottom:10px">'+esc(e.desc)+'</div>' +
+    '<div style="font-size:12px;margin-bottom:4px"><b>生命周期：</b>'+esc(e.lifecycle||"—")+'</div>' +
+    (e.stage?'<div style="font-size:12px;margin-bottom:4px"><b>合作阶段：</b>'+esc(e.stage)+'</div>':"") +
+    (e.tier?'<div style="font-size:12px;margin-bottom:8px"><b>梯队：</b>'+esc(e.tier)+'</div>':"") +
+    '<div style="font-size:13px;font-weight:700;margin-bottom:4px">关联（出向 '+outR.length+' / 入向 '+inR.length+'）</div>' +
+    '<div style="font-size:12.5px"><div style="color:#666;margin-bottom:2px">产出 / 指向</div><ul style="margin:0 0 8px 18px;line-height:1.7">'+relHtml(outR,"out")+'</ul></div>' +
+    '<div style="font-size:12.5px"><div style="color:#666;margin-bottom:2px">来源 / 被指向</div><ul style="margin:0 0 8px 18px;line-height:1.7">'+relHtml(inR,"in")+'</ul></div>';
+  document.getElementById("detail").style.display = "block";
+}
+function closeDetail(){ document.getElementById("detail").style.display="none"; }
+</script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "schema": "codebuddy.conversation",
+  "schemaVersion": 1,
+  "exportedAt": "2026-08-21T15:19:36.418Z",
+  "data": {
+    "lastMessageAt": "2026-08-21T15:19:33.199Z",
+    "conversations": [
+      {
+        "id": "ae743616248b4937a2fae04ceced2153",
+        "type": "craft",
+        "name": "",
+        "createdAt": "2026-08-21T15:19:33.199Z",
+        "lastMessageAt": "2026-08-21T15:19:33.199Z",
+        "requests": []
+      }
+    ]
+  }
+}

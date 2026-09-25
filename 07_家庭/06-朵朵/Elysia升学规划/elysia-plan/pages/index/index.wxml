@@ -1,0 +1,109 @@
+<!--pages/index/index.wxml - 总览页-->
+<view class="page-index">
+
+  <!-- 头部 -->
+  <view class="gradient-header">
+    <view class="header-title">
+      <text class="header-greeting">Hi Elysia ✨</text>
+      <text class="header-subtitle">你的专属升学攻略看板</text>
+    </view>
+    <view class="header-stats">
+      <view class="stat-item">
+        <text class="stat-num">{{stats.totalSchools}}</text>
+        <text class="stat-label">目标院校</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-num">{{stats.totalPrograms}}</text>
+        <text class="stat-label">匹配专业</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-num">{{stats.regions}}</text>
+        <text class="stat-label">申请区域</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 个人画像卡片 -->
+  <view class="card profile-card">
+    <view class="profile-header">
+      <text class="profile-emoji">🎀</text>
+      <view class="profile-info">
+        <text class="profile-name">{{profile.name}}</text>
+        <text class="profile-school">{{profile.school}}</text>
+      </view>
+    </view>
+    <view class="profile-details">
+      <view class="detail-row">
+        <text class="detail-label">雅思</text>
+        <text class="detail-value">{{profile.ielts}} → 目标 {{profile.ieltsTarget}}</text>
+        <view class="progress-bar">
+          <view class="progress-fill" style="width: 78%;"></view>
+        </view>
+      </view>
+      <view class="detail-row">
+        <text class="detail-label">港居民</text>
+        <text class="detail-value highlight">{{profile.hkResident ? '✓ 已获优才' : '申请中'}}</text>
+        <text class="detail-note">续签: {{profile.renewDate}}</text>
+      </view>
+    </view>
+    <view class="strength-tags">
+      <text class="strength-title">核心优势</text>
+      <view class="tags-wrap">
+        <text wx:for="{{profile.strengths}}" wx:key="*this" class="tag strength-tag">{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 核心结论 -->
+  <view class="card conclusion-card">
+    <text class="section-title">📌 核心结论</text>
+    <text class="conclusion-text">{{conclusions.summary}}</text>
+    <view class="divider"></view>
+    <text class="section-title">🎯 策略建议</text>
+    <text class="strategy-text">{{conclusions.strategyNote}}</text>
+  </view>
+
+  <!-- 推荐院校 Top Picks -->
+  <view class="card">
+    <text class="section-title">🏆 推荐申请组合</text>
+    <view class="top-picks-list">
+      <view wx:for="{{conclusions.topPicks}}" wx:key="school" class="pick-item" bindtap="goToDetail" data-school-id="{{item.schoolId}}">
+        <view class="pick-left">
+          <view class="priority-badge" style="background: {{item.color}}20; color: {{item.color}};">{{item.priority}}</view>
+          <view class="pick-info">
+            <text class="pick-school">{{item.school}}</text>
+            <text class="pick-reason">{{item.reason}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 区域入口 -->
+  <view class="region-grid">
+    <view wx:for="{{regionCards}}" wx:key="key" class="region-card card" bindtap="goToSchools" data-region="{{item.key}}">
+      <text class="region-emoji">{{item.emoji}}</text>
+      <text class="region-name">{{item.name}}</text>
+      <text class="region-desc">{{item.desc}}</text>
+      <text class="region-count">{{item.count}} 所院校</text>
+    </view>
+  </view>
+
+  <!-- 关键行动 -->
+  <view class="card action-preview">
+    <text class="section-title">⚡ 关键行动 (Top 5)</text>
+    <view class="action-list">
+      <view wx:for="{{conclusions.keyActions}}" wx:key="*this" class="action-item">
+        <text class="action-num">{{index + 1}}</text>
+        <text class="action-text">{{item}}</text>
+      </view>
+    </view>
+    <view class="btn-primary action-btn" bindtap="goToAction">查看完整时间线 →</view>
+  </view>
+
+  <!-- 底部 -->
+  <view class="footer">
+    <text class="footer-text">为 Elysia 量身定制 · 2026年8月</text>
+  </view>
+
+</view>

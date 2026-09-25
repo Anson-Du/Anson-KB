@@ -1,0 +1,322 @@
+/* pages/index/index.wxss */
+
+.page-index {
+  padding-bottom: 40rpx;
+}
+
+/* 头部 */
+.gradient-header {
+  background: linear-gradient(135deg, #6C5CE7 0%, #A29BFE 50%, #FD79A8 100%);
+  padding: 60rpx 40rpx 48rpx;
+  color: #FFF;
+  border-radius: 0 0 48rpx 48rpx;
+}
+
+.header-title {
+  margin-bottom: 36rpx;
+}
+
+.header-greeting {
+  font-size: 48rpx;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.header-subtitle {
+  font-size: 28rpx;
+  opacity: 0.85;
+}
+
+.header-stats {
+  display: flex;
+  justify-content: space-around;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-num {
+  font-size: 52rpx;
+  font-weight: 700;
+  display: block;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  opacity: 0.8;
+}
+
+/* 个人画像 */
+.profile-card {
+  margin-top: -20rpx;
+  position: relative;
+  z-index: 2;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 28rpx;
+}
+
+.profile-emoji {
+  font-size: 64rpx;
+  margin-right: 20rpx;
+}
+
+.profile-name {
+  font-size: 36rpx;
+  font-weight: 700;
+  display: block;
+  color: #2D3436;
+}
+
+.profile-school {
+  font-size: 24rpx;
+  color: #636E72;
+}
+
+.profile-details {
+  margin-bottom: 24rpx;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+  flex-wrap: wrap;
+}
+
+.detail-label {
+  font-size: 24rpx;
+  color: #636E72;
+  width: 100rpx;
+  flex-shrink: 0;
+}
+
+.detail-value {
+  font-size: 26rpx;
+  color: #2D3436;
+  font-weight: 500;
+}
+
+.detail-value.highlight {
+  color: #00B894;
+  font-weight: 700;
+}
+
+.detail-note {
+  font-size: 22rpx;
+  color: #B2BEC3;
+  margin-left: 16rpx;
+}
+
+.progress-bar {
+  width: 200rpx;
+  height: 12rpx;
+  background: #EEE;
+  border-radius: 6rpx;
+  margin-left: 16rpx;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6C5CE7, #FD79A8);
+  border-radius: 6rpx;
+}
+
+.strength-tags {
+  border-top: 1rpx solid #F0F0F0;
+  padding-top: 20rpx;
+}
+
+.strength-title {
+  font-size: 24rpx;
+  color: #636E72;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.tags-wrap {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.strength-tag {
+  background: linear-gradient(135deg, #F0E6FF, #FFE6F0);
+  color: #6C5CE7;
+  font-size: 24rpx;
+  padding: 8rpx 20rpx;
+  border-radius: 24rpx;
+  margin-right: 12rpx;
+  margin-bottom: 8rpx;
+}
+
+/* 结论卡片 */
+.conclusion-card {
+  background: linear-gradient(135deg, #FFF9E6, #FFF0F5);
+  border: 2rpx solid #FDCB6E40;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 16rpx;
+  color: #2D3436;
+}
+
+.conclusion-text {
+  font-size: 26rpx;
+  color: #2D3436;
+  line-height: 1.8;
+  display: block;
+}
+
+.strategy-text {
+  font-size: 26rpx;
+  color: #6C5CE7;
+  line-height: 1.8;
+  display: block;
+  font-weight: 500;
+}
+
+/* Top Picks */
+.top-picks-list {
+  margin-top: 12rpx;
+}
+
+.pick-item {
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #F5F5F5;
+}
+
+.pick-item:last-child {
+  border-bottom: none;
+}
+
+.pick-left {
+  display: flex;
+  align-items: flex-start;
+}
+
+.priority-badge {
+  font-size: 22rpx;
+  font-weight: 700;
+  padding: 6rpx 16rpx;
+  border-radius: 12rpx;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+  margin-top: 4rpx;
+}
+
+.pick-info {
+  flex: 1;
+}
+
+.pick-school {
+  font-size: 28rpx;
+  font-weight: 600;
+  display: block;
+  color: #2D3436;
+  margin-bottom: 6rpx;
+}
+
+.pick-reason {
+  font-size: 24rpx;
+  color: #636E72;
+  line-height: 1.5;
+}
+
+/* 区域卡片网格 */
+.region-grid {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 24rpx;
+  gap: 16rpx;
+}
+
+.region-card {
+  flex: 1;
+  text-align: center;
+  padding: 28rpx 16rpx;
+  margin: 20rpx 0;
+}
+
+.region-emoji {
+  font-size: 56rpx;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.region-name {
+  font-size: 28rpx;
+  font-weight: 700;
+  display: block;
+  color: #2D3436;
+  margin-bottom: 8rpx;
+}
+
+.region-desc {
+  font-size: 20rpx;
+  color: #B2BEC3;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.region-count {
+  font-size: 22rpx;
+  color: #6C5CE7;
+  font-weight: 600;
+}
+
+/* 行动预览 */
+.action-list {
+  margin-bottom: 24rpx;
+}
+
+.action-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 16rpx;
+}
+
+.action-num {
+  width: 44rpx;
+  height: 44rpx;
+  background: linear-gradient(135deg, #6C5CE7, #A29BFE);
+  color: #FFF;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 44rpx;
+  font-size: 24rpx;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-right: 16rpx;
+}
+
+.action-text {
+  font-size: 26rpx;
+  color: #2D3436;
+  line-height: 1.6;
+  padding-top: 6rpx;
+}
+
+.action-btn {
+  width: 100%;
+  margin-top: 8rpx;
+}
+
+/* 底部 */
+.footer {
+  text-align: center;
+  padding: 40rpx 0 20rpx;
+}
+
+.footer-text {
+  font-size: 22rpx;
+  color: #B2BEC3;
+}

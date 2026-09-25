@@ -1,0 +1,388 @@
+# =============================================================================
+# RoboX 商业模式分析工具 - 配置文件
+# =============================================================================
+# 按七范式和三重锁定框架定义十维度的分析规则
+
+# ---- 全局设置 ----
+global:
+  workspace_root: "d:/RoboX"
+  report_dir: "data/reports"
+  snapshot_dir: "data/snapshots"
+  log_dir: "data/logs"
+  # 文档扫描目录（相对于 workspace_root）
+  scan_dirs:
+    - "01_战略分析"
+    - "02_股权融资"
+    - "03_政府合作"
+    - "04_听记纪要/转写与纪要"
+    - "05_行业与竞争"
+    - "06_产业生态"
+  # 评分权重
+  weights:
+    hit_density: 0.50       # 关键词命中密度权重
+    evidence_strength: 0.35  # 证据强度权重（量化数据/纪要格式加分）
+    freshness: 0.15          # 时间新鲜度权重
+
+# ---- 十维度分析规则 ----
+dimensions:
+  # ========== 七范式（合作协同范式） ==========
+
+  # 1. Human-Centric 范式
+  human_centric:
+    name: "Human-Centric 范式"
+    category: "paradigm"
+    description: "以人类行为数据为核心的数据采集策略"
+    keywords:
+      - "human centric"
+      - "human-centric"
+      - "人类为中心"
+      - "人类行为数据"
+      - "ego video"
+      - "ego-centric"
+      - "第一人称视角"
+      - "第一视角"
+      - "人类操作视频"
+      - "人类操作数据"
+      - "90亿人"
+      - "人类数据"
+      - "manipulation data"
+      - "wearable"
+      - "可穿戴设备"
+      - "遥操作"
+      - "teleoperation"
+      - "tele-operat"
+      - "人类演示"
+      - "human demo"
+      - "imitation learning"
+      - "模仿学习"
+    weighting: 1.0
+
+  # 2. System 2 先行范式
+  system2_first:
+    name: "System 2 先行范式"
+    category: "paradigm"
+    description: "从大脑决策系统出发，1000万小时训练100B模型再蒸馏"
+    keywords:
+      - "system 2"
+      - "system2"
+      - "系统二"
+      - "大脑决策"
+      - "1000万小时"
+      - "100B"
+      - "蒸馏"
+      - "distill"
+      - "scaling law"
+      - "scaling"
+      - "大脑模型"
+      - "brain model"
+      - "Rain Brain"
+      - "rain brain"
+      - "决策系统"
+      - "cognitive"
+      - "认知模型"
+      - "reasoning"
+      - "推理能力"
+      - "规划能力"
+      - "planning"
+      - "large model"
+      - "大模型训练"
+      - "预训练"
+      - "pre-train"
+    weighting: 1.2
+
+  # 3. 手眼脑协同范式
+  eye_hand_brain:
+    name: "手眼脑协同范式"
+    category: "paradigm"
+    description: "感知（眼）、执行（手）、决策（脑）三层闭环"
+    keywords:
+      - "手眼脑"
+      - "eye.hand.brain"
+      - "感知.*执行.*决策"
+      - "视觉.*动作.*规划"
+      - "vision.*action"
+      - "VLA"
+      - "Vision-Language-Action"
+      - "闭环"
+      - "closed.loop"
+      - "感知层"
+      - "执行层"
+      - "决策层"
+      - "sensorimotor"
+      - "感知-行动"
+      - "perception.action"
+      - "视觉语言动作"
+      - "跨本体"
+      - "cross-embodiment"
+      - "embodiment"
+      - "多本体"
+    weighting: 1.0
+
+  # 4. Latent 空间通信范式
+  latent_communication:
+    name: "Latent 空间通信范式"
+    category: "paradigm"
+    description: "隐空间通信替代自然语言指令"
+    keywords:
+      - "latent"
+      - "隐空间"
+      - "潜在空间"
+      - "通信"
+      - "自然语言.*替代"
+      - "非语言.*指令"
+      - "language.free"
+      - "语言无关"
+      - "去除.*语言"
+      - "解耦.*语言"
+      - "AR架构"
+      - "autoregressive"
+      - "同源.*生成"
+      - "统一.*架构"
+      - "unified.*arch"
+      - "tokenization"
+      - "tokenize"
+      - "embedding"
+      - "嵌入.*空间"
+    weighting: 0.9
+
+  # 5. 多模态数据金字塔范式
+  multimodal_pyramid:
+    name: "多模态数据金字塔范式"
+    category: "paradigm"
+    description: "真机操作→第一视角+触觉→混合视角→互联网公开数据的层级"
+    keywords:
+      - "数据金字塔"
+      - "data pyramid"
+      - "多模态"
+      - "multimodal"
+      - "第一视角"
+      - "ego.centric"
+      - "触觉"
+      - "tactile"
+      - "混合视角"
+      - "真机操作"
+      - "real.robot"
+      - "互联网数据"
+      - "internet.data"
+      - "数据层级"
+      - "数据层次"
+      - "合成数据"
+      - "synthetic data"
+      - "仿真"
+      - "simulation"
+      - "sim.to.real"
+      - "sim2real"
+      - "数据混合"
+    weighting: 1.0
+
+  # 6. 触觉优先范式
+  tactile_first:
+    name: "触觉优先范式"
+    category: "paradigm"
+    description: "构建触觉世界模型，解决视觉遮挡场景"
+    keywords:
+      - "触觉"
+      - "tactile"
+      - "haptic"
+      - "触觉传感器"
+      - "tactile sensor"
+      - "力觉"
+      - "force.*sense"
+      - "力反馈"
+      - "force feedback"
+      - "世界模型"
+      - "world model"
+      - "视觉遮挡"
+      - "occlusion"
+      - "灵巧手"
+      - "dexterous hand"
+      - "指尖"
+      - "fingertip"
+      - "触觉世界"
+      - "tactile world"
+      - "pressure"
+      - "压力传感"
+      - "torque"
+      - "力矩"
+      - "GelSight"
+      - "gelsight"
+    weighting: 1.1
+
+  # 7. 软硬 Co-design 范式
+  codesign:
+    name: "软硬 Co-design 范式"
+    category: "paradigm"
+    description: "不自研整机但深度参与硬件定义"
+    keywords:
+      - "co.design"
+      - "codesign"
+      - "软硬.*协同"
+      - "硬件.*定义"
+      - "深度参与.*硬件"
+      - "不自研.*整机"
+      - "灵巧手.*设计"
+      - "传感器.*定制"
+      - "硬件.*合作"
+      - "本体.*合作"
+      - "整机.*合作"
+      - "supply chain"
+      - "供应链"
+      - "硬件规格"
+      - "硬件平台"
+      - "视觉模组"
+      - "camera.*module"
+      - "维塔"
+      - "Vita"
+      - "CP协议"
+      - "通信协议"
+      - "protocol"
+      - "接口标准"
+      - "interface.*standard"
+    weighting: 1.0
+
+  # ========== 三重锁定机制 ==========
+
+  # 8. 数据锁定
+  data_lockin:
+    name: "数据锁定"
+    category: "lockin"
+    description: "自建数据基础设施（目标50-100万小时），数据飞轮正向循环"
+    keywords:
+      - "数据基础设施"
+      - "data.*infra"
+      - "数据飞轮"
+      - "data flywheel"
+      - "数据.*锁定"
+      - "数据.*壁垒"
+      - "data.*moat"
+      - "自建.*数据"
+      - "采集.*数据"
+      - "数据.*规模"
+      - "data.*scale"
+      - "数据.*小时"
+      - "万小时"
+      - "数据.*闭环"
+      - "数据.*优势"
+      - "训练数据"
+      - "training data"
+      - "专有数据"
+      - "proprietary.*data"
+      - "数据.*工厂"
+      - "data.*factory"
+      - "数据.*引擎"
+      - "data.*engine"
+      - "datasets"
+      - "数据壁垒"
+      - "数采"
+      - "数据采集"
+    weighting: 1.2
+
+  # 9. 硬件生态锁定
+  hardware_lockin:
+    name: "硬件生态锁定"
+    category: "lockin"
+    description: "Co-design 灵巧手/传感器、维塔 CP 协议标准、视觉模组绑定"
+    keywords:
+      - "硬件.*生态"
+      - "hardware.*ecosystem"
+      - "硬件.*锁定"
+      - "硬件.*壁垒"
+      - "传感器.*绑定"
+      - "sensor.*binding"
+      - "协议.*标准"
+      - "protocol.*standard"
+      - "维塔"
+      - "Vita"
+      - "CP协议"
+      - "视觉模组"
+      - "灵巧手"
+      - "dexterous.*hand"
+      - "供应.*锁定"
+      - "supplier.*lock"
+      - "硬件.*依赖"
+      - "平台.*锁定"
+      - "platform.*lock"
+      - "切换.*成本"
+      - "switching.*cost"
+      - "绑定"
+      - "粘性"
+      - "stickiness"
+      - "合作伙伴"
+      - "partner.*ecosystem"
+    weighting: 1.0
+
+  # 10. 场景/政府绑定
+  government_lockin:
+    name: "场景/政府绑定"
+    category: "lockin"
+    description: "与地方政府共建数采中心、国资订单绑定、产业资本锁定"
+    keywords:
+      - "政府"
+      - "government"
+      - "国资"
+      - "state.own"
+      - "产业.*园区"
+      - "industrial.*park"
+      - "政策"
+      - "policy"
+      - "落地"
+      - "landing"
+      - "选址"
+      - "site.*select"
+      - "补贴"
+      - "subsidy"
+      - "税收"
+      - "tax"
+      - "产业.*载体"
+      - "订单"
+      - "order"
+      - "政府采购"
+      - "procurement"
+      - "地方政府"
+      - "local.*government"
+      - "数采中心"
+      - "data.*center"
+      - "产业基金"
+      - "industrial.*fund"
+      - "一事一议"
+      - "特殊政策"
+      - "人才.*政策"
+      - "talent.*policy"
+      - "政务"
+      - "营商环境"
+    weighting: 1.1
+
+# ---- 报告模板设置 ----
+report:
+  title: "RoboX 商业模式周度分析报告"
+  subtitle: "基于七范式与三重锁定框架的持续追踪"
+  # Markdown 模板变量可用: {report_date}, {last_report_date}, {dimensions}, {trend_table}, {new_files}, {competitor_summary}, {version}
+  include_sections:
+    - overview
+    - paradigm_analysis
+    - lockin_analysis
+    - trend_panel
+    - file_manifest
+    - competitor_dynamics
+    - recommendations
+
+# ---- 竞争情报追踪 ----
+competitors:
+  tracking:
+    - "1X Technologies"
+    - "Figure AI"
+    - "Physical Intelligence"
+    - "Skild AI"
+    - "千寻智能"
+    - "智元机器人"
+    - "灵初智能"
+    - "星海图"
+    - "宇树科技"
+    - "银河通用"
+  source_file: "01_战略分析/明修65.txt"
+
+# ---- 元数据 ----
+meta:
+  version: "1.0.0"
+  created: "2026-08-08"
+  framework: "七范式 + 三重锁定"

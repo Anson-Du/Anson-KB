@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>睦灵科技（RoboX）竞对监测看板</title>
+<style>
+/* ================= 设计令牌 ================= */
+:root{
+  --bg0:#06080F; --bg1:#0B1020; --bg2:#16233A;
+  --line:rgba(255,255,255,.10); --line-soft:rgba(255,255,255,.06);
+  --glass:rgba(255,255,255,.045);
+  --txt:#E8EEFC; --txt2:#93A5C8; --txt3:#5C6B8C;
+  --pri:#2F6BFF; --acc:#00D0B0; --deep:#1E3A8A;
+  --p0:#FF5C5C; --p1:#FF9F45; --p2:#8C9E5A;
+  --ok:#34D399; --warn:#F5A623;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Cascadia Mono",monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  min-height:100vh; color:var(--txt);
+  background:
+    radial-gradient(1200px 700px at 10% -12%, rgba(47,107,255,.20), transparent 62%),
+    radial-gradient(900px 620px at 90% 4%, rgba(0,208,176,.15), transparent 62%),
+    radial-gradient(700px 700px at 50% 120%, rgba(30,58,138,.28), transparent 65%),
+    linear-gradient(180deg,#06080F 0%,#0B1020 42%,#06080F 100%);
+  background-attachment:fixed;
+  font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,sans-serif;
+  font-size:14px; font-weight:400; line-height:1.72; -webkit-font-smoothing:antialiased;
+}
+a{color:var(--acc);text-decoration:none}
+::selection{background:rgba(0,208,176,.28)}
+
+/* ================= 顶栏 ================= */
+header.nav{
+  position:sticky; top:0; z-index:50;
+  display:flex; align-items:center; gap:18px; flex-wrap:wrap;
+  padding:12px 26px;
+  background:rgba(6,8,15,.78); backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--line);
+}
+.brand{display:flex;flex-direction:column;gap:1px;min-width:210px}
+.brand b{font-size:15px;letter-spacing:.4px}
+.brand span{font-size:11px;color:var(--txt3);letter-spacing:1.4px;text-transform:uppercase}
+nav.tabs{display:flex;gap:6px;flex-wrap:wrap}
+nav.tabs button{
+  font:inherit; font-size:13px; color:var(--txt2);
+  background:transparent; border:1px solid transparent; border-radius:10px;
+  padding:7px 13px; cursor:pointer;
+  transition:all .16s ease;
+}
+nav.tabs button:hover{color:var(--txt);background:rgba(255,255,255,.05)}
+nav.tabs button.on{
+  color:#fff; background:linear-gradient(135deg,rgba(47,107,255,.30),rgba(0,208,176,.22));
+  border-color:rgba(0,208,176,.42); box-shadow:0 0 18px -6px rgba(0,208,176,.55);
+}
+.grow{flex:1}
+.back-link{
+  font-size:12.5px; color:var(--txt2); border:1px solid var(--line);
+  border-radius:10px; padding:7px 13px; white-space:nowrap;
+  transition:all .16s ease;
+}
+.back-link:hover{color:var(--txt);border-color:rgba(0,208,176,.5);background:rgba(0,208,176,.08)}
+
+main{max-width:1520px;margin:0 auto;padding:26px 26px 90px}
+.view{display:none;animation:rise .34s cubic-bezier(.22,.8,.3,1)}
+.view.on{display:block}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ================= 通用块 ================= */
+.h1{font-size:28px;font-weight:700;letter-spacing:.3px;margin:0 0 6px}
+.h2{font-size:17px;font-weight:600;margin:30px 0 12px;display:flex;align-items:center;gap:9px}
+.h2:before{content:"";width:3px;height:16px;border-radius:2px;background:linear-gradient(180deg,var(--acc),var(--pri))}
+.sub{color:var(--txt2);font-size:13.5px}
+.muted{color:var(--txt3)}
+.card{
+  background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.018));
+  border:1px solid var(--line); border-radius:16px;
+  box-shadow:0 1px 0 rgba(255,255,255,.06) inset, 0 20px 44px -28px rgba(0,0,0,.95);
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.card.hoverable{cursor:pointer}
+.card.hoverable:hover{transform:translateY(-4px);border-color:rgba(0,208,176,.42);box-shadow:0 0 0 1px rgba(0,208,176,.22),0 24px 52px -28px rgba(0,208,176,.45)}
+.tag{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;letter-spacing:.6px;text-transform:uppercase;
+  padding:3px 8px;border-radius:999px;border:1px solid var(--line);
+  color:var(--txt2);background:rgba(255,255,255,.03);white-space:nowrap;
+}
+.tag.p0{color:#FFD9D9;border-color:rgba(255,92,92,.5);background:rgba(255,92,92,.14)}
+.tag.p1{color:#FFE8CE;border-color:rgba(255,159,69,.5);background:rgba(255,159,69,.13)}
+.tag.p2{color:#E4EBD2;border-color:rgba(140,158,90,.5);background:rgba(140,158,90,.13)}
+.tag.watch{color:#CFF5EE;border-color:rgba(0,208,176,.5);background:rgba(0,208,176,.13)}
+.tag.pending{color:#FFD9A8;border-color:rgba(245,166,35,.45);background:rgba(245,166,35,.12)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* ================= 总览仪表盘 ================= */
+.hero{padding:26px 28px;margin-bottom:20px;position:relative;overflow:hidden}
+.hero:after{
+  content:"";position:absolute;right:-90px;top:-90px;width:320px;height:320px;border-radius:50%;
+  background:radial-gradient(circle,rgba(0,208,176,.22),transparent 68%);filter:blur(6px);
+}
+.hero .tagline{margin-top:12px;font-size:13px;color:var(--acc);letter-spacing:.3px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-bottom:8px}
+.stat{padding:18px 20px}
+.stat .k{font-size:11.5px;letter-spacing:1.6px;text-transform:uppercase;color:var(--txt3)}
+.stat .v{font-family:var(--mono);font-size:34px;font-weight:700;line-height:1.25;margin-top:4px;
+  background:linear-gradient(135deg,#fff,#8FD9FF 55%,var(--acc));-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat .d{font-size:12.5px;color:var(--txt2)}
+
+.grid-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.quick{display:flex;gap:14px;overflow-x:auto;padding:4px 2px 14px}
+.quick .card{min-width:264px;max-width:264px;padding:16px 16px 14px}
+.cname{font-size:15.5px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.calias{font-size:11.5px;color:var(--txt3);font-family:var(--mono);margin-top:2px}
+.crel{margin-top:9px;font-size:12.5px;color:var(--txt2);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.cmeta{margin-top:11px;display:flex;gap:6px;flex-wrap:wrap}
+
+.siglist{display:flex;flex-direction:column;gap:9px}
+.sig{display:flex;gap:12px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.028);border:1px solid var(--line-soft)}
+.sig .bar{width:3px;border-radius:2px;flex:0 0 3px;background:var(--pri)}
+.sig .body{flex:1;min-width:0}
+.sig .top{display:flex;gap:9px;align-items:center;flex-wrap:wrap;font-size:12.5px}
+.sig .co{font-weight:600}
+.sig .dt{font-family:var(--mono);color:var(--txt2);font-size:11.5px}
+.sig .tx{margin-top:4px;font-size:12.8px;color:var(--txt2)}
+.sig .im{margin-top:4px;font-size:12px;color:var(--txt3)}
+
+/* ================= 筛选条 ================= */
+.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:16px 0 18px}
+.filters select,.filters input{
+  font:inherit;font-size:13px;color:var(--txt);
+  background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:10px;
+  padding:8px 11px;outline:none;transition:border-color .16s ease;
+}
+.filters select:focus,.filters input:focus{border-color:rgba(0,208,176,.55)}
+.filters input{min-width:220px}
+.filters option{background:#0B1020;color:var(--txt)}
+
+/* ================= 详情视图 ================= */
+.detail-head{padding:20px 22px;margin-bottom:16px;display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
+.detail-head .left{flex:1;min-width:280px}
+.detail-head .name{font-size:24px;font-weight:700}
+.detail-head .tags{margin-top:10px;display:flex;gap:7px;flex-wrap:wrap}
+.detail-grid{display:grid;grid-template-columns:minmax(0,1.62fr) minmax(300px,.85fr);gap:16px;align-items:start}
+@media(max-width:1080px){.detail-grid{grid-template-columns:1fr}}
+.dim{border:1px solid var(--line-soft);border-radius:12px;margin-bottom:9px;background:rgba(255,255,255,.025);overflow:hidden}
+.dim>summary{
+  cursor:pointer;list-style:none;padding:12px 15px;display:flex;align-items:center;gap:10px;
+  font-size:13.5px;font-weight:600;transition:background .16s ease;
+}
+.dim>summary::-webkit-details-marker{display:none}
+.dim>summary:hover{background:rgba(255,255,255,.045)}
+.dim>summary .dot{width:7px;height:7px;border-radius:50%;flex:0 0 7px}
+.dim>summary .hint{margin-left:auto;font-size:11px;color:var(--txt3);font-weight:400}
+.dim .content{padding:0 16px 15px 32px;font-size:13.2px;color:var(--txt2);line-height:1.85;white-space:pre-wrap}
+.dim.pending .content{border-left:2px dashed rgba(245,166,35,.5);margin-left:16px;padding-left:14px}
+
+.tl{position:relative;padding-left:24px}
+.tl:before{content:"";position:absolute;left:6px;top:6px;bottom:6px;width:1.5px;background:linear-gradient(180deg,rgba(0,208,176,.6),rgba(47,107,255,.25),transparent)}
+.tl .node{position:relative;margin-bottom:16px}
+.tl .node:before{
+  content:"";position:absolute;left:-22px;top:6px;width:9px;height:9px;border-radius:50%;
+  background:#0B1020;border:2px solid var(--pri);
+}
+.tl .node.newest:before{border-color:var(--acc);box-shadow:0 0 0 4px rgba(0,208,176,.16);animation:pulse 2.1s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 3px rgba(0,208,176,.10)}50%{box-shadow:0 0 0 7px rgba(0,208,176,.20)}}
+.tl .d{font-family:var(--mono);font-size:11.5px;color:var(--txt3)}
+.tl .t{margin-top:3px;font-size:13px;color:var(--txt)}
+.tl .s{margin-top:4px;font-size:11.5px;color:var(--txt3)}
+
+/* ================= 全景层 ================= */
+.track{margin-bottom:22px;padding:18px 20px}
+.track .name{font-size:16.5px;font-weight:600;display:flex;align-items:center;gap:10px}
+.track .feat{margin-top:8px;font-size:12.8px;color:var(--txt2)}
+.track .insight{
+  margin-top:10px;font-size:12.8px;color:#CFE0FF;padding:10px 13px;border-radius:10px;
+  background:linear-gradient(135deg,rgba(47,107,255,.14),rgba(0,208,176,.08));
+  border-left:3px solid var(--acc);
+}
+.tablewrap{overflow-x:auto;margin-top:14px;border:1px solid var(--line-soft);border-radius:12px}
+table{border-collapse:collapse;width:100%;min-width:1080px;font-size:12.6px}
+th,td{padding:10px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line-soft)}
+th{
+  position:sticky;top:0;background:#0C1428;
+  font-size:11.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--txt3);font-weight:600;
+}
+tbody tr{transition:background .14s ease}
+tbody tr:hover{background:rgba(0,208,176,.055)}
+td.co{font-weight:600;color:var(--txt);white-space:nowrap}
+td.clamp div{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;color:var(--txt2);max-width:330px}
+
+/* ================= 口径页 ================= */
+.doc{padding:20px 22px}
+.doc ul{margin:8px 0 0;padding-left:20px}
+.doc li{margin:5px 0;color:var(--txt2);font-size:13.2px}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.kv .cell{padding:14px 16px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--line-soft)}
+.kv .cell b{display:block;font-size:13.4px;margin-bottom:4px}
+.kv .cell span{font-size:12.6px;color:var(--txt2)}
+.flow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.flow .step{
+  flex:1;min-width:190px;padding:12px 14px;border-radius:12px;
+  background:linear-gradient(135deg,rgba(47,107,255,.12),rgba(0,208,176,.06));
+  border:1px solid var(--line-soft);font-size:12.6px;color:var(--txt2);
+}
+footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--line-soft);font-size:11.8px;color:var(--txt3);line-height:1.9}
+@media(max-width:640px){
+  main{padding:16px 14px 70px}
+  header.nav{padding:10px 14px;gap:10px}
+  .h1{font-size:22px}
+  .grid-cards{grid-template-columns:1fr}
+  .tablewrap table{min-width:900px}
+}
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="brand">
+    <b>RoboX 竞对监测看板</b>
+    <span>Competitive Intelligence</span>
+  </div>
+  <nav class="tabs" id="tabs">
+    <button data-v="overview" class="on">总览仪表盘</button>
+    <button data-v="focus">重点层</button>
+    <button data-v="panorama">全景层</button>
+    <button data-v="signals">信号时间线</button>
+    <button data-v="plan">监测口径与管道</button>
+  </nav>
+  <div class="grow"></div>
+  <a class="back-link" href="./睦灵科技（RoboX）生态图谱.html">← 返回生态图谱</a>
+</header>
+<main>
+  <section class="view on" id="v-overview"></section>
+  <section class="view" id="v-focus"></section>
+  <section class="view" id="v-detail"></section>
+  <section class="view" id="v-panorama"></section>
+  <section class="view" id="v-signals"></section>
+  <section class="view" id="v-plan"></section>
+</main>
+<script>
+const DATA = {"meta":{"title":"睦灵科技（RoboX）竞对监测看板","subtitle":"全景层（5 赛道 · 26 家）+ 重点层（8 家 + 1 家在测）｜以变化量为核心的持续竞对情报","version":"v1.0","date":"2026-09-12","author":"Anson（杜岩松）整理 / 内部使用","audiences":"内部团队（含 Anson 本人）；配套读本为《睦灵科技（RoboX）生态图谱》与《企业地图（本体）》","tagline":"以人类操作数据、灵巧末端与具身大脑为核心，构建手眼脑协同的物理智能系统。","sourceNote":"全景层迁移自 2026-08-08《具身智能赛道监测看板》；重点层为公开信息与旧看板条目升级，逐条标注日期与来源。","disclaimer":"本看板为内部决策参考，非投资建议。公开信息可能存在滞后与口径差异；标注「待核实」的字段未经确证，引用前请回溯原始来源。"},"layers":[{"key":"focus","label":"重点层","desc":"对 RoboX 有直接竞争或强对标关系的关键对手，按 9 维建档、每月增量监测。"},{"key":"panorama","label":"全景层","desc":"5 个细分赛道的行业格局视野，按季度全量复核，用于判断赛道重心迁移。"}],"dimensions":[{"key":"identity","label":"身份与融资","hint":"主体、国别、成立时间、创始人、融资轮次与估值；标注来源与日期，未披露写「待核实」。"},{"key":"tech","label":"技术路线","hint":"模型范式（VLA / 世界模型 / 分层架构）、核心主张，以及与 RoboX「手眼脑协同」的同位或错位关系。"},{"key":"data","label":"数据资产","hint":"数据来源（真机 / 仿真 / 视频众包）、规模、采集方式，是否包含触觉与力觉——这是 RoboX 的核心比较维度。"},{"key":"hardware","label":"硬件与末端","hint":"是否自研本体、手部自由度、触觉传感方案、是否绑定特定本体。"},{"key":"scene","label":"场景与客户","hint":"已落地的真实场景、付费方、客户名单；严格区分「demo 展示」与「验收交付」。"},{"key":"business","label":"商业模式与定价","hint":"卖硬件 / 卖模型授权 / 按结果付费；价格锚点与毛利结构。"},{"key":"team","label":"团队与人才风险","hint":"创始背景、人才密度、扩张速度；仅写公司与公开招聘层面的信号，不涉及个人动向。"},{"key":"threat","label":"对 RoboX 的威胁与启示","hint":"威胁等级判定 + 8 特征场景可做性对照 + 对 RoboX 的具体行动启示。"},{"key":"timeline","label":"动态时间线","hint":"只记变化量（delta）：时间、维度、变化、来源、影响。"}],"tracks":[{"key":"tactile","label":"触觉感知与模型","feature":"两条技术路线分化：伪标签路线（从视频推断触觉）vs 物理传感器路线（真实触觉信号）。核心竞争维度是数据规模与触觉融入预训练模型的进度。","insight":"智在无界以 50 万小时 Ego 数据在规模上大幅领先；帕西尼以传感器市占率与降价建立成本护城河。伪标签 vs 物理传感器是赛道核心分歧——前者规模化快但牺牲真实性，后者真实但采集成本高，RoboX 属于后者阵营。"},{"key":"hand","label":"灵巧手 / 末端执行器","feature":"2025 年出货超 2 万台，2026 年预计 7 万台。行业从「参数竞赛」转向「量产稳定性 + 真实场景价值」。","insight":"灵心巧手以 80%+ 高 DOF 市占率成为龙头，因时是量产先驱，临界点借智元拆分创最快独角兽纪录。灵巧手对 RoboX 是「下游载体」而非竞争——它们是 RoboX System 1/0 端侧模型的潜在部署对象。"},{"key":"body","label":"整机本体 / 人形机器人","feature":"2026 上半年国内具身智能融资 935 亿元，22 家估值超百亿。整机公司从「demo 驱动」转向「量产 + 场景」驱动。关键分化：全身人形 vs 双臂桌面，ToB 商业服务 vs ToC 家庭。","insight":"多数整机公司灵巧操作能力仍薄弱（宇树假手仅 3DOF/手、银河通用用夹爪），真正的灵巧操作仍需 RoboX 级别的大脑支撑。整机对 RoboX 更多是「客户/载体」而非竞争；但特斯拉与蚂蚁灵波已被升级为重点层，因其在灵巧手与通用大脑上直接压向 RoboX 的主场。"},{"key":"data","label":"数据采集与服务","feature":"定价 200–500 元/小时，优质数据复售超 10 倍。行业从「采集」升级为「数据基座 + 仿真 + 评测」全链路。","insight":"光轮智能以仿真优先路线成为首个独角兽，无问智科日产千小时已跑通。该赛道对 RoboX 是「参照」也是「替代选项」——若外部数据可采购到足够质量，自建真机触觉数采的边际价值会被重新定价。"},{"key":"brain","label":"具身大脑 / VLA 模型","feature":"VLA 是具身智能核心。关键分化：System 2/1/0 分层 vs 端到端单模型；AR 架构 vs diffusion 架构；纯模型公司 vs 模型 + 本体公司。","insight":"穹彻智能 120B 参数具身大脑与 RoboX「手眼脑协同」理念重叠，是最直接的大脑路线竞争者；自变量以 200 亿估值成为国内估值锚点。RoboX 的差异化在于「分层 + latent space 通信」与真实触觉数据的稀缺性。"}],"companies":[{"id":"c-pi","name":"Physical Intelligence","alias":"π / PI","origin":"美国 · 旧金山","layer":"focus","trackKey":"brain","trackKeys":["brain"],"priority":"P0","roboxRelation":"直接竞争（具身基础模型全球最强的资本与人才磁极）","dims":{"identity":"2024 年初由七位联合创始人创立于旧金山，CEO 为前 Google DeepMind 资深研究科学家 Karol Hausman，联合创始人含 Sergey Levine（UC Berkeley）、Chelsea Finn（Stanford）等学界要角，早期由 OpenAI 支持。2024 年种子轮约 7000 万美元；2025 年 11 月 B 轮后估值约 56 亿美元；2026 年 3–4 月被多家媒体报道正以 110 亿美元估值募资约 10 亿美元。【融资数字均来自公开报道，公司未正式披露，待核实】","tech":"机器人基础模型（VLA）路线：π0 → π0.5 → π*0.6 系列持续迭代，主打跨本体与开放世界泛化，公司称 π0.5 为其首个具备开放世界泛化能力的基础模型。走「大规模异构机器人数据预训练 + 少量后训练适配具体本体」的路径，与 RoboX「分层 System 2/1/0 + 手眼脑协同」正面同位。","data":"以跨本体、多任务真机数据为核心壁垒，合作机构与本体型号覆盖面广；具体数据小时数未公开披露，待核实。数据构成以视觉-语言-动作轨迹为主，触觉与力觉是否纳入主干未披露——这是与 RoboX 的关键差异点。","hardware":"不做本体，模型运行在第三方本体与商用机械臂上；末端以平行夹爪为主，高自由度灵巧手与触觉感知并非其当前主线。","scene":"未形成公开的规模化商业场景与客户名单，至今无公开收入，仍以研究与早期合作为主。","business":"商业模式未公开披露，业界普遍预期为模型授权与合作开发；无产品化定价信息，待核实。","team":"创始团队为学界顶级阵容（Berkeley / Stanford / DeepMind 交叉），研究能力极强；风险在于学术团队向工程化与商业化落地的转换效率，且其人才结构与 RoboX 目标人才高度重叠。","threat":"威胁等级：最高。它是「具身基础模型」叙事在全球范围内最强的资本与人才磁极，110 亿美元量级的估值会持续抬高 RoboX 在海外募资与人才招募上的对标门槛。但短板明确：高自由度灵巧操作与触觉数据均非其主线，且未见中国场景落地。启示：RoboX 的差异化应继续压在「触觉优先 + 分层架构 + 真实场景账本」上，避免在通用 VLA 的「数据规模竞赛」中与其正面拼消耗。【8 特征场景对照·框架推演】主攻场景：无（跨本体通用 VLA，属基础设施层，尚未收敛为可验收作业场景）。逐项：①可回退 不适用 ②高频 不适用 ③触觉真门槛 ❌（夹爪为主线）④环境半结构化 不适用 ⑤结果可自动评估 不适用 ⑥支付方明确 ❌（无公开收入）⑦合规可绕行 ⚠ ⑧B2B 工作站化 ❌ → 判定 P2（场景不可评级）：其威胁集中在资本与人才对标线，而非在某一支付方上与 RoboX 正面抢单。"},"verified":false,"lastUpdate":"2026-09-12","signals":[{"date":"2026-09-12","dimension":"tech","delta":"Physical Intelligence (π) Physical Intelligence (π) Home Research Join Us Physical Intelligence is bringing general-purpose AI into the physical world. We are a group of engineers,","source":"官网 · Physical Intelligence","impact":"","confidence":"low"},{"date":"2026-09-11","dimension":"hardware","delta":"不堆 Transformer，斯坦福吴佳俊如何用物理重新定义多模态融合？｜ECCV 2026","source":"新闻 · 雷峰网 · Physical Intelligence","impact":"","confidence":"low"},{"date":"2026-04-22","dimension":"tech","delta":"发布 π0.5，公司称其为首个具备开放世界泛化能力的机器人基础模型","source":"公开报道 / 公司官网","impact":"通用 VLA 的泛化门槛再次抬高，RoboX 须在触觉维度保持不可替代性","confidence":"medium"},{"date":"2026-03","dimension":"identity","delta":"据公开报道正以 110 亿美元估值募资约 10 亿美元（2025-11 B 轮估值约 56 亿美元）","source":"多家媒体报道，未获公司确认","impact":"抬高全球具身基础模型的估值锚点","confidence":"medium"}]},{"id":"c-nvidia","name":"英伟达 NVIDIA（Isaac GR00T）","alias":"Isaac GR00T / Cosmos / Newton","origin":"美国 · 圣克拉拉","layer":"focus","trackKey":"brain","trackKeys":["brain","body"],"priority":"P0","roboxRelation":"平台级竞争 + 上游供应商（算力与仿真）","dims":{"identity":"英伟达机器人业务线，由 Isaac 平台、GR00T 人形机器人基础模型家族（N1 / N1.5 / N2）、Cosmos 世界模型与 Newton 物理引擎组成。2026 年 5 月 31 日台北 GTC 发布首款开源人形机器人参考设计「Isaac GR00T」，采用宇树 H2 硬件 + 英伟达 Jetson Thor 计算平台；2026 年 8 月 13 日与 LG 签署合作，以 Isaac GR00T 驱动其下一代人形机器人。","tech":"三件套组合：基础模型（GR00T 系列，强调跨本体泛化）+ 世界模型（Cosmos，用于合成数据与仿真）+ 物理引擎（Newton）。策略是通过开源与参考设计，把「模型 + 仿真 + 算力」打包成行业默认底座。","data":"以 Cosmos 合成数据与仿真资产为主要抓手，不依赖自建真机数采队伍，合成数据占比高与其路线强相关；真实数据规模未披露。","hardware":"不产整机，但通过参考设计指定硬件组合（宇树 H2 本体 + Jetson Thor 算力），实质上影响全行业的硬件与算力选型标准。","scene":"面向科研与开发者生态，做的是「给所有机器人公司提供大脑与训练基础设施」，客户即全行业。","business":"开源模型 + 硬件（芯片 / 模组）与云服务变现；模型本身不直接收费，靠生态锁定带动算力销售，定价按算力与平台计。","team":"平台型巨头组织，研究方向由公司战略驱动，对单一垂直场景不做深度定制——这正是它留给垂直公司的空间。","threat":"威胁等级：最高（结构性威胁高于直接竞争）。一旦「基座模型 + 仿真数据 + 参考硬件」成为行业默认组合，RoboX 的自研模型与数据飞轮将被迫在同一标准下被比较，而合成数据路线可能侵蚀「真实触觉数据稀缺性」这一 RoboX 核心假设。启示：必须在其开源模型之上明确「触觉数据 + 场景账本」的不可替代性；同时把英伟达当算力与仿真的上游供应商经营，避免既是对手又是客户却无筹码。【8 特征场景对照·框架推演】主攻场景：向全行业供应「基座模型 + 仿真数据 + 算力」（供应侧基座，非作业场景）。逐项：①可回退 不适用 ②高频 不适用 ③触觉真门槛 ❌（以合成数据为主）④⑤取决于下游场景 ⑥支付方明确 ✅（芯片 / 模组 / 云按算力计费）⑦合规可绕行 ✅ ⑧B2B 工作站化 ✅ → 判定 P1（供应侧结构性威胁）：它不抢单一场景，而是定义所有场景的底座标准。RoboX 含义：把「真实触觉数据 + 可验收场景账本」做成其仿真路线无法覆盖的部分。"},"verified":true,"lastUpdate":"2026-09-12","signals":[{"date":"2026-08-13","dimension":"scene","delta":"与 LG 签署合作，以 Isaac GR00T 驱动其下一代人形机器人","source":"公开报道","impact":"平台生态再添国际整机厂，参考设计的行业默认性增强","confidence":"high"},{"date":"2026-05-31","dimension":"hardware","delta":"发布首款开源人形机器人参考设计 Isaac GR00T（宇树 H2 本体 + Jetson Thor）","source":"GTC 台北大会","impact":"以参考设计锁定硬件与算力标准，压缩垂直公司的自研空间","confidence":"high"}]},{"id":"c-skild","name":"Skild AI","alias":"Skild Brain","origin":"美国 · 匹兹堡","layer":"focus","trackKey":"brain","trackKeys":["brain"],"priority":"P0","roboxRelation":"直接竞争（模型授权派，直撞 RoboX 模型商业化路径）","dims":{"identity":"由 CMU 教授 Deepak Pathak 与 Abhinav Gupta 创立，2026 年 1 月完成约 14 亿美元融资（SoftBank 领投），投后估值超 140 亿美元，距公司成立约 18 个月。【融资与估值来自公开报道，待核实】","tech":"以「Skild Brain」通用机器人基础模型为核心，强调一个模型适配多形态机器人（跨本体泛化），走纯软件授权路线、不做本体。","data":"公开采集规模未披露；宣称通过多客户部署回流数据形成飞轮，待核实。触觉与力觉是否纳入未公开。","hardware":"不自研硬件，模型运行于合作方机器人上；末端能力以夹爪与简单抓取为主，高自由度灵巧手与触觉非其公开重点。","scene":"面向工业、仓储与服务业的机器人厂商做模型授权，客户是机器人公司而非终端场景方。","business":"软件授权 / 按机器人台数或订阅收费，具体定价未披露。","team":"CMU 机器人学习方向的学术带头人团队，学术转产业化能力强；其人才目标池与 Physical Intelligence、RoboX 高度重叠。","threat":"威胁等级：高。与 Physical Intelligence 同属「模型授权派」，直接挑战 RoboX 的模型商业化路径——如果下游本体厂能以合理价格买到通用大脑，「模型 + 数据 + 场景」打包的价值需要更硬的证明。启示：把可验收的场景结果（账本）作为主战场，而不是在参数规模与泛化指标上较量。【8 特征场景对照·框架推演】主攻场景：向机器人厂商授权「Skild Brain」通用大脑（客户为本体厂，非终端场景方）。逐项：①可回退 不适用 ②高频 不适用 ③触觉真门槛 ❌（夹爪与简单抓取为主）④环境半结构化 ❓（取决于被授权方的部署场景）⑤结果可自动评估 ❓ ⑥支付方明确 ✅（机器人厂商按台数 / 订阅付费）⑦合规可绕行 ✅ ⑧B2B 工作站化 ✅ → 判定 P1：支付方与边界清晰，但触觉非其门槛，价值可被泛化竞赛替代。RoboX 含义：以可验收的任务结果（账本）作为主战场。"},"verified":false,"lastUpdate":"2026-09-12","signals":[{"date":"2026-09-12","dimension":"identity","delta":"Skild AI — General Purpose Robotic Intelligence Overview Bringing AI into the physical world Most AI today exists solely in cyberspace. Physical reality is far more information ric","source":"官网 · Skild AI","impact":"","confidence":"low"},{"date":"2026-01-14","dimension":"identity","delta":"完成约 14 亿美元融资（SoftBank 领投），投后估值超 140 亿美元","source":"公开报道","impact":"模型授权派获得超大额弹药，纯软件路线被资本背书","confidence":"high"}]},{"id":"c-ant","name":"蚂蚁灵波（上海蚂蚁灵波科技）","alias":"灵波 / Ant Lingbo","origin":"中国 · 上海","layer":"focus","trackKey":"brain","trackKeys":["brain","body"],"priority":"P0","roboxRelation":"直接竞争（大厂阵营的通用大脑 + 跨本体叙事）","dims":{"identity":"蚂蚁集团旗下具身智能公司。2026 年 7 月 WAIC 展示「具身原生机器人通用大脑」；2026 年 8 月 3 日正式确认启动首轮外部融资，拟募资 15 亿元；2026 年 9 月外滩大会展示通用大脑 2.0，强调跨本体、多场景泛化与产业落地。旧看板记录其早期为「~80 亿（明修评价）」、无 tech report。","tech":"「具身原生」通用大脑路线，已迭代至 2.0，核心卖点是跨本体、多场景泛化。旧看板记录其早期为全身人形 + System 1 模型、手部为低自由度假手（约 3DOF/手）、「无 tech report」的质疑需持续跟踪是否已由 2.0 解决。","data":"背靠蚂蚁生态的数据与算力资源，具体机器人数据规模未披露，待核实；触觉数据是否在规划内未公开。","hardware":"有本体（人形），但末端能力是历史短板；对外叙事重心在「大脑」而非手。","scene":"商服、科研及蚂蚁生态内场景；公开的具体客户与订单未披露。","business":"整机 + 模型双向；首轮融资尚未关闭，商业化路径待明确。","team":"蚂蚁集团体系内孵化，资源与工程化能力强；大厂体系下的产品化节奏与创业公司不同，需观察独立融资后的决策速度与激励结构。","threat":"威胁等级：高。它是 RoboX 在国内最需正视的「大厂阵营」对手——资金、算力、数据与场景入口均强于创业公司，且同样以「通用大脑 + 跨本体」为叙事。关键观察点是它能否把 2.0 的泛化能力转化为可验收、可付费的场景。启示：RoboX 的相对优势在触觉与真实操作数据，应在其「泛化叙事」被大规模验证之前，尽快把可验收账本做成事实标准。【8 特征场景对照·框架推演】主攻场景：商服、科研及蚂蚁生态内场景。逐项：①可回退 ✅ ②高频 ❓（生态内场景频次待确认）③触觉真门槛 ❌（历史假手约 3DOF/手，末端为短板）④环境半结构化 ✅ ⑤结果可自动评估 ❓ ⑥支付方明确 ✅（集团生态内付费）⑦合规可绕行 ✅ ⑧B2B 工作站化 ✅ → 判定 P1：生态内场景可回退、支付方明确，是真实威胁；瓶颈在末端灵巧度。RoboX 含义：抢在其把 2.0 泛化能力转化为规模化账本前，用触觉与真实操作数据建立事实标准。"},"verified":false,"lastUpdate":"2026-09-12","signals":[{"date":"2026-09-12","dimension":"tech","delta":"外滩大会三问具身智能： 模型、数据、生态如何突围？","source":"新闻 · 雷峰网 · 乐聚机器人 / 蚂蚁灵波（上海蚂蚁灵波科技）","impact":"","confidence":"low"},{"date":"2026-09-09","dimension":"tech","delta":"外滩大会展示具身原生机器人通用大脑 2.0，强调跨本体、多场景泛化与产业落地","source":"环球网等公开报道","impact":"泛化叙事升级，需跟踪是否转化为付费场景","confidence":"high"},{"date":"2026-08-03","dimension":"identity","delta":"正式确认启动首轮外部融资，拟募资 15 亿元","source":"公司确认（上海市政府网站转载）","impact":"大厂阵营具身公司独立融资，弹药与独立性同步提升","confidence":"high"}]},{"id":"c-zibianliang","name":"自变量机器人（X² Robot）","alias":"X Square Robot / WALL-B","origin":"中国 · 深圳","layer":"focus","trackKey":"brain","trackKeys":["brain","body"],"priority":"P0","roboxRelation":"直接竞争（国内具身模型赛道的估值锚点）","dims":{"identity":"2023 年底成立（公开报道称成立两年半）；2026 年上半年连续完成 B+、B++、C 轮并全部交割，2026 年 6 月 29 日确认投后估值突破 200 亿元人民币，累计 30 余家机构、超 50 亿元融资，并已启动上市相关准备。官网称其世界统一模型为 WALL-B。","tech":"自研世界统一模型 WALL-B，已进入用户家庭；开源 WALL-OSS 与事件级世界模型 WALL-WM。路线为「端到端大模型驱动通用机器人」，软硬一体（自研本体整机）。","data":"数据规模未公开披露；以自研本体在真实场景中采集为主，待核实。","hardware":"自研本体整机（含双臂与人形形态），双足与轮式均有推进；末端能力公开信息有限。","scene":"物流分拣（2026 年 8 月直播宣称效率超越 Figure AI 45%，被指对比设计存在问题）、家庭场景探索。","business":"整机 + 模型；尚未实现规模化量产与销售收入，估值与收入的背离是公开报道中的主要争议点。","team":"创始团队信息未详细公开（旧看板记为「FA 提到」）；组织扩张快但收入未验证，需持续观察人才密度与实际交付能力。","threat":"威胁等级：高。它是 RoboX 在「估值叙事」上最强的国内对手：200 亿估值、超 50 亿融资、家庭与物流双场景，且公开对标海外第一梯队，会直接影响 RoboX 后续融资的市场定价预期。软肋是「估值先行、收入未至」。启示：RoboX 的融资叙事应主打「可验收账本 + 数据资产回流」，用真实收入与数据资产对冲纯估值比较。【8 特征场景对照·框架推演】主攻场景：物流分拣 + 家庭探索。逐项（分拣）：①可回退 ✅ ②高频 ✅ ③触觉真门槛 ❓（分拣多依赖视觉 + 吸盘/夹爪，若纯视觉方案已达标即触发 kill gate）④环境半结构化 ✅ ⑤结果可自动评估 ✅（分拣成功率）⑥支付方明确 ✅（物流客户）⑦合规可绕行 ✅ ⑧B2B 工作站化 ✅；逐项（家庭）：①可回退 ❌（不可逆伤害风险）⑥支付方明确 ❌（C 端家庭）→ 综合判定 P2：分拣场景若触觉非门槛则被专机路线 kill，家庭路线与 RoboX 终局重合但当期不构成账本威胁。RoboX 含义：其分拣宣传不等同于 RoboX 的触觉场景，避免被其估值叙事牵动融资定价。"},"verified":false,"lastUpdate":"2026-09-12","signals":[{"date":"2026-09-12","dimension":"hardware","delta":"自变量机器人官网 全球首个世界统一模型WALL-B 首页 技术 & 开源 技术 Blog 开源 具亮计划 产品 量子1号 Pro 量子2号 五指灵巧手 无本体数采 桌面主从套装 高性能六轴机械臂 关于我们 新闻资讯 加入我们 社会招聘 校园招聘 采购咨询 EN CN TwinDEX Wall-OSS-0.5 WALL-WM 关闭 技术 Blog TwinDE","source":"官网 · 自变量机器人（X² Robot）","impact":"","confidence":"low"},{"date":"2026-08","dimension":"scene","delta":"物流分拣直播宣称效率超越 Figure AI 45%，被指存在对比设计问题","source":"虎嗅等公开报道","impact":"营销口径与实际交付能力需分开评估","confidence":"medium"},{"date":"2026-06-29","dimension":"identity","delta":"确认 2026 上半年连续完成 B+/B++/C 轮并全部交割，投后估值突破 200 亿元人民币","source":"公司确认 / 公开报道","impact":"刷新国内具身模型赛道估值锚点，间接影响 RoboX 融资预期","confidence":"high"}]},{"id":"c-shengshu","name":"生数科技（Shengshu Technology）","alias":"Vidu / 通用世界模型","origin":"中国 · 北京","layer":"focus","trackKey":"data","trackKeys":["data","brain"],"priority":"P1","roboxRelation":"潜在上游合作 + 世界模型路线的替代压力","dims":{"identity":"朱军（清华）领衔的通用世界模型公司，视频生成模型 Vidu 系列。2026 年 4 月 10 日完成近 20 亿元人民币 B 轮融资，阿里云领投，中网投、九安海棠、好未来、光合创投等参与；2026 年 7 月据公开报道完成 5 亿美元融资，称创国内通用世界模型领域最大单笔。【第二笔金额来自行业媒体，待核实】","tech":"世界模型（World Model）路线：以视频生成与物理世界建模为核心，向具身智能提供「可预测、可生成」的物理世界表征与合成数据能力。与 VLA 端到端路线互补，但在「数据从哪来」这一层构成替代关系。","data":"以互联网视频与自建生成数据为主，不是真机数采公司；其价值在于把视频先验转成可用的训练与仿真素材。","hardware":"无本体、无末端，属纯模型 / 数据上游。","scene":"当前商业化以 AI 视频生成（Vidu）为主；具身方向处于向机器人训练与仿真的延伸阶段，尚无公开的机器人落地场景与客户。","business":"视频生成订阅与授权 + 面向机器人行业的模型与数据服务；机器人侧定价未披露。","team":"清华朱军团队，生成模型领域国内顶级；组织重心仍在视频生成，具身是第二曲线，投入确定性待观察。","threat":"威胁等级：中（短期非直接竞争）。它是 RoboX 数据金字塔中「仿真 / 合成数据层」的强替代选项：如果世界模型能低成本生成高质量操作数据，RoboX 自建真机触觉数采的边际价值会被重新定价。启示：与其对抗，不如评估把它作为仿真数据上游接入；同时坚持「触觉与力觉的真实数据无法被视频生成替代」这一论证，把真实数据资产化做实。【8 特征场景对照·框架推演】主攻场景：无作业场景（AI 视频生成 + 面向机器人的合成数据 / 世界模型上游）。逐项：①②④⑤不适用（非作业场景）③触觉真门槛 ❌（视频生成无法产出真实触觉信号）⑥支付方明确 ✅（视频订阅 + 机器人模型与数据服务）⑦合规可绕行 ⚠（生成内容合规）⑧B2B 工作站化 ❓ → 判定 P2（上游供给）：非场景竞争者，是 RoboX 数据金字塔「仿真层」的替代选项。RoboX 含义：优先评估接入为仿真数据上游，同时守住「真实触觉与力觉不可由视频生成替代」的论证。"},"verified":false,"lastUpdate":"2026-09-12","signals":[{"date":"2026-07-06","dimension":"identity","delta":"据公开报道完成 5 亿美元融资，称创国内通用世界模型领域最大单笔","source":"行业媒体（待核实）","impact":"世界模型作为数据上游的资金实力显著增强","confidence":"medium"},{"date":"2026-04-10","dimension":"identity","delta":"完成近 20 亿元人民币 B 轮融资，阿里云领投","source":"公司公告 / 媒体","impact":"世界模型路线获大厂背书，仿真数据供给侧竞争加剧","confidence":"high"}]},{"id":"c-xieyue","name":"斜跃智能（杭州斜跃智能科技）","alias":"Duplex Reasoning","origin":"中国 · 杭州","layer":"focus","trackKey":"brain","trackKeys":["brain","body"],"priority":"P1","roboxRelation":"潜在竞争（家庭场景具身基础模型，直指 RoboX 终局场景）","dims":{"identity":"成立于 2026 年 2 月，以家庭为第一落地场景的具身基础模型公司，由理想汽车前 AI 首席科学家、基座模型团队负责人陈伟创办（另据媒体报道有理想系高管联合创立，完整名单待核实）。2026 年 9 月 12 日宣布完成数亿元天使+轮融资，线性资本、钧山资本、弘颐资本、隐山资本等参与；资金用于具身基础模型训练、算力与数据基础设施建设、核心团队扩充，以及家庭机器人本体研发与场景验证。","tech":"提出 Duplex Reasoning（双工推理）范式，主张面向真实物理世界的通用具身模型，以自研模型驱动通用家庭机器人，模型与本体同步自研。具体架构细节未公开，待核实。","data":"融资明确用于「算力与数据基础设施建设」，说明数据侧仍在早期搭建阶段；无公开数据规模。","hardware":"计划自研家庭机器人本体（融资用途之一），尚未有公开产品。","scene":"第一落地场景明确为家庭，与 RoboX 2028 第三幕·终局（进入家庭 C 端）正面重合。","business":"尚未商业化，无定价信息。","team":"创始人为理想汽车前 AI 首席科学家，具备基座模型与大模型工程化的完整经验；理想系创业潮（斜跃智能、至简动力等）导致同一人才池被多方争夺，团队稳定性与扩张速度是关键变量。","threat":"威胁等级：中高。它把 RoboX 的「终局场景」提前摆上牌桌：一家成立半年、即获数亿元融资的团队，直接以家庭具身基础模型为目标。短期不威胁 RoboX 的 ToB 账本，但会在 2026–2027 年争夺同一批具身模型人才与后续融资额度。启示：RoboX 的家庭路线应坚持以「ToB 场景数据回流」为差异化前提，而不是与它比谁的模型先「通用」。注意它与本体图中原「理想王凯团队」并非同一主体——后者是至简动力。【8 特征场景对照·框架推演】主攻场景：家庭（第一落地场景）。逐项：①可回退 ❌（家庭人体接触存在不可逆伤害风险）②高频 ❓ ③触觉真门槛 ✅（家庭柔性操作确需触觉）④环境半结构化 ❌（家庭环境高度非结构化）⑤结果可自动评估 ❌ ⑥支付方明确 ❌（C 端家庭付费意愿与 ROI 未验证）⑦合规可绕行 ⚠ ⑧B2B 工作站化 ❌ → 判定 P2：家庭未过 6/8 硬性项，与 RoboX 终局重合但当期不投。RoboX 含义：短期竞争在人才与融资额度而非场景账本；家庭路线应坚持「ToB 场景数据回流」为前置条件。"},"verified":true,"lastUpdate":"2026-09-12","signals":[{"date":"2026-09-12","dimension":"identity","delta":"宣布完成数亿元天使+轮融资，线性资本、钧山资本、弘颐资本、隐山资本等参与","source":"新京报贝壳财经等公开报道","impact":"理想系具身创业潮再添一家，家庭场景出现同期竞争者","confidence":"high"},{"date":"2026-02","dimension":"identity","delta":"公司成立，由理想汽车前 AI 首席科学家陈伟创办，家庭为第一落地场景","source":"公开报道","impact":"同源人才进入家庭具身赛道，岗位与融资竞争前置","confidence":"high"}]},{"id":"c-tesla","name":"特斯拉 Optimus","alias":"Tesla Optimus / Gen 3 / V3","origin":"美国 · 奥斯汀","layer":"focus","trackKey":"body","trackKeys":["body"],"priority":"P1","roboxRelation":"对标（灵巧手 + 量产能力的极限样本，非 ToB 场景竞争者）","dims":{"identity":"特斯拉内部项目（2021 年立项），无独立融资与估值，预算不限；马斯克为其公开发声的主要渠道。不适用常规融资维度。","tech":"全身人形 + 自研灵巧手 + 触觉传感 + FSD 技术迁移。走「硬件规模化 + 端到端神经网络」路线，强调单一模型跨任务与量产一致性，而非分层架构。","data":"以特斯拉工厂内部部署与自有产线为数据来源，规模未披露；其数据获取的独特优势是自有真实工业场景。","hardware":"Optimus Gen 3 / V3，自研灵巧手 11DOF/手并集成触觉传感；灵巧手为其突破关键，空心杯电机等核心部件依赖外部供应链（公开报道提及国内供应商）。","scene":"先在特斯拉自有工厂内部部署，未来对外销售；家庭服务为目标场景之一，但无公开的第三方客户与验收数据。","business":"内部部署为主，未来对外销售；马斯克公开表述 2026 年夏启动生产、2027 年大规模量产，2026 年底前建年产能 100 万台产线的目标。","team":"依托特斯拉整体工程与制造体系，量产与供应链能力是最大优势；项目领导人变动与目标时间表反复是主要风险。","threat":"威胁等级：中高（非直接竞争但影响全行业成本曲线）。它在灵巧手自由度与规模化量产上的推进，会直接压低末端执行器与触觉部件的行业成本，进而影响 RoboX「手」的采购经济性与自研必要性。它不做 ToB 场景大脑供应，因此不争夺 RoboX 的客户。启示：把特斯拉视为「末端供应链的成本驱动者」，据此重估 RoboX 灵巧末端的自制与外采边界；同时其 11DOF + 触觉的方案参数可作为 RoboX 硬件规格的行业基准参照。【8 特征场景对照·框架推演】主攻场景：自有工厂内部部署，未来对外销售。逐项（工厂内）：①可回退 ✅ ②高频 ✅ ③触觉真门槛 ❓（自研 11DOF + 触觉，增益待验证）④环境半结构化 ✅ ⑤结果可自动评估 ✅ ⑥支付方明确 ✅（内部 ROI 可算）⑦合规可绕行 ✅ ⑧B2B 工作站化 ✅；逐项（对外家庭）：①可回退 ❌ ⑥支付方明确 ❓ → 判定 P1（自有工厂场景）：真实但封闭；对外扩张仍是 P2。RoboX 含义：威胁体现在末端成本曲线而非客户争夺，据此重估灵巧末端的自制 / 外采边界。"},"verified":false,"lastUpdate":"2026-09-12","signals":[{"date":"2026-05","dimension":"hardware","delta":"Optimus V3 完成系统级设计冻结，进入 SOP，灵巧手为核心环节","source":"公开报道","impact":"灵巧手量产与成本下探将影响整个末端供应链定价","confidence":"medium"},{"date":"2026-04","dimension":"business","delta":"马斯克公开表述 Gen3 今夏启动生产、2027 年走向大规模量产","source":"公开报道","impact":"量产时间锚点，影响行业对 2027 年竞争格局的判断","confidence":"medium"}]},{"id":"c-zhijian","name":"至简动力（理想系：王凯 / 贾鹏 / 王佳佳）","alias":"原「理想王凯团队」","origin":"中国","layer":"focus","watchOnly":true,"trackKey":"brain","trackKeys":["brain","body"],"priority":"P1","roboxRelation":"在测竞对（检验类场景能力交叠，工程化能力强）","dims":{"identity":"前理想自动驾驶高管贾鹏、王佳佳及前理想 CTO 王凯联合创立（原《企业地图（本体）》中以「理想王凯团队」记录，贾鹏任 CEO&CTO、团队规模 300+）；据 2026 年 4 月媒体报道，理想汽车与元璟资本联合投资。注：与「斜跃智能」（陈伟，理想前 AI 首席科学家）为两家不同主体。","tech":"一体化 VLA + 真机数据闭环体系（旧看板记录），不采用分层架构，与 RoboX 的 System 2/1/0 分层 + latent space 通信路线形成方法论分野。","data":"以真机数据闭环为主，规模未披露，待核实。","hardware":"尚无公开本体产品；已落地无人质检入库、无人充电站、自动充电手臂、工厂自动化检验，并预研人形。","scene":"工厂自动化检验、无人质检入库、无人充电站等工业与补能场景；其检验类能力与 RoboX 医学检验 POC 存在能力交叠。","business":"未公开披露。","team":"理想系核心高管团队、300+ 人规模，工程化与量产经验强，是从量产体系转出的团队；同源公司（斜跃智能等）同时争夺相近人才。","threat":"威胁等级：中高。它的场景选择（工厂检验、自动充电）与 RoboX 的医学检验 POC 在「检验 / 质检」能力上交叠，且团队来自量产体系、更擅长工程化落地与成本控制。启示：RoboX 需在检验类场景中明确「触觉与柔性操作」的不可替代部分，避免与纯视觉质检路线陷入同质竞争；同时把它列为场景级对标而非模型级对标。【8 特征场景对照·框架推演】主攻场景：工厂自动化检验 / 无人质检入库 / 无人充电。逐项（检验类）：①可回退 ✅ ②高频 ✅ ③触觉真门槛 ❓（若纯视觉质检已达标即触发 kill gate）④环境半结构化 ✅ ⑤结果可自动评估 ✅ ⑥支付方明确 ✅（工厂）⑦合规可绕行 ✅ ⑧B2B 工作站化 ✅；逐项（自动充电）：①可回退 ✅ ②高频 ✅ ③触觉真门槛 ❌（结构相对简单）→ 判定 P1（场景级对标）：检验场景支付方明确、可回退，与 RoboX 医学检验 POC 能力交叠。RoboX 含义：在检验场景中明确「触觉 + 柔性操作」的不可替代部分，避免与纯视觉质检同质竞争。"},"verified":false,"lastUpdate":"2026-09-12","signals":[{"date":"2026-04-08","dimension":"identity","delta":"媒体报道理想汽车前高管王凯、贾鹏、王佳佳创办至简动力，理想汽车与元璟资本联合投资","source":"21 世纪经济报道 / 界面新闻","impact":"原本体图「理想王凯团队」实体已具名并获机构投资，监测等级应上调为建档跟踪","confidence":"high"}]},{"id":"p-zizai","name":"智在无界 BeingBeyond","alias":"Being-H0.8","origin":"中国","layer":"panorama","trackKey":"tactile","trackKeys":["tactile","brain"],"priority":"P0","roboxRelation":"直接竞争（触觉维度最直接对手，数据量领先）","dims":{"identity":"创始人卢宗青（北大副教授）；2025 年 1 月成立；获数千万天使轮（联想之星等）。","tech":"TactoHand 伪标签路线，从视频推断触觉；Being-H0.8 为隐式触觉世界动作模型，30Hz 端侧推理，算力需求约为主流方案的 1/100。","data":"50 万小时 Ego 数据（自称全球第一），是旧看板记录中 RoboX 数据量的 62.5 倍。","hardware":"无自研本体对外销售；能力重心在模型与数据侧。","scene":"面向通用具身基础模型，尚无公开的规模化商业场景。","business":"模型授权。","team":"学术背景创始人主导，研究导向突出。","threat":"直接竞争：它是 RoboX 在触觉维度最直接的对手，数据量领先 62.5 倍且已将触觉融入预训练模型。伪标签路线规模化快但牺牲真实性，与 RoboX 物理传感器路线形成方法论对撞。启示：RoboX 必须论证「真实触觉与力觉不可由视频推断替代」，并以可验收任务结果对冲纯数据规模比较。"},"verified":true,"lastUpdate":"2026-08-08","signals":[]},{"id":"p-paxini","name":"帕西尼感知 PaXini","alias":"DexH13 / ITPU / OmniVTLA","origin":"中国","layer":"panorama","trackKey":"tactile","trackKeys":["tactile","hand","data"],"priority":"P0","roboxRelation":"潜在合作（触觉手套与数据采集的上游伙伴，亦敌亦友）","dims":{"identity":"创始人许晋诚（早稻田博士）；2021 年 6 月成立；累计融资约 35 亿元，估值超 100 亿元。","tech":"6D 霍尔阵列物理传感器 + ITPU 触觉芯片；全栈覆盖「传感器 → 灵巧手 → 数据 → 模型」，推出 OmniVTLA 全模态大模型。","data":"百亿条全模态数据、5 座数据工厂、OmniSharing DB 数据商城；以「以人为中心」的全模态实采，触觉为核心差异化。","hardware":"ITPU 触觉芯片、DexH13 灵巧手（13DOF + 1140 触觉传感单元）、DexH5；传感器全球市占率约 80%。","scene":"客户含比亚迪 / 京东 / TCL / 上汽 / 北汽，部分客户同时是股东；全球 100+ 本体厂。","business":"传感器销售（价格从 10 万元/片降至 199 元/片）+ 灵巧手 + 数据商城 + 大模型平台；以价格螺旋建立成本护城河。","team":"创始人技术背景强，全栈自研；组织覆盖硬件、数据与模型三条线，管理复杂度高。","threat":"潜在合作 + 间接竞争：它是「亦敌亦友」型对手——传感器全球垄断但与 RoboX 无直接模型竞争，是触觉手套与数据采集的潜在上游。风险在于它自身也在往数据与模型延伸，长期可能变成「传感器 + 数据 + 模型」的全栈竞争者。启示：与其建立采购关系锁定价量，同时警惕其数据商城对 RoboX 数据资产化的替代。"},"verified":true,"lastUpdate":"2026-08-08","signals":[]},{"id":"p-wujie","name":"无界智航 Xspark AI","alias":"DOVE 8.5B / SuperTac","origin":"中国","layer":"panorama","trackKey":"tactile","trackKeys":["tactile"],"priority":"P2","roboxRelation":"间接竞争","dims":{"identity":"创始人熊祺 + 丁文伯 + 陈天行；2025 年成立；获近亿元天使轮（鼎晖 / 百度）。","tech":"多光谱物理传感器 + 模型 + 评测全栈；DOVE 8.5B 触觉大模型已发布。","data":"未披露。","hardware":"SuperTac 传感器。","scene":"未披露具体场景。","business":"传感器 + 模型 + 评测平台。","team":"技术型创始团队，规模尚小。","threat":"间接竞争：与 RoboX 同属物理传感器路线，验证了该路线的资本认可度，但规模与数据量远未构成直接压力。启示：可作为同业路线验证的参照，关注其评测平台是否形成标准话语权。"},"verified":true,"lastUpdate":"2026-08-08","signals":[]},{"id":"p-dayan","name":"大衍科技","alias":"触觉手套 1015 触点","origin":"中国","layer":"panorama","trackKey":"tactile","trackKeys":["tactile"],"priority":"P2","roboxRelation":"间接竞争","dims":{"identity":"创始人杨林（NUS 博士）；2025 年成立；获数千万天使轮（松禾领投）。","tech":"合成数据驱动 + 手套采集双路线；触觉大模型计划 2026 下半年发布。","data":"以合成数据与手套采集为主。","hardware":"自研触觉手套（1015 触点）+ Shadow Gauntlet 手套。","scene":"未披露具体场景。","business":"手套销售 + 模型授权。","team":"创始人有海外博士背景，团队规模小。","threat":"间接竞争：其 1015 触点手套在采集硬件规格上有参考价值，合成数据路线同样挑战「真实数据稀缺」假设。启示：跟踪其手套参数与价格，作为 RoboX 自研采集装置的规格与成本参照。"},"verified":true,"lastUpdate":"2026-08-08","signals":[]},{"id":"p-weitai","name":"纬钛机器人","alias":"GelSight / 白虎-VTouch","origin":"中国","layer":"panorama","trackKey":"tactile","trackKeys":["tactile"],"priority":"P2","roboxRelation":"潜在合作（数据集互补）","dims":{"identity":"创始人李瑞（MIT 起源）；2024 年成立；融资未披露。","tech":"GelSight 视觉触觉路线（摄像头拍摄弹性体形变反演触觉），权威度高但带宽与集成复杂度受限。","data":"6 万分钟视触觉多模态数据，白虎-VTouch 数据集；与国家地方共建中心合作。","hardware":"GelSight 视触觉传感器。","scene":"以数据集与传感器供应为主。","business":"传感器 + 数据集。","team":"MIT 技术源流，学术背景强。","threat":"潜在合作：视触觉与 RoboX 的触觉路线在数据维度互补，数据集可考虑接入。启示：评估其 VTouch 数据集与 RoboX 自有数据的互补性，避免重复采集。"},"verified":true,"lastUpdate":"2026-08-08","signals":[]},{"id":"p-yinshi","name":"因时机器人 Inspire","alias":"RH56 系列","origin":"中国","layer":"panorama","trackKey":"hand","trackKeys":["hand"],"priority":"P1","roboxRelation":"下游载体（核心零部件供应商）","dims":{"identity":"创始人蔡颖鹏（北航）；2016 年 5 月成立；累计融资约 6 亿元，估值未披露（行业标杆）。","tech":"连杆驱动为量产主力，储备绳驱与直驱；RH56 系列（6 主动 + 6 被动）与微型伺服电缸。","data":"不适用（零部件供应商）。","hardware":"RH56 系列灵巧手、RH5DG2 13DOF 全栈自研；2025 年出货突破 1 万台，为当年全球唯一万级出货厂商，2026 年春晚展示。","scene":"客户覆盖宇树 / 智元 / 银河 / 优必选 / 宁德时代 / 苹果 / 英伟达，全球 2000+ 客户。","business":"核心零部件供应商，卖硬件。","team":"量产工程能力强，是最早跑通万级出货的团队。","threat":"非竞争、是下游载体：它对 RoboX 的意义在于本体与末端的成本与规格基准，是 System 1/0 端侧模型的潜在部署对象。启示：作为灵巧手外采的优先候选，用量产能力对冲 RoboX 自制成本。"},"verified":true,"lastUpdate":"2026-08-08","signals":[]},{"id":"p-lingxin","name":"灵心巧手 LinkerBot","alias":"O6 / L10 / O30","origin":"中国","layer":"panorama","trackKey":"hand","trackKeys":["hand"],"priority":"P1","roboxRelation":"下游载体（赛道龙头，生态化演进）","dims":{"identity":"创始人周永（华中大少年班）；2023 年 7 月成立；累计融资数十亿元，估值超 200 亿元（目标 424 亿元），计划 2027 年港股 IPO。","tech":"连杆 + 直驱 + 绳驱三线全覆盖、全栈自研；产品覆盖 7–42DOF。","data":"Open TeleDex 遥操作系统采集操作数据；自有数据与算法侧持续投入。","hardware":"O6 / L6 / L10 / L20 / L30 / O30 系列；月产 4000 台，2026 年目标 5–10 万台，全球高 DOF 市占 80%+。","scene":"客户含华为 / 三星 / 西门子 / 小米 / 富士康，为宇树独家供应。","business":"从硬件供应商向「数据 - 算法 - 生态」平台演进，推 Dex-Serl RL 与灵心造物大模型。","team":"团队年轻、迭代快，是赛道绝对龙头。","threat":"非竞争、但生态化值得警惕：龙头的估值与出货体量决定末端规格走向，其「硬件 → 数据 → 算法平台」演进方向与 RoboX 的模型层存在远期交叠。启示：短期作为载体合作，长期跟踪其大模型与遥操作数据积累是否演化为 RoboX 的模型级竞争。"},"verified":true,"lastUpdate":"2026-08-08","signals":[]},{"id":"p-linjiedian","name":"临界点 AGILINK","alias":"OmniHand / OmniPicker","origin":"中国","layer":"panorama","trackKey":"hand","trackKeys":["hand"],"priority":"P2","roboxRelation":"下游载体（智元生态协同）","dims":{"identity":"创始人熊坤（前腾讯 RX）；2026 年 1 月由智元拆分，智元控股 67%；融资约 10 亿元，估值超 10 亿美元（成立 5 个月即成独角兽）。","tech":"连杆量产 + 绳驱前瞻 + 全直驱（Ultra-M）；接触智能模型研发、数据飞轮构建。","data":"通过智元生态与自身交付回流数据。","hardware":"OmniHand 系列（10–25DOF）+ OmniPicker 夹爪；5 个月交付 8000 台+，2026Q1 国内第一。","scene":"客户含 LG（CES 2026 首款人形搭载）/ 均胜 / 龙旗 / 上汽；智元生态内协同。","business":"独立开放供货 + 智元生态协同。","team":"腾讯背景创始人，拆分后独立运作，速度极快。","threat":"非竞争、是载体：其「接触智能」模型若成型，会与 RoboX 的触觉模型思路接近，需关注。启示：作为灵巧手载体候选之一，跟踪其接触智能模型的自研边界。"},"verified":true,"lastUpdate":"2026-08-08","signals":[]},{"id":"p-aoyi","name":"傲意科技 OYMotion","alias":"ROH 系列 / OHand","origin":"中国","layer":"panorama","trackKey":"hand","trackKeys":["hand"],"priority":"P2","roboxRelation":"下游载体（医疗资质为差异化）","dims":{"identity":"创始人倪华良（前高通）；2015 年 3 月成立；累计融资约 3.5 亿元，估值未披露。","tech":"腱绳驱动（柔顺性突出）+ 脑机接口融合；具备 VLA 模型适配与「仿真 - 验证 - 部署」全链路能力。","data":"不适用为主。","hardware":"ROH 系列（6 主动 + 5 被动）+ OHand 仿生手；年产近万台，工业市占 52%+，含医疗 FDA 认证。","scene":"客户 200+ 具身企业、德国 HBO 集团、特斯拉、小米。","business":"硬件全生命周期解决方案供应商（含医疗认证）。","team":"创始人有芯片与医疗跨界背景，医疗资质是稀缺资产。","threat":"非竞争、有合作空间：其在康复与医疗的资质积累与 RoboX 康复场景线存在互补。启示：康复场景可评估其仿生手作为末端方案，避免重复开发医疗资质。"},"verified":true,"lastUpdate":"2026-08-08","signals":[]},{"id":"p-unitree","name":"宇树科技 Unitree","alias":"G1 / H1","origin":"中国","layer":"panorama","trackKey":"body","trackKeys":["body"],"priority":"P2","roboxRelation":"客户而非竞争","dims":{"identity":"创始人王兴兴；2016 年成立；估值约 420 亿元，已盈利，A 股 IPO 已盈利受理。","tech":"全身人形 + 假手（3DOF）自研电机；四足机器人为基本盘。","data":"以商演、科研与教育场景的直销数据为主。","hardware":"G1 / H1 人形 + Z1 机械臂 + 四足机器人；双手 44DOF 但假手自由度低（3DOF/手）。","scene":"商演 / 科研 / 教育；全球电商直销 + 分销，2026 年春晚亮相。","business":"电商直销，是唯一已盈利的整机公司。","team":"硬件与供应链能力强，成本控制是其核心优势。","threat":"客户而非竞争：其假手仅 3DOF/手，恰说明真正的灵巧操作仍需 RoboX 级别的大脑支撑。启示：把宇树作为「RoboX 大脑 + 灵巧手」的潜在客户与载体，而非对手。"},"verified":true,"lastUpdate":"2026-08-08","signals":[]},{"id":"p-agibot","name":"智元机器人 AGIBOT","alias":"远征 A2 / 灵犀 X2","origin":"中国","layer":"panorama","trackKey":"body","trackKeys":["body"],"priority":"P1","roboxRelation":"载体与生态（模型层远期交叠）","dims":{"identity":"创始人邓泰华（前华为）；2023 年成立；估值约 1400 亿元，为国内整机估值最高。","tech":"全身人形 + 自研灵巧手（拆分出临界点）+ 数据飞轮。","data":"自建数据采集体系与数据飞轮。","hardware":"远征 A2 / 灵犀 X2；通过临界点获得灵巧手能力。","scene":"工业 / 商业服务 / 科研；客户含临界点、均胜、龙旗。","business":"量产交付 + 数据服务。","team":"华为系管理团队，组织与生态构建能力强。","threat":"载体而非竞争：它构建「本体 + 灵巧手 + 数据」生态，短期需要 RoboX 级大脑，长期其数据飞轮可能自建模型能力。启示：跟踪其数据飞轮与模型自研边界，判断合作窗口期长度。"},"verified":true,"lastUpdate":"2026-08-08","signals":[]},{"id":"p-galbot","name":"银河通用 Galbot","alias":"G1 双臂","origin":"中国","layer":"panorama","trackKey":"body","trackKeys":["body"],"priority":"P2","roboxRelation":"间接（场景侧参照）","dims":{"identity":"创始人王鹤（北大）；2023 年成立；估值数百亿元，获美团 / 京东战略投资。","tech":"双臂 + 夹爪（非灵巧手）、视觉驱动，走「抓取放置」的务实路线。","data":"以商超 / 仓储 / 药房真实场景采集为主。","hardware":"G1 双臂机器人 + 轮式底盘。","scene":"商超 / 仓储 / 药房；合作方含美团 / 京东 / 沃尔玛。","business":"场景落地 + 数据采集。","team":"北大具身研究背景，场景落地推进快。","threat":"间接：其「夹爪而非灵巧手」的选择说明多数场景尚未需要高自由度操作，反证 RoboX 的触觉与灵巧手要选对场景才能体现价值。启示：区分「抓取放置」与「柔性精细操作」两类需求，避免在夹爪可解决的场景里投入高成本灵巧方案。"},"verified":true,"lastUpdate":"2026-08-08","signals":[]},{"id":"p-fourier","name":"傅利叶智能 Fourier","alias":"GR-2","origin":"中国","layer":"panorama","trackKey":"body","trackKeys":["body"],"priority":"P2","roboxRelation":"场景对齐（康复线参照）","dims":{"identity":"创始人顾捷；2015 年成立；估值数十亿元，港股上市筹备中。","tech":"全身人形 + 自研关节 + 外骨骼技术积累，康复场景工程化深。","data":"康复场景的真实交互数据积累。","hardware":"GR-2 人形 + 康复机器人；灵巧手为合作方方案。","scene":"康复 / 医疗 / 商服；客户为康复医院与科研机构。","business":"整机销售 + 康复方案。","team":"康复医疗行业积累十余年，临床渠道强。","threat":"场景对齐：它与 RoboX 康复线在场景上重叠，但走整机销售路线、且灵巧手靠合作，与 RoboX「大脑 + 手」的增量包定位不同。启示：康复场景可参照其临床渠道打法，同时明确 RoboX 在柔性操作与数据回流上的差异。"},"verified":true,"lastUpdate":"2026-08-08","signals":[]},{"id":"p-ubtech","name":"优必选 UBTECH","alias":"Walker S2","origin":"中国","layer":"panorama","trackKey":"body","trackKeys":["body"],"priority":"P2","roboxRelation":"载体（汽车产线场景参照）","dims":{"identity":"创始人周剑；2012 年成立；港股上市（9880.HK），百亿级估值。","tech":"全身人形 + 自研伺服 + 商用服务机器人积累。","data":"汽车产线等工业场景数据。","hardware":"Walker S2 + 商用服务机器人；灵巧手为自研 + 合作并行。","scene":"汽车装配 / 商服 / 教育；客户含比亚迪 / 吉利 / 富士康。","business":"整机销售 + 教育方案 + 汽车产线。","team":"上市公司体系，资金与交付体系成熟。","threat":"载体：其汽车产线落地是工业场景的参照样本。启示：跟踪其实测的节拍与良率数据，用于校准 RoboX 工业场景的可行性判断。"},"verified":true,"lastUpdate":"2026-08-08","signals":[]},{"id":"p-leju","name":"乐聚机器人","alias":"夸父人形","origin":"中国","layer":"panorama","trackKey":"body","trackKeys":["body"],"priority":"P2","roboxRelation":"载体（与灵心巧手互投）","dims":{"identity":"创始人冷春晓；2016 年成立；估值数十亿元，与灵心巧手战略互投（A+ 轮投资方）。","tech":"全身人形 + 自研伺服 + 教育机器人积累。","data":"教育科研场景数据。","hardware":"夸父人形 + 教育机器人；灵巧手为合作方（灵心巧手）。","scene":"教育 / 科研 / 商服；客户为高校与政府。","business":"教育 + 科研 + 整机销售。","team":"教育与科研渠道积累深。","threat":"载体：整机 + 灵巧手互投的模式说明生态内绑定加深。启示：可参考其与末端厂商的绑定方式，评估 RoboX 与本体厂合作的股权或排他安排。"},"verified":true,"lastUpdate":"2026-08-08","signals":[]},{"id":"p-robotera","name":"星动纪元 Robot Era","alias":"星动 STAR","origin":"中国","layer":"panorama","trackKey":"body","trackKeys":["body"],"priority":"P2","roboxRelation":"载体（操作能力较强）","dims":{"identity":"创始人陈建宇（清华）；2023 年成立；估值数十亿元，获联想之星等投资。","tech":"全身人形 + 自研灵巧手 + 强化学习训练，操作能力在整机公司中较强。","data":"向无问智科采购数据，同时自建真机数据。","hardware":"星动 STAR 人形 + 自研灵巧手。","scene":"科研 / 工业 / 商服；合作方含无问智科、清华大学。","business":"整机销售 + 科研合作。","team":"清华团队，RL 与操作能力突出。","threat":"载体：其自研灵巧手 + RL 组合是整机公司中最接近 RoboX 能力模型的，需关注其是否向「大脑自研」延伸。启示：作为潜在客户优先接触，同时监测其模型自研边界。"},"verified":true,"lastUpdate":"2026-08-08","signals":[]},{"id":"p-figure","name":"Figure AI","alias":"Figure 02 / 03","origin":"美国","layer":"panorama","trackKey":"body","trackKeys":["body"],"priority":"P2","roboxRelation":"全球终极对标（尚未进入中国）","dims":{"identity":"创始人 Brett Adcock；2022 年成立；估值约 390 亿美元（约 2800 亿元人民币），为全球整机估值最高。","tech":"全身人形 + 自研灵巧手 + VLA 模型 + 语音交互，与 OpenAI 合作。","data":"以自建与合作伙伴数据为主，规模未披露。","hardware":"Figure 02 与 Figure 03（即将发布）；自研灵巧手。","scene":"汽车装配 / 仓储 / 家庭；客户含 BMW / 亚马逊，合作方含 OpenAI / 微软 / 英伟达。","business":"整机部署 + B 端订阅。","team":"融资与人才吸引力最强的海外整机公司。","threat":"终极对标：它是 RoboX 在全球范围的终极对标——自研灵巧手 + VLA + OpenAI 合作 + BMW/亚马逊客户，但尚未进入中国。启示：以其「灵巧手 + VLA 一体化」为长期竞争形态，跟踪其中国进入计划。"},"verified":true,"lastUpdate":"2026-08-08","signals":[]},{"id":"p-wuwen","name":"无问智科 WuWen.AI","alias":"无垠数据基座","origin":"中国","layer":"panorama","trackKey":"data","trackKeys":["data"],"priority":"P1","roboxRelation":"参照（数采模式可直接对标）","dims":{"identity":"创始人刘盛翔（前百度 Apollo）；2022 年 11 月成立；超亿元 A+ 轮（浙创投等）。","tech":"真实 + 合成 + 仿真三线，Real2Sim2Real 闭环（由自动驾驶迁移）。","data":"日产千小时，千万条目标；德清三层训练场（室内 3000㎡ + 室外 505 亩 + 全域 937㎢）。","hardware":"训练场与数据基座基础设施。","scene":"客户含星动纪元 / 字节跳动 / 地平线；与德清县政府合作落地 + 基金。","business":"数据产品 + 平台订阅 + 训练场运营。","team":"自动驾驶背景，工程化与政企合作能力强。","threat":"参照：其「日产千小时 + 三层训练场」已验证，RoboX 数据采集模式可直接参照其产能组织方式。启示：评估其训练场产能作为 RoboX 数采外包的备选，对冲自建基地的时间成本。"},"verified":true,"lastUpdate":"2026-08-08","signals":[]},{"id":"p-noematrix","name":"穹彻智能 Noematrix","alias":"Noematrix Brain 120B","origin":"中国","layer":"panorama","trackKey":"brain","trackKeys":["brain","data"],"priority":"P0","roboxRelation":"直接竞争（大脑路线重叠）","dims":{"identity":"创始人卢策吾（上海交大）；2023 年 11 月成立；数亿元 A+ 轮，估值约 40 亿元，A+ 轮由无锡数据集团领投。","tech":"「力位混合」（非纯视觉）+ 纯大脑路线不绑定本体；Noematrix Brain 120B 参数（称全球最大具身大模型），任务成功率 85.3%；数据与模型两周交替迭代，推全民参与式采集（RoboPocket / CoMiner）。","data":"目标 100 万小时/年，惠州数采厂；A+ 轮与无锡数据集团共建「千企百万小时」数据集联合体。","hardware":"不绑定本体，属纯大脑路线。","scene":"漱玉平民药房 / 优必选；药房机器人已批量落地，AnySkill 原子技能库面向药房 / 零售 / 酒店 / 家庭。","business":"大脑授权 + 工具链销售 + 场景方案。","team":"上海交大团队，与高校联合实验室 + 阿里战略投资，学术与资本资源兼备。","threat":"直接竞争：它是 RoboX 在大脑模型赛道的最直接竞争者——120B 参数、40 亿估值、「力位混合」理念与 RoboX「手眼脑协同」有理念重叠，且已跑通药房批量落地。启示：RoboX 需在「分层架构 + latent space 通信 + 真实触觉」三点上形成清晰对比论证，并把可验收场景数量作为核心指标对标。"},"verified":true,"lastUpdate":"2026-08-08","signals":[]},{"id":"p-lightwheel","name":"光轮智能 Lightwheel AI","alias":"EgoSuite / SimFoundry","origin":"中国","layer":"panorama","trackKey":"data","trackKeys":["data"],"priority":"P1","roboxRelation":"参照（仿真数据替代压力）","dims":{"identity":"创始人谢晨（前英伟达）；2023 年 1 月成立；融资约 20 亿元+，估值 150 亿元（约 20 亿美元），为全球具身数据领域首个独角兽。","tech":"人类视频 + 仿真合成，「非本体数据」路线，仿真优先（99% 仿真）；Newton TSC 唯一中国企业。","data":"150 万+小时人类视频（自称全球第一）；国际主要具身团队 80%+ 仿真资产来自光轮。","hardware":"不产硬件，提供数据与仿真平台。","scene":"客户含英伟达 / 谷歌 / Figure AI / 字节 / 比亚迪。","business":"数据产品（按小时）+ 仿真平台 + 评测服务，优质数据复售超 10 倍；参与 20 项国家标准、EgoVerse 委员会。","team":"英伟达背景，国际化客户结构最强。","threat":"参照 + 替代压力：其仿真优先路线是 RoboX「真机触觉数采」的直接替代论证来源——若 99% 仿真已足够，真机数据的高成本需要更强辩护。启示：RoboX 必须用触觉与力觉的实采不可替代性来界定仿真边界，并跟踪其标准话语权。"},"verified":true,"lastUpdate":"2026-08-08","signals":[]},{"id":"p-yiren","name":"弈人科技 1renData","alias":"星汉时空大模型","origin":"中国","layer":"panorama","trackKey":"data","trackKeys":["data"],"priority":"P2","roboxRelation":"参照（低成本数据组织方式）","dims":{"identity":"创始人马成辉（前蚂蚁金服）；2013 年 3 月成立；亿级 Pre-A++（多地国资），交通部产业基金等投资。","tech":"千万车辆众包感知 + 空天地感知网络，「车感知世界」能力迁移至机器人，技术人员占比 90%。","data":"百亿级时空数据、覆盖 300+ 城市。","hardware":"感知网络基础设施。","scene":"客户含腾讯 / 阿里 / 百度 / 一汽 / 长安。","business":"数据服务 + 模型能力，是唯一已盈利的数据公司，30 人团队人均效率极高。","team":"团队精简、商业化能力强。","threat":"参照：它证明了「低成本众包 + 跨行业复用」的数据组织方式效率极高。启示：RoboX 可评估消费级众包采集（如家庭 Ego 采集漏斗）在成本结构上的可借鉴之处。"},"verified":true,"lastUpdate":"2026-08-08","signals":[]},{"id":"p-xinghaitu","name":"星海图 Xinghaitu","alias":"—","origin":"中国","layer":"panorama","trackKey":"brain","trackKeys":["brain"],"priority":"P2","roboxRelation":"间接竞争（技术待验证）","dims":{"identity":"创始团队未详细公开（旧看板记为 FA 提到）；2024 年成立；融资未披露（多维资本服务客户）。","tech":"具身大模型，技术细节未详细披露。","data":"未披露。","hardware":"未披露。","scene":"未详细；仅有 demo 展示。","business":"未披露；旧看板记录其案例由多维资本包装。","team":"公开信息极少；旧看板记录 Fanny 评价「PR 能力强」。","threat":"间接竞争：其公开叙事与实际技术之间存在落差，旧看板评价「PR 能力强但技术待验证」。启示：以技术报告与可验收交付为唯一判据，不以其对外发布节奏作为威胁评估依据。"},"verified":true,"lastUpdate":"2026-08-08","signals":[]},{"id":"p-yuanli","name":"元力无限","alias":"—","origin":"中国","layer":"panorama","trackKey":"brain","trackKeys":["brain"],"priority":"P2","roboxRelation":"间接竞争（估值与认知错位）","dims":{"identity":"创始团队未详细公开（旧看板记为 FA 提到）；2024 年成立；估值约 150 亿元（险资 / 国家队）。","tech":"具身大模型，技术细节未详细披露。","data":"未披露。","hardware":"未披露。","scene":"未详细；仅有 demo 展示。","business":"未披露；旧看板记录明修评价「像一条灵活的狗」、沈千旸评价「灵活但无使命」。","team":"未公开详细。","threat":"间接竞争：150 亿估值与技术验证程度之间存在明显背离，旧看板记录「估值高但技术争议大」。启示：把「高估值 ≠ 技术领先」作为内部共识，RoboX 的融资与叙事不应被同类公司的估值竞赛带偏。"},"verified":true,"lastUpdate":"2026-08-08","signals":[]}],"watchPlan":{"cadence":"重点层每月增量更新（信号流）+ 每季度全量复核 9 维；全景层每季度全量复核；采集管道每周一定时执行并产出周报。","sources":["公众号文章链接投喂（微信中复制链接 → 落入 inbox，脚本抓取正文）","公开网络自动采集（公司官网与官方 blog、arXiv、雷峰网 / 新浪财经 / 搜狐等可直抓媒体）","本地行业文档（05_具身智能行业与竞对 目录新增的研报、纪要、截图）","钉钉竞对情报群（可选兜底：dws 可用时自动拉取，不可用时自动降级到投喂目录）"],"triggers":["融资与估值变化（新轮次、估值跳变、上市动作）","关键产品 / 模型发布（版本迭代、开源、技术报告）","量产与交付里程碑（出货量、产线、客户名单从 demo 转为交付）","关键客户或场景合作签约（尤其是检测 / 零售 / 物流 / 家庭场景）","团队与组织信号（核心岗位公开招聘、规模跳变、分拆与合并）","专利与标准动作（标准委员会席位、行业标准牵头）"],"refreshFlow":["① 采集：inbox 投喂 + 公开网络抓取 + 本地文档扫描，统一为原始条目并做增量去重","② 提炼：云端 AI 将原始条目提炼为结构化信号（公司 / 维度 / 变化 / 来源 / 日期 / 影响 / 置信度）","③ 回灌：信号按「日期 + 公司 + 维度」去重后合并进本数据源的 signals 数组","④ 生成：重新生成 HTML 看板与 Word 版看板，并输出本周信号周报"],"notes":["信号只记变化量（delta），档案只记当前态——避免同一事实在档案与信号中重复膨胀。","标注「待核实」的字段在引用前必须回溯原始来源；AI 提炼结果需人工复核后方可进入对外材料。","不写入团队成员个人动向类信息；公司定位统一采用「以人类操作数据、灵巧末端与具身大脑为核心，构建手眼脑协同的物理智能系统」。"]}};
+
+/* ---------------- 基础工具 ---------------- */
+var COMPS = DATA.companies;
+var FOCUS = COMPS.filter(function(c){return c.layer==='focus';});
+var PANO  = COMPS.filter(function(c){return c.layer==='panorama';});
+var DIMS  = DATA.dimensions.filter(function(d){return d.key!=='timeline';});
+var TRACKS= DATA.tracks;
+var DIMCOLOR = {identity:'#2F6BFF',tech:'#00D0B0',data:'#7C5CFF',hardware:'#F5A623',
+                scene:'#34D399',business:'#FF9F45',team:'#FF5C5C',threat:'#FF3D71'};
+var PRICOLOR= {P0:'#FF5C5C',P1:'#FF9F45',P2:'#8C9E5A'};
+
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+  .replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function trackLabel(k){for(var i=0;i<TRACKS.length;i++){if(TRACKS[i].key===k)return TRACKS[i].label;}return k;}
+function dimLabel(k){for(var i=0;i<DATA.dimensions.length;i++){if(DATA.dimensions[i].key===k)return DATA.dimensions[i].label;}return k;}
+function pTag(p){return '<span class="tag '+(p||'').toLowerCase()+'">'+esc(p||'—')+'</span>';}
+function byId(id){for(var i=0;i<COMPS.length;i++){if(COMPS[i].id===id)return COMPS[i];}return null;}
+
+/* 汇总全局信号（含公司名与维度） */
+var SIGNALS=[];
+COMPS.forEach(function(c){
+  (c.signals||[]).forEach(function(s){
+    SIGNALS.push({company:c.name,cid:c.id,companyObj:c,date:s.date||'',dimension:s.dimension||'',
+      delta:s.delta||'',source:s.source||'',impact:s.impact||'',confidence:s.confidence||''});
+  });
+});
+SIGNALS.sort(function(a,b){return (b.date||'').localeCompare(a.date||'');});
+
+/* 待核实字段统计 */
+function pendingCount(){
+  var n=0;
+  COMPS.forEach(function(c){
+    DIMS.forEach(function(d){
+      var v=(c.dims||{})[d.key]||'';
+      if(v.indexOf('待核实')>=0||v.indexOf('未披露')>=0)n++;
+    });
+  });
+  return n;
+}
+function draftCount(){return COMPS.filter(function(c){return c.verified===false;}).length;}
+function latestSignal(c){
+  var s=(c.signals||[]).slice().sort(function(a,b){return (b.date||'').localeCompare(a.date||'');});
+  return s.length?s[0]:null;
+}
+
+/* ---------------- 视图切换 ---------------- */
+var current='overview';
+function show(v){
+  document.querySelectorAll('.view').forEach(function(el){el.classList.remove('on');});
+  var el=document.getElementById('v-'+v);
+  if(el)el.classList.add('on');
+  document.querySelectorAll('#tabs button').forEach(function(b){b.classList.toggle('on',b.dataset.v===v);});
+  current=v;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.getElementById('tabs').addEventListener('click',function(e){
+  var b=e.target.closest('button[data-v]');
+  if(b)show(b.dataset.v);
+});
+
+/* ---------------- 总览 ---------------- */
+function signalCard(s){
+  var col=DIMCOLOR[s.dimension]||'#2F6BFF';
+  return '<div class="sig"><div class="bar" style="background:'+col+'"></div><div class="body">'
+    +'<div class="top"><span class="co">'+esc(s.company)+'</span>'
+    +'<span class="tag">'+esc(dimLabel(s.dimension))+'</span>'
+    +'<span class="dt">'+esc(s.date)+'</span></div>'
+    +'<div class="tx">'+esc(s.delta)+'</div>'
+    +(s.impact?'<div class="im">影响：'+esc(s.impact)+'</div>':'')
+    +(s.source?'<div class="im">来源：'+esc(s.source)+(s.confidence?' · 置信度 '+esc(s.confidence):'')+'</div>':'')
+    +'</div></div>';
+}
+function miniCard(c){
+  var s=latestSignal(c);
+  return '<div class="card hoverable" data-goto="'+esc(c.id)+'">'
+    +'<div class="cname">'+esc(c.name)+pTag(c.priority)
+    +(c.watchOnly?'<span class="tag watch">在测竞对</span>':'')+'</div>'
+    +'<div class="calias">'+esc(c.alias||'')+' · '+esc(c.origin)+'</div>'
+    +'<div class="crel">'+esc(c.roboxRelation)+'</div>'
+    +'<div class="cmeta"><span class="tag">'+esc(trackLabel(c.trackKey))+'</span>'
+    +(c.verified===false?'<span class="tag pending">含待核实字段</span>':'')
+    +(s?'<span class="tag">最近 '+esc(s.date)+'</span>':'')+'</div></div>';
+}
+function renderOverview(){
+  var w=(DATA.watchPlan&&DATA.watchPlan.cadence)||'';
+  document.getElementById('v-overview').innerHTML=
+   '<div class="card hero">'
+   +'<div class="h1">'+esc(DATA.meta.title)+'</div>'
+   +'<div class="sub">'+esc(DATA.meta.subtitle)+'</div>'
+   +'<div class="tagline">'+esc(DATA.meta.tagline)+'</div>'
+   +'<div class="muted" style="margin-top:10px;font-size:12px">'+esc(DATA.meta.version)+' · '+esc(DATA.meta.date)+' · '+esc(DATA.meta.author)+'</div>'
+   +'</div>'
+   +'<div class="stats">'
+   +'<div class="card stat"><div class="k">重点层</div><div class="v">'+FOCUS.length+'</div><div class="d">家深度建档（含 '+FOCUS.filter(function(c){return c.watchOnly;}).length+' 家在测竞对）</div></div>'
+   +'<div class="card stat"><div class="k">全景层</div><div class="v">'+PANO.length+'</div><div class="d">5 个细分赛道</div></div>'
+   +'<div class="card stat"><div class="k">待核实字段</div><div class="v">'+pendingCount()+'</div><div class="d">覆盖 '+draftCount()+' 家公司档案</div></div>'
+   +'<div class="card stat"><div class="k">信号总量</div><div class="v">'+SIGNALS.length+'</div><div class="d">只记变化量（delta）</div></div>'
+   +'</div>'
+   +'<div class="h2">最近信号流</div>'
+   +'<div class="siglist">'+(SIGNALS.length?SIGNALS.slice(0,8).map(signalCard).join(''):'<div class="muted">暂无信号，采集管道跑通后自动汇入。</div>')+'</div>'
+   +'<div class="h2">重点层速览</div>'
+   +'<div class="quick">'+FOCUS.map(miniCard).join('')+'</div>'
+   +'<div class="h2">监测节奏</div>'
+   +'<div class="card doc"><div class="sub">'+esc(w)+'</div></div>';
+}
+
+/* ---------------- 重点层网格 ---------------- */
+var focusFilter={p:'',t:'',q:''};
+function renderFocus(){
+  var tracks={};
+  FOCUS.forEach(function(c){tracks[c.trackKey]=trackLabel(c.trackKey);});
+  var opts=Object.keys(tracks).map(function(k){return '<option value="'+esc(k)+'">'+esc(tracks[k])+'</option>';}).join('');
+  document.getElementById('v-focus').innerHTML=
+   '<div class="h1">重点层 · 深度建档</div>'
+   +'<div class="sub">对 RoboX 有直接竞争或强对标关系的关键对手，按 9 维建档、每月增量监测。点击卡片进入 9 维详情与动态时间线。</div>'
+   +'<div class="filters">'
+   +'<select id="fp"><option value="">全部优先级</option><option value="P0">P0 · 直接竞争</option><option value="P1">P1 · 强对标</option><option value="P2">P2 · 观察</option></select>'
+   +'<select id="ft"><option value="">全部赛道</option>'+opts+'</select>'
+   +'<input id="fq" placeholder="搜索公司 / 别名 / 关系">'
+   +'</div><div class="grid-cards" id="fgrid"></div>';
+  document.getElementById('fp').value=focusFilter.p;
+  document.getElementById('ft').value=focusFilter.t;
+  document.getElementById('fq').value=focusFilter.q;
+  function paint(){
+    var list=FOCUS.filter(function(c){
+      if(focusFilter.p&&c.priority!==focusFilter.p)return false;
+      if(focusFilter.t&&c.trackKey!==focusFilter.t)return false;
+      if(focusFilter.q){
+        var q=focusFilter.q.toLowerCase();
+        var hay=(c.name+' '+(c.alias||'')+' '+c.roboxRelation+' '+(c.origin||'')).toLowerCase();
+        if(hay.indexOf(q)<0)return false;
+      }
+      return true;
+    });
+    document.getElementById('fgrid').innerHTML=list.length?list.map(miniCard).join('')
+      :'<div class="muted">没有符合条件的公司。</div>';
+  }
+  document.getElementById('fp').onchange=function(e){focusFilter.p=e.target.value;paint();};
+  document.getElementById('ft').onchange=function(e){focusFilter.t=e.target.value;paint();};
+  document.getElementById('fq').oninput=function(e){focusFilter.q=e.target.value;paint();};
+  paint();
+}
+
+/* ---------------- 详情 ---------------- */
+function renderDetail(id){
+  var c=byId(id);
+  var box=document.getElementById('v-detail');
+  if(!c){box.innerHTML='<div class="muted">未找到该公司档案。</div>';return;}
+  var sigs=(c.signals||[]).slice().sort(function(a,b){return (b.date||'').localeCompare(a.date||'');});
+  var dimsHtml=DIMS.map(function(d){
+    var v=(c.dims||{})[d.key]||'未披露 / 待核实。';
+    var pending=(v.indexOf('待核实')>=0||v.indexOf('未披露')>=0);
+    return '<details class="dim'+(pending?' pending':'')+'"'+(d.key==='threat'?' open':'')+'>'
+      +'<summary><span class="dot" style="background:'+(DIMCOLOR[d.key]||'#2F6BFF')+'"></span>'
+      +esc(d.label)+(pending?'<span class="tag pending" style="margin-left:8px">待核实</span>':'')
+      +'<span class="hint">'+esc(d.hint.slice(0,26))+'…</span></summary>'
+      +'<div class="content">'+esc(v)+'</div></details>';
+  }).join('');
+  var tl=sigs.length?sigs.map(function(s,i){
+    return '<div class="node'+(i===0?' newest':'')+'">'
+      +'<div class="d">'+esc(s.date)+' · '+esc(dimLabel(s.dimension))+'</div>'
+      +'<div class="t">'+esc(s.delta)+'</div>'
+      +(s.impact?'<div class="s">影响：'+esc(s.impact)+'</div>':'')
+      +(s.source?'<div class="s">来源：'+esc(s.source)+(s.confidence?' · 置信度 '+esc(s.confidence):'')+'</div>':'')
+      +'</div>';
+  }).join(''):'<div class="muted">暂无信号记录。</div>';
+  box.innerHTML=
+   '<div style="margin-bottom:12px"><button class="back-link" id="backFocus" style="cursor:pointer">← 返回重点层</button></div>'
+   +'<div class="card detail-head">'
+   +'<div class="left"><div class="name">'+esc(c.name)+'</div>'
+   +'<div class="calias">'+esc(c.alias||'')+' · '+esc(c.origin||'')+'</div>'
+   +'<div class="sub" style="margin-top:9px">'+esc(c.roboxRelation)+'</div></div>'
+   +'<div class="tags">'+pTag(c.priority)
+   +'<span class="tag">'+esc(trackLabel(c.trackKey))+'</span>'
+   +(c.watchOnly?'<span class="tag watch">在测竞对</span>':'')
+   +(c.verified===false?'<span class="tag pending">含待核实字段</span>':'<span class="tag p2">字段已核实</span>')
+   +'<span class="tag">更新 '+esc(c.lastUpdate||'')+'</span></div></div>'
+   +'<div class="detail-grid">'
+   +'<div>'+dimsHtml+'</div>'
+   +'<div class="card doc"><div class="h2" style="margin-top:0">动态时间线</div><div class="tl">'+tl+'</div></div>'
+   +'</div>';
+  document.getElementById('backFocus').onclick=function(){show('focus');};
+}
+
+/* ---------------- 全景层 ---------------- */
+var panoQ='';
+function renderPanorama(){
+  document.getElementById('v-panorama').innerHTML=
+   '<div class="h1">全景层 · 赛道格局</div>'
+   +'<div class="sub">迁移自 2026-08-08《具身智能赛道监测看板》，5 个细分赛道共 '+PANO.length+' 家。跨赛道公司（帕西尼、智在无界、穹彻智能）在其参与的每个赛道分组中分别体现；重点层公司同样纳入所属赛道，便于横向比较。</div>'
+   +'<div class="filters"><input id="pq" placeholder="搜索公司 / 创始人 / 技术路线"></div>'
+   +'<div id="pgroups"></div>';
+  document.getElementById('pq').value=panoQ;
+  function paint(){
+    var q=panoQ.toLowerCase();
+    var out=TRACKS.map(function(t){
+      var list=COMPS.filter(function(c){
+        return (c.trackKeys||[c.trackKey]).indexOf(t.key)>=0;
+      }).filter(function(c){
+        if(!q)return true;
+        var hay=(c.name+' '+(c.alias||'')+' '+(c.dims.identity||'')+' '+(c.dims.tech||'')+' '+c.roboxRelation).toLowerCase();
+        return hay.indexOf(q)>=0;
+      });
+      if(!list.length)return '';
+      var rows=list.map(function(c){
+        var d=c.dims;
+        return '<tr data-goto="'+esc(c.id)+'" style="cursor:pointer">'
+          +'<td class="co">'+esc(c.name)+'<div class="calias">'+esc(c.alias||'')+'</div></td>'
+          +'<td>'+esc(c.origin)+'</td>'
+          +'<td>'+pTag(c.priority)+(c.layer==='focus'?'<div style="margin-top:5px"><span class="tag watch">重点层</span></div>':'')+'</td>'
+          +'<td>'+esc(c.roboxRelation)+'</td>'
+          +'<td class="clamp"><div>'+esc(d.identity||'—')+'</div></td>'
+          +'<td class="clamp"><div>'+esc(d.tech||'—')+'</div></td>'
+          +'<td class="clamp"><div>'+esc(d.hardware||'—')+'</div></td>'
+          +'<td class="clamp"><div>'+esc(d.data||'—')+'</div></td>'
+          +'</tr>';
+      }).join('');
+      return '<div class="card track">'
+        +'<div class="name">'+esc(t.label)+'<span class="tag">'+list.length+' 家</span></div>'
+        +'<div class="feat"><b class="muted">赛道特征 · </b>'+esc(t.feature)+'</div>'
+        +'<div class="insight"><b>关键洞察 · </b>'+esc(t.insight)+'</div>'
+        +'<div class="tablewrap"><table><thead><tr>'
+        +'<th>公司</th><th>国别</th><th>优先级</th><th>对 RoboX 关系</th>'
+        +'<th>身份与融资</th><th>技术路线</th><th>硬件与末端</th><th>数据资产</th>'
+        +'</tr></thead><tbody>'+rows+'</tbody></table></div></div>';
+    }).join('');
+    document.getElementById('pgroups').innerHTML=out||'<div class="muted">没有符合条件的公司。</div>';
+  }
+  document.getElementById('pq').oninput=function(e){panoQ=e.target.value;paint();};
+  paint();
+}
+
+/* ---------------- 信号时间线 ---------------- */
+var sigFilter={c:'',d:''};
+function renderSignals(){
+  var co=[],seen={};
+  SIGNALS.forEach(function(s){if(!seen[s.cid]){seen[s.cid]=1;co.push(s);}});
+  var coOpt=co.map(function(s){return '<option value="'+esc(s.cid)+'">'+esc(s.company)+'</option>';}).join('');
+  var dOpt=DIMS.map(function(d){return '<option value="'+esc(d.key)+'">'+esc(d.label)+'</option>';}).join('');
+  document.getElementById('v-signals').innerHTML=
+   '<div class="h1">信号时间线</div>'
+   +'<div class="sub">全局变化量视图：只记 delta，不重复档案。点击任一条可回溯到对应公司档案。</div>'
+   +'<div class="filters">'
+   +'<select id="sc"><option value="">全部公司</option>'+coOpt+'</select>'
+   +'<select id="sd"><option value="">全部维度</option>'+dOpt+'</select>'
+   +'</div><div id="sigbody"></div>';
+  document.getElementById('sc').value=sigFilter.c;
+  document.getElementById('sd').value=sigFilter.d;
+  function paint(){
+    var list=SIGNALS.filter(function(s){
+      if(sigFilter.c&&s.cid!==sigFilter.c)return false;
+      if(sigFilter.d&&s.dimension!==sigFilter.d)return false;
+      return true;
+    });
+    if(!list.length){document.getElementById('sigbody').innerHTML='<div class="muted">暂无信号，采集管道跑通后自动汇入。</div>';return;}
+    var groups={},order=[];
+    list.forEach(function(s){
+      var m=(s.date||'').slice(0,7)||'未标日期';
+      if(!groups[m]){groups[m]=[];order.push(m);}
+      groups[m].push(s);
+    });
+    order.sort(function(a,b){return b.localeCompare(a);});
+    document.getElementById('sigbody').innerHTML=order.map(function(m){
+      return '<div class="h2">'+esc(m)+'<span class="tag">'+groups[m].length+' 条</span></div>'
+        +'<div class="siglist">'+groups[m].map(function(s){
+          return '<div class="sig" data-goto="'+esc(s.cid)+'" style="cursor:pointer">'
+            +'<div class="bar" style="background:'+(DIMCOLOR[s.dimension]||'#2F6BFF')+'"></div>'
+            +'<div class="body"><div class="top"><span class="co">'+esc(s.company)+'</span>'
+            +'<span class="tag">'+esc(dimLabel(s.dimension))+'</span>'
+            +'<span class="dt">'+esc(s.date)+'</span></div>'
+            +'<div class="tx">'+esc(s.delta)+'</div>'
+            +(s.impact?'<div class="im">影响：'+esc(s.impact)+'</div>':'')
+            +'</div></div>';
+        }).join('')+'</div>';
+    }).join('');
+  }
+  document.getElementById('sc').onchange=function(e){sigFilter.c=e.target.value;paint();};
+  document.getElementById('sd').onchange=function(e){sigFilter.d=e.target.value;paint();};
+  paint();
+}
+
+/* ---------------- 监测口径 ---------------- */
+function renderPlan(){
+  var p=DATA.watchPlan||{};
+  document.getElementById('v-plan').innerHTML=
+   '<div class="h1">监测口径与管道</div>'
+   +'<div class="sub">9 维监测口径、更新节奏、采集管道与数据来源说明。本页定义了「看什么、多久看一次、怎么进来」。</div>'
+   +'<div class="h2">9 维监测口径</div>'
+   +'<div class="kv">'+DATA.dimensions.map(function(d){
+      return '<div class="cell"><b>'+(DIMCOLOR[d.key]?'<span class="dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+DIMCOLOR[d.key]+';margin-right:7px"></span>':'')
+        +esc(d.label)+'</b><span>'+esc(d.hint)+'</span></div>';
+    }).join('')+'</div>'
+   +'<div class="h2">更新节奏</div><div class="card doc"><div class="sub">'+esc(p.cadence||'')+'</div></div>'
+   +'<div class="h2">采集管道</div>'
+   +'<div class="flow">'+(p.refreshFlow||[]).map(function(s){return '<div class="step">'+esc(s)+'</div>';}).join('')+'</div>'
+   +'<div class="h2">数据来源</div><div class="card doc"><ul>'+(p.sources||[]).map(function(s){return '<li>'+esc(s)+'</li>';}).join('')+'</ul></div>'
+   +'<div class="h2">监测触发条件</div><div class="card doc"><ul>'+(p.triggers||[]).map(function(s){return '<li>'+esc(s)+'</li>';}).join('')+'</ul></div>'
+   +'<div class="h2">使用注意</div><div class="card doc"><ul>'+(p.notes||[]).map(function(s){return '<li>'+esc(s)+'</li>';}).join('')+'</ul></div>'
+   +'<footer>'+esc(DATA.meta.sourceNote)+'<br>'+esc(DATA.meta.disclaimer)+'</footer>';
+}
+
+/* ---------------- 事件委托：卡片 / 行 → 详情 ---------------- */
+document.addEventListener('click',function(e){
+  var t=e.target.closest('[data-goto]');
+  if(t){renderDetail(t.dataset.goto);show('detail');}
+});
+
+/* ---------------- 初始化 ---------------- */
+renderOverview();
+renderFocus();
+renderPanorama();
+renderSignals();
+renderPlan();
+</script>
+</body>
+</html>

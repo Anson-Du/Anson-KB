@@ -1,0 +1,98 @@
+<!--pages/schools/schools.wxml - 院校库页-->
+<view class="page-schools">
+
+  <!-- 区域切换 -->
+  <view class="region-tabs">
+    <view
+      wx:for="{{regions}}"
+      wx:key="key"
+      class="region-tab {{currentRegion === item.key ? 'active' : ''}}"
+      bindtap="switchRegion"
+      data-region="{{item.key}}"
+    >
+      <text>{{item.name}}</text>
+    </view>
+  </view>
+
+  <!-- 截止日期提示 -->
+  <view class="deadline-bar" wx:if="{{regionInfo}}">
+    <text class="deadline-icon">⏰</text>
+    <text class="deadline-text">{{regionInfo.deadline_note}}</text>
+  </view>
+
+  <!-- 专业筛选 -->
+  <scroll-view class="filter-scroll" scroll-x enable-flex>
+    <view
+      wx:for="{{filters}}"
+      wx:key="key"
+      class="filter-chip {{filterTag === item.key ? 'active' : ''}}"
+      bindtap="filterByTag"
+      data-tag="{{item.key}}"
+    >
+      <text>{{item.name}}</text>
+    </view>
+  </scroll-view>
+
+  <!-- 院校列表 -->
+  <view class="schools-list">
+    <view wx:for="{{schools}}" wx:key="id" class="school-card card">
+
+      <!-- 院校头部 -->
+      <view class="school-header">
+        <text class="school-emoji">{{item.emoji}}</text>
+        <view class="school-info">
+          <text class="school-name">{{item.name}}</text>
+          <text class="school-en">{{item.nameEn}}</text>
+          <view class="school-meta">
+            <text class="school-rank">QS {{item.qsRank}}</text>
+            <text class="school-city">📍 {{item.city}}</text>
+            <text wx:if="{{item.localFee}}" class="local-badge">本地学费</text>
+          </view>
+        </view>
+        <view class="match-score">
+          <text class="match-label">匹配度</text>
+          <text class="match-stars">
+            <text wx:for="{{item.matchScore}}" wx:for-item="star" wx:key="*this" class="star-on">★</text>
+            <text wx:for="{{5 - item.matchScore}}" wx:for-item="star" wx:key="*this" class="star-off">★</text>
+          </text>
+        </view>
+      </view>
+
+      <view class="divider"></view>
+
+      <!-- 专业列表 -->
+      <view class="programs-list">
+        <block wx:for="{{item.programs}}" wx:for-item="prog" wx:key="id">
+          <view
+            class="program-item {{filterTag !== 'all' && !prog.tags.includes(filterTag) ? 'hidden' : ''}}"
+            bindtap="goToDetail"
+            data-school-id="{{item.id}}"
+            data-program-id="{{prog.id}}"
+          >
+            <view class="prog-top">
+              <text class="prog-name">{{prog.nameCn}}</text>
+              <view class="prog-match">
+                <text class="match-mini">{{'★'.repeat(prog.match)}}{{'☆'.repeat(5 - prog.match)}}</text>
+              </view>
+            </view>
+            <text class="prog-en">{{prog.name}}</text>
+            <view class="prog-tags">
+              <text wx:for="{{prog.tags}}" wx:for-item="t" wx:key="*this" class="tag tag-{{t}}">
+                {{t === 'math' ? '数学' : t === 'datascience' ? '数据科学' : t === 'chemistry' ? '化学' : '数学+设计'}}
+              </text>
+            </view>
+            <view class="prog-bottom">
+              <text class="prog-level">🎯 {{prog.level}}</text>
+              <text class="prog-ielts">🗣️ {{prog.ielts}}</text>
+            </view>
+            <view class="prog-comment" wx:if="{{prog.comment}}">
+              <text class="comment-text">{{prog.comment}}</text>
+            </view>
+          </view>
+        </block>
+      </view>
+
+    </view>
+  </view>
+
+</view>

@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>持仓看板 · 打开即抓最新行情</title>
+<style>
+:root{
+  --bg:#0a0e17; --card:#131a26; --card2:#0f1621; --line:#22303f;
+  --txt:#e6edf3; --sub:#7d8da1;
+  --up:#ff4d4f; --down:#00d68f; --warn:#f0a020; --blue:#4d9fff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-size:14px;line-height:1.5;padding:18px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}
+a{color:var(--blue)}
+.top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:16px}
+h1{font-size:20px;font-weight:600;letter-spacing:.5px}
+.brand .sub{color:var(--sub);font-size:12px;margin-left:10px}
+.actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+button{background:#1b2637;color:var(--txt);border:1px solid var(--line);border-radius:6px;
+  padding:6px 14px;font-size:13px;cursor:pointer;transition:.15s}
+button:hover{background:#243349;border-color:#3a4c63}
+button:disabled{opacity:.5;cursor:not-allowed}
+.status{font-size:12px;color:var(--sub)}
+.auto{font-size:12px;color:var(--sub);display:flex;align-items:center;gap:4px;cursor:pointer}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.metric .k{font-size:12px;color:var(--sub);margin-bottom:6px}
+.metric .v{font-size:20px;font-weight:600;font-variant-numeric:tabular-nums}
+.metric .v small{font-size:12px;font-weight:400;margin-left:4px}
+.up{color:var(--up)} .down{color:var(--down)} .flat{color:var(--sub)}
+.warn{color:var(--warn)} .low{color:var(--blue)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px}
+.panel h2{font-size:13px;color:var(--sub);font-weight:500;margin-bottom:10px;letter-spacing:.5px}
+.bars{display:flex;flex-direction:column;gap:9px}
+.bar-row{display:grid;grid-template-columns:106px 1fr 88px;gap:10px;align-items:center;font-size:13px}
+.bar-tgt{position:absolute;top:-3px;bottom:-3px;width:2px;background:#e6edf3;opacity:.65}
+.bar-dev{font-size:11px;margin-left:4px}
+.bar-track{height:8px;background:#1b2432;border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width .4s}
+.bar-val{text-align:right;color:var(--sub);font-variant-numeric:tabular-nums}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{padding:9px 8px;text-align:right;white-space:nowrap;border-bottom:1px solid #1a2434}
+th{font-size:12px;color:var(--sub);font-weight:500;cursor:pointer;user-select:none;position:sticky;top:0;background:var(--card)}
+th:hover{color:var(--txt)}
+th.sorted{color:var(--blue)}
+td:first-child,th:first-child,td:nth-child(2),th:nth-child(2){text-align:left}
+tr:hover td{background:#161f2e}
+.nm{font-weight:500}
+.code{color:var(--sub);font-size:12px}
+.tag{display:inline-block;font-size:11px;padding:1px 6px;border-radius:4px;background:#1e2a3c;color:#8fa5bf;margin-left:6px}
+.sig{font-size:11px;padding:2px 7px;border-radius:4px;white-space:nowrap}
+.sig.tp{background:rgba(240,160,32,.15);color:var(--warn);border:1px solid rgba(240,160,32,.35)}
+.sig.sl{background:rgba(255,77,79,.13);color:var(--up);border:1px solid rgba(255,77,79,.3)}
+.sig.conc{background:rgba(77,159,255,.13);color:var(--blue);border:1px solid rgba(77,159,255,.3)}
+.note{color:var(--sub);font-size:12px;line-height:1.9}
+.note b{color:#b8c6d6;font-weight:500}
+.err{background:rgba(255,77,79,.1);border:1px solid rgba(255,77,79,.3);color:#ffb3b3;
+  padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:12px;display:none}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--sub);margin-top:10px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
+
+/* ---- 调仓执行跟踪 ---- */
+.plan-prog{display:flex;align-items:center;gap:12px;margin-bottom:10px;font-size:13px;color:var(--sub)}
+.pbar{flex:1;height:8px;background:#1b2432;border-radius:4px;overflow:hidden}
+.pbar i{display:block;height:100%;background:linear-gradient(90deg,#4d9fff,#36cfc9);border-radius:4px;transition:width .4s}
+button.mini{padding:3px 10px;font-size:12px;border-radius:5px}
+.plan-scroll{max-height:360px;overflow:auto}
+.plan-head,.plan-row{display:grid;grid-template-columns:30px 1fr 62px 96px 84px 74px;gap:8px;align-items:center}
+.plan-head{font-size:12px;color:var(--sub);padding:6px 4px;border-bottom:1px solid #1a2434;
+  position:sticky;top:0;background:var(--card);z-index:1}
+.plan-row{padding:8px 4px;border-bottom:1px solid #1a2434;font-size:13px}
+.plan-row:hover{background:#161f2e}
+.plan-row.done{opacity:.45}
+.plan-row.done .p-name{text-decoration:line-through}
+.p-chk{width:15px;height:15px;accent-color:#4d9fff;cursor:pointer}
+.p-name{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.p-side{font-size:11px;padding:2px 6px;border-radius:4px;text-align:center}
+.p-side.sell{background:rgba(255,77,79,.13);color:var(--up);border:1px solid rgba(255,77,79,.3)}
+.p-side.buy{background:rgba(0,214,143,.13);color:var(--down);border:1px solid rgba(0,214,143,.3)}
+.p-num{text-align:right;font-variant-numeric:tabular-nums}
+.plan-note{color:var(--sub);font-size:12px;line-height:1.9;margin-top:10px}
+
+/* ---- 交易台账 ---- */
+.ledger-sum{display:flex;flex-wrap:wrap;gap:22px;font-size:12px;color:var(--sub);margin-bottom:12px}
+.ledger-sum i{display:block;font-style:normal;font-size:17px;font-weight:600;color:var(--txt);
+  font-variant-numeric:tabular-nums;margin-top:3px}
+.led-scroll{max-height:330px;overflow:auto}
+.led-scroll table{font-size:13px}
+.led-scroll .code{font-size:11px}
+.rbadge{font-size:10px;padding:1px 5px;border-radius:4px;background:#1e2a3c;color:#8fa5bf;margin-left:6px;white-space:nowrap}
+.cash-in{width:104px;background:#0f1621;border:1px solid var(--line);color:var(--txt);
+  border-radius:5px;padding:3px 7px;font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+.cash-in:focus{outline:none;border-color:var(--blue)}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <h1>持仓看板</h1>
+    <span class="sub">A 股持仓 · 打开即抓最新行情 · 四源并行兜底 · 每交易日 9:26 定时刷新</span>
+  </div>
+  <div class="actions">
+    <span id="status" class="status">正在加载行情…</span>
+    <button id="refreshBtn">刷新行情</button>
+    <label class="auto">待投现金 <input type="number" id="cashIn" class="cash-in" step="1" min="0"></label>
+    <label class="auto"><input type="checkbox" id="autoChk" checked> 自动刷新</label>
+  </div>
+</header>
+
+<div id="err" class="err"></div>
+
+<section class="cards" id="summary"></section>
+
+<section class="panel">
+  <h2>组合结构</h2>
+  <div class="bars" id="groups"></div>
+  <div class="legend">
+    <span><i class="dot" style="background:var(--blue)"></i>主题集中度</span>
+    <span>点击表头可排序</span>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>调仓执行跟踪</h2>
+  <div class="plan-prog">
+    <span id="planStat">—</span>
+    <div class="pbar"><i id="planBar" style="width:0%"></i></div>
+    <button id="planReset" class="mini">清空勾选</button>
+  </div>
+  <div class="plan-scroll">
+    <div class="plan-head">
+      <span></span><span>标的</span><span>方向</span>
+      <span class="p-num">目标金额</span><span class="p-num">预计股数</span><span class="p-num">参考价</span>
+    </div>
+    <div id="planBody"></div>
+  </div>
+  <div class="plan-note" id="planNote"></div>
+</section>
+
+<section class="panel">
+  <h2>交易台账（本轮调仓已实现）</h2>
+  <div class="ledger-sum" id="ledgerSum"></div>
+  <div class="led-scroll"><table>
+    <thead><tr>
+      <th>日期</th><th>标的</th><th>代码</th><th>方向</th>
+      <th>数量</th><th>成交价</th><th>金额</th><th>成本</th><th>已实现</th>
+    </tr></thead>
+    <tbody id="ledgerBody"></tbody>
+  </table></div>
+  <div class="plan-note" id="ledgerNote"></div>
+</section>
+
+<section class="panel" style="overflow-x:auto">
+  <h2>持仓明细（按市值降序）</h2>
+  <table>
+    <thead>
+      <tr>
+        <th data-sort="name">名称</th>
+        <th data-sort="code">代码</th>
+        <th data-sort="qty">数量</th>
+        <th data-sort="cost">成本</th>
+        <th data-sort="price">现价</th>
+        <th data-sort="dayChg">今日</th>
+        <th data-sort="mv">市值</th>
+        <th data-sort="pnl">盈亏</th>
+        <th data-sort="pnlPct">盈亏比</th>
+        <th data-sort="weight">占比</th>
+        <th>信号</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</section>
+
+<section class="panel">
+  <div class="note">
+    <b>说明</b>：本看板仅内置「持仓标的 / 持有数量 / 持有成本」三项，其余（现价、市值、盈亏、占比）由页面实时抓取行情计算。<br>
+    <b>刷新规则</b>：每次打开、切回本页、网络恢复时，立即抓取最新行情；页面打开期间每 60 秒刷新一次；抓取失败会自动重试（5 秒起，最长 60 秒一次），并回落到上次缓存行情（页面会标注缓存时间）；每个交易日 9:26 定时刷新一次（集合竞价 9:25 结束后）。<br>
+    <b>调仓目标</b>：结构图中白色竖线为目标权重，数字为「当前% / 目标%」；<span class="warn">橙色 ▲</span> 为超配 ≥3pt，<span class="low">蓝色 ▼</span> 为低配 ≥3pt。<br>
+    <b>调仓跟踪</b>：「调仓执行跟踪」由目标权重机械推导（偏离 ≥3pt 触发，板块内按市值等比例分摊，股数取整到 100 股），勾选后自动保存执行进度，重开页面自动恢复。<br>
+    <b>信号定义</b>：<span class="sig tp">止盈关注</span> 盈亏比 ≥ +50% ｜ <span class="sig sl">止损关注</span> 盈亏比 ≤ −25% ｜ <span class="sig conc">集中度</span> 单一标的占比 ≥ 20%。<br>
+    <b>免责</b>：行情来自第三方公开接口，可能存在延迟或缺口；信号仅为纪律提醒，不构成投资建议。
+  </div>
+</section>
+
+<script>
+/* ============ 1. 持仓数据（仅：标的 / 数量 / 成本） ============ */
+const HOLDINGS = [
+  {code:'SZ002472', name:'双环传动',  qty:11200,  cost:43.500, group:'机器人产业链'},
+  {code:'SH515230', name:'软件ETF',   qty:664600, cost:1.003,  group:'科技ETF'},
+  {code:'SZ300124', name:'汇川技术',  qty:5900,   cost:76.640, group:'机器人产业链'},
+  {code:'SZ002050', name:'三花智控',  qty:8500,   cost:52.840, group:'机器人产业链'},
+  {code:'SH688017', name:'绿的谐波',  qty:260,    cost:179.370,group:'机器人产业链'},
+  {code:'SZ159526', name:'机器人ETF', qty:74000,  cost:1.040,  group:'机器人产业链'},
+  {code:'SH588030', name:'科创100',   qty:40000,  cost:0.985,  group:'宽基指数'},
+  {code:'SZ159278', name:'机器人PH',  qty:50200,  cost:1.090,  group:'机器人产业链'},
+  {code:'SH562380', name:'央企科技银华',qty:20000, cost:0.923,  group:'科技ETF'},
+  {code:'SH603728', name:'鸣志电器',  qty:1000,   cost:72.950, group:'机器人产业链'},
+  {code:'SH588460', name:'科创50增强', qty:10000, cost:1.106,  group:'科技ETF'},
+  {code:'SH513180', name:'恒指科技',  qty:50000,  cost:0.727,  group:'海外资产'},
+  {code:'SH603486', name:'科沃斯',    qty:300,    cost:78.970, group:'机器人产业链'},
+  {code:'SH560050', name:'MSCIA50',   qty:10000,  cost:0.845,  group:'宽基指数'}
+];
+
+/* ============ 1.1 待投现金（卖出所得，未投出部分；顶部输入框可直接改） ============ */
+const CASH_KEY = 'holdings_cash_v1';
+let CASH = (()=>{ const v = parseFloat(localStorage.getItem(CASH_KEY)); return isFinite(v) ? v : 559842; })();
+
+/* ============ 1.2 交易台账（本轮调仓已实现成交；cost = 该标的持仓成本，etf 用于估税费） ============ */
+const TRADES = [
+  {d:'2026-09-14', code:'SZ002472', name:'双环传动',    qty:500,    price:35.24,  cost:43.500,  etf:false},
+  {d:'2026-09-14', code:'SZ002472', name:'双环传动',    qty:1500,   price:34.96,  cost:43.500,  etf:false},
+  {d:'2026-09-14', code:'SH688017', name:'绿的谐波',    qty:200,    price:283.50, cost:179.370, etf:false},
+  {d:'2026-09-14', code:'SH515230', name:'软件ETF',     qty:100000, price:0.673,  cost:1.003,   etf:true},
+  {d:'2026-09-14', code:'SZ159278', name:'机器人PH',    qty:16700,  price:0.907,  cost:1.090,   etf:true},
+  {d:'2026-09-14', code:'SH688169', name:'石头科技',    qty:200,    price:120.21, cost:155.910, etf:false},
+  {d:'2026-09-14', code:'SH588460', name:'科创50增强',  qty:10000,  price:1.920,  cost:1.106,   etf:true},
+  {d:'2026-09-14', code:'SH562380', name:'央企科技银华',qty:20000,  price:1.229,  cost:0.923,   etf:true},
+  {d:'2026-09-14', code:'SZ002747', name:'埃斯顿',      qty:2300,   price:29.05,  cost:23.330,  etf:false},
+  {d:'2026-09-14', code:'SZ159994', name:'通信ETF银华', qty:40000,  price:1.266,  cost:0.497,   etf:true},
+  {d:'2026-09-14', code:'SH688017', name:'绿的谐波',    qty:260,    price:284.28, cost:179.370, etf:false},
+  {d:'2026-09-15', code:'SZ002472', name:'双环传动',    qty:1000,   price:36.50,  cost:43.500,  etf:false},
+  {d:'2026-09-15', code:'SZ002472', name:'双环传动',    qty:1500,   price:36.63,  cost:43.500,  etf:false}
+];
+/* 佣金率（买卖双向）+ 印花税（仅股票卖出） */
+const FEE_COMM = 0.00025, FEE_STAMP = 0.0005;
+
+const GROUP_COLORS = {'机器人产业链':'#ff7a45','科技ETF':'#4d9fff','宽基指数':'#9254de','海外资产':'#36cfc9','债券/固收':'#73d13d'};
+/* 调仓目标权重（%）：白线为目标基准线，实际权重偏离 ≥3pt 时在右侧给出 ▲/▼ 提示 */
+const GROUP_TARGET = {'机器人产业链':45,'科技ETF':20,'宽基指数':20,'海外资产':5,'债券/固收':10};
+
+/* ============ 2. 工具函数 ============ */
+const money = n => (n<0?'-':'') + Math.abs(n).toLocaleString('zh-CN',{maximumFractionDigits:0});
+const priceFmt = n => n>=10 ? n.toFixed(2) : n.toFixed(3);
+const pct = n => (n>=0?'+':'') + n.toFixed(2) + '%';
+const cls = n => n>0 ? 'up' : (n<0 ? 'down' : 'flat');
+
+/* ============ 3. 行情抓取（四源并行竞速 + 覆盖率校验） ============ */
+function jsonp(url, opts){
+  const o = opts || {};
+  return new Promise((resolve,reject)=>{
+    const s = document.createElement('script');
+    if(o.charset) s.charset = o.charset;
+    s.src = url;
+    const timer = setTimeout(()=>{ s.remove(); reject(new Error((o.name||'行情源')+' 超时')); }, 8000);
+    s.onload = ()=>{ clearTimeout(timer); s.remove(); resolve(); };
+    s.onerror = ()=>{ clearTimeout(timer); s.remove(); reject(new Error((o.name||'行情源')+' 加载失败')); };
+    document.head.appendChild(s);
+  });
+}
+
+/* 源 1：腾讯 qt.gtimg.cn（GBK，全局变量 v_<code>） */
+async function srcTencent(){
+  const codes = HOLDINGS.map(h=>h.code.toLowerCase()).join(',');
+  await jsonp('https://qt.gtimg.cn/q=' + codes + '&_=' + Date.now(), {charset:'GBK', name:'腾讯'});
+  const out = {};
+  HOLDINGS.forEach(h=>{
+    const raw = window['v_' + h.code.toLowerCase()];
+    if(!raw) return;
+    const p = raw.split('~');
+    const now = parseFloat(p[3]), pre = parseFloat(p[4]);
+    if(!isFinite(now) || now<=0) return;
+    out[h.code] = {price:now, prevClose:pre, dayChg: pre ? (now-pre)/pre*100 : 0, src:'腾讯'};
+  });
+  return out;
+}
+
+/* 源 2/3：东方财富（主站 + 延时站，JSONP 回调） */
+function srcEastmoney(host){
+  return new Promise((resolve,reject)=>{
+    const secids = HOLDINGS.map(h=>(h.code.startsWith('SH') ? '1.' : '0.') + h.code.slice(2)).join(',');
+    const cb = 'em_cb_' + Math.random().toString(36).slice(2);
+    const s = document.createElement('script');
+    s.src = 'https://' + host + '/api/qt/ulist.np/get?fltt=2&secids=' + secids +
+            '&fields=f2,f3,f12,f14&cb=' + cb + '&_=' + Date.now();
+    const timer = setTimeout(()=>{ s.remove(); delete window[cb]; reject(new Error(host+' 超时')); }, 8000);
+    window[cb] = data=>{
+      clearTimeout(timer);
+      s.remove(); delete window[cb];
+      const out = {};
+      (((data||{}).data||{}).diff||[]).forEach(d=>{
+        const hit = HOLDINGS.find(h=>h.code.slice(2)===String(d.f12));
+        if(!hit) return;
+        const now = Number(d.f2);
+        if(!isFinite(now) || now<=0) return;
+        out[hit.code] = {price:now, prevClose:0, dayChg:Number(d.f3)||0, src:'东财'};
+      });
+      Object.keys(out).length ? resolve(out) : reject(new Error(host+' 返回为空'));
+    };
+    s.onerror = ()=>{ clearTimeout(timer); delete window[cb]; s.remove(); reject(new Error(host+' 加载失败')); };
+    document.head.appendChild(s);
+  });
+}
+
+/* 源 4：新浪 hq.sinajs.cn（GBK，全局变量 hq_str_<code>） */
+async function srcSina(){
+  const codes = HOLDINGS.map(h=>h.code.toLowerCase()).join(',');
+  await jsonp('https://hq.sinajs.cn/list=' + codes + '&_=' + Date.now(), {charset:'GBK', name:'新浪'});
+  const out = {};
+  HOLDINGS.forEach(h=>{
+    const raw = window['hq_str_' + h.code.toLowerCase()];
+    if(!raw) return;
+    const p = raw.split(',');
+    const now = parseFloat(p[3]), pre = parseFloat(p[2]);
+    if(!isFinite(now) || now<=0) return;
+    out[h.code] = {price:now, prevClose:pre, dayChg: pre ? (now-pre)/pre*100 : 0, src:'新浪'};
+  });
+  return out;
+}
+
+/* 竞速：四源同时发起，第一个覆盖率达标的源胜出；全不达标时取覆盖最广的结果 */
+function bestOf(tasks, minCover){
+  return new Promise((resolve,reject)=>{
+    let pending = tasks.length, best = null;
+    const errs = [];
+    const finish = ()=>{
+      if(pending > 0) return;
+      best ? resolve(best) : reject(new Error(errs.join('；') || '全部行情源失败'));
+    };
+    tasks.forEach(t=>{
+      t.then(q=>{
+        const hit = Object.keys(q).length;
+        if(hit / HOLDINGS.length >= minCover) resolve(q);
+        else if(hit > 0 && (!best || hit > Object.keys(best).length)) best = q;
+        pending--; finish();
+      }).catch(e=>{ errs.push(e.message); pending--; finish(); });
+    });
+  });
+}
+
+async function fetchQuotes(){
+  return bestOf([
+    srcTencent(),
+    srcEastmoney('push2.eastmoney.com'),
+    srcEastmoney('push2delay.eastmoney.com'),
+    srcSina()
+  ], 0.8);
+}
+
+/* ============ 4. 渲染 ============ */
+let ROWS = [];
+let sortKey = 'mv', sortAsc = false;
+
+function build(quotes){
+  ROWS = HOLDINGS.map(h=>{
+    const q = quotes[h.code];
+    const price = q ? q.price : null;
+    const costAmt = h.qty * h.cost;
+    const mv = price!=null ? h.qty*price : null;
+    const pnl = mv!=null ? mv - costAmt : null;
+    return {
+      ...h, price, dayChg: q?q.dayChg:null,
+      costAmt, mv,
+      pnl,
+      pnlPct: pnl!=null ? pnl/costAmt*100 : null
+    };
+  });
+  const totalMV = ROWS.reduce((s,r)=>s+(r.mv||0),0);
+  const totalCost = ROWS.reduce((s,r)=>s+r.costAmt,0);
+  /* 组合口径 = 持仓市值 + 待投现金；占比、结构、调仓推导统一以组合口径为分母 */
+  const totalAsset = totalMV + CASH;
+  ROWS.forEach(r=>{ r.weight = totalAsset>0 ? (r.mv||0)/totalAsset*100 : 0; });
+  return {totalMV,totalCost,totalAsset};
+}
+
+function renderSummary(totalMV,totalCost,totalAsset){
+  const pnl = totalMV - totalCost;
+  const pctVal = totalCost>0 ? pnl/totalCost*100 : 0;
+  const miss = ROWS.filter(r=>r.price==null).length;
+  document.getElementById('summary').innerHTML = `
+    <div class="card metric"><div class="k">组合总资产</div><div class="v">${money(totalAsset)}<small>元</small></div></div>
+    <div class="card metric"><div class="k">持仓市值</div><div class="v">${money(totalMV)}<small>元</small></div></div>
+    <div class="card metric"><div class="k">待投现金</div><div class="v">${money(CASH)}<small>元</small></div></div>
+    <div class="card metric"><div class="k">浮动盈亏</div><div class="v ${cls(pnl)}">${money(pnl)}<small>元</small></div></div>
+    <div class="card metric"><div class="k">浮动盈亏比</div><div class="v ${cls(pnl)}">${pct(pctVal)}</div></div>
+    <div class="card metric"><div class="k">持仓只数</div><div class="v">${ROWS.length}<small>${miss?('（'+miss+'只未取到价）'):''}</small></div></div>`;
+}
+
+function renderGroups(totalAsset){
+  const map = {};
+  ROWS.forEach(r=>{ map[r.group] = (map[r.group]||0) + (r.mv||0); });
+  const total = totalAsset || 1;
+  let html = Object.entries(GROUP_TARGET).map(([g,tgt])=>{
+    const p = (map[g]||0)/total*100;
+    const dev = p - tgt;
+    const color = GROUP_COLORS[g] || '#4d9fff';
+    const dv = Math.abs(dev) < 3 ? '' : (dev > 0 ? 'warn' : 'low');
+    const mark = Math.abs(dev) < 3 ? '' : (dev > 0 ? '▲' : '▼');
+    return `<div class="bar-row">
+      <span>${g}</span>
+      <div class="bar-track" style="position:relative">
+        <div class="bar-fill" style="width:${Math.min(p,100).toFixed(1)}%;background:${color}"></div>
+        <div class="bar-tgt" style="left:${tgt}%"></div>
+      </div>
+      <span class="bar-val ${dv}">${p.toFixed(1)}%<span style="opacity:.5"> / ${tgt}%</span> ${mark}</span>
+    </div>`;
+  }).join('');
+  /* 待投现金单列，目标是 0%（最终应全部投出） */
+  const cp = CASH/total*100;
+  html += `<div class="bar-row">
+      <span>待投现金</span>
+      <div class="bar-track" style="position:relative">
+        <div class="bar-fill" style="width:${Math.min(cp,100).toFixed(1)}%;background:#5a6b80"></div>
+      </div>
+      <span class="bar-val">${cp.toFixed(1)}%<span style="opacity:.5"> / 0%</span></span>
+    </div>`;
+  document.getElementById('groups').innerHTML = html;
+}
+
+function signalOf(r){
+  const out = [];
+  if(r.pnlPct!=null && r.pnlPct>=50)  out.push('<span class="sig tp">止盈关注</span>');
+  if(r.pnlPct!=null && r.pnlPct<=-25) out.push('<span class="sig sl">止损关注</span>');
+  if(r.weight>=20) out.push('<span class="sig conc">集中度</span>');
+  return out.join(' ');
+}
+
+function renderTable(){
+  const rows = [...ROWS].sort((a,b)=>{
+    const va = a[sortKey], vb = b[sortKey];
+    if(typeof va === 'string') return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+    const na = va==null?-Infinity:va, nb = vb==null?-Infinity:vb;
+    return sortAsc ? na-nb : nb-na;
+  });
+  document.getElementById('tbody').innerHTML = rows.map(r=>`
+    <tr>
+      <td class="nm">${r.name}<span class="tag">${r.group}</span></td>
+      <td class="code">${r.code}</td>
+      <td>${r.qty.toLocaleString('zh-CN')}</td>
+      <td>${priceFmt(r.cost)}</td>
+      <td class="${r.dayChg!=null?cls(r.dayChg):''}">${r.price!=null?priceFmt(r.price):'—'}</td>
+      <td class="${r.dayChg!=null?cls(r.dayChg):''}">${r.dayChg!=null?pct(r.dayChg):'—'}</td>
+      <td>${r.mv!=null?money(r.mv):'—'}</td>
+      <td class="${r.pnl!=null?cls(r.pnl):''}">${r.pnl!=null?money(r.pnl):'—'}</td>
+      <td class="${r.pnlPct!=null?cls(r.pnlPct):''}">${r.pnlPct!=null?pct(r.pnlPct):'—'}</td>
+      <td>${r.weight.toFixed(2)}%</td>
+      <td style="text-align:left">${r.price!=null?signalOf(r):''}</td>
+    </tr>`).join('');
+}
+
+function renderAll(quotes){
+  const {totalMV,totalCost,totalAsset} = build(quotes);
+  renderSummary(totalMV,totalCost,totalAsset);
+  renderGroups(totalAsset);
+  PLAN = buildPlan(totalAsset);
+  renderPlan();
+  renderLedger();
+  renderTable();
+}
+
+/* ============ 6. 调仓执行跟踪（按目标权重推导 + 勾选持久化） ============ */
+const PLAN_KEY = 'holdings_plan_checks_v1';
+let PLAN = [];
+let planChecks = (()=>{
+  try{ return JSON.parse(localStorage.getItem(PLAN_KEY) || '{}') || {}; }catch(e){ return {}; }
+})();
+function saveChecks(){
+  try{ localStorage.setItem(PLAN_KEY, JSON.stringify(planChecks)); }catch(e){}
+}
+function planKey(it){ return it.group + '|' + it.code + '|' + it.side; }
+
+/* 推导规则：板块偏离目标 ≥3pt 才动作；分母 = 组合总资产（持仓市值 + 待投现金）。
+   减仓优先级：①清尾仓（单只占组合 <2%）→ ②重仓止盈减半（占组合 ≥4% 且盈亏比 ≥ +50%）
+   → ③剩余按板块内市值等比例分摊；加仓按板块内市值等比例分摊。
+   股数一律向下取整到 100 股，不足 100 股忽略。 */
+function buildPlan(totalAsset){
+  const map = {};
+  ROWS.forEach(r=>{ map[r.group] = (map[r.group]||0) + (r.mv||0); });
+  const out = [];
+  const TAIL_PT = 2;
+  const TP_PT   = 50;
+  const TP_MIN_W = 4;
+
+  Object.entries(GROUP_TARGET).forEach(([g,tgt])=>{
+    const cur = totalAsset>0 ? (map[g]||0)/totalAsset*100 : 0;
+    const dev = cur - tgt;
+    if(Math.abs(dev) < 3) return;
+    const amt = Math.abs(dev)/100*totalAsset;
+    const side = dev>0 ? 'sell' : 'buy';
+    const members = ROWS.filter(r=>r.group===g && r.price!=null && r.qty>0);
+    if(!members.length){
+      out.push({group:g, side, code:'', name:'（暂无持仓标的，需先选定）', amt, shares:null, price:null, reason:'待选定', needPick:true});
+      return;
+    }
+    const push = (r, shares, reason)=>{
+      out.push({group:g, side, code:r.code, name:r.name, amt:shares*r.price, shares, price:r.price, reason});
+    };
+    const cutOf = (r, budget)=>{
+      const s = Math.floor(budget / r.price / 100) * 100;
+      return Math.min(s, Math.floor(r.qty/100)*100);
+    };
+
+    /* 加仓：板块内等比例分摊 */
+    if(side==='buy'){
+      const memMV = members.reduce((s,r)=>s+(r.mv||0),0) || 1;
+      members.forEach(r=>{
+        const shares = Math.floor(amt*(r.mv||0)/memMV / r.price / 100) * 100;
+        if(shares >= 100) push(r, shares, '等比例加仓');
+      });
+      return;
+    }
+
+    /* 减仓：三级优先级 */
+    let remain = amt;
+    const used = new Set();
+
+    members.filter(r => (r.mv||0)/totalAsset*100 < TAIL_PT)
+           .sort((a,b)=>(a.mv||0)-(b.mv||0))
+           .forEach(r=>{
+             if(remain < r.price*100) return;
+             const shares = cutOf(r, Math.min(remain, r.mv||0));
+             if(shares < 100) return;
+             used.add(r.code); remain -= shares*r.price;
+             push(r, shares, '清尾仓');
+           });
+
+    if(remain > 0){
+      members.filter(r => !used.has(r.code) && r.pnlPct!=null && r.pnlPct>=TP_PT
+                          && (r.mv||0)/totalAsset*100 >= TP_MIN_W)
+             .sort((a,b)=>b.pnlPct-a.pnlPct)
+             .forEach(r=>{
+               if(remain < r.price*100) return;
+               const shares = cutOf(r, Math.min(remain, (r.mv||0)*0.5));
+               if(shares < 100) return;
+               used.add(r.code); remain -= shares*r.price;
+               push(r, shares, '止盈减半');
+             });
+    }
+
+    if(remain > 0){
+      const rest = members.filter(r=>!used.has(r.code));
+      const restMV = rest.reduce((s,r)=>s+(r.mv||0),0) || 1;
+      rest.forEach(r=>{
+        const shares = cutOf(r, remain*(r.mv||0)/restMV);
+        if(shares >= 100) push(r, shares, '等比例减仓');
+      });
+    }
+  });
+  return out;
+}
+
+function renderPlan(){
+  const body = document.getElementById('planBody');
+  const stat = document.getElementById('planStat');
+  const bar  = document.getElementById('planBar');
+  const note = document.getElementById('planNote');
+  if(!PLAN.length){
+    body.innerHTML = '<div class="note" style="padding:12px 4px">各板块权重均在目标 ±3pt 以内，当前无需调仓。</div>';
+    stat.textContent = '无需调仓';
+    bar.style.width = '100%';
+    note.innerHTML = '';
+    return;
+  }
+  const totalAmt = PLAN.reduce((s,it)=>s+it.amt,0);
+  const doneList = PLAN.filter(it=>planChecks[planKey(it)]);
+  const doneAmt  = doneList.reduce((s,it)=>s+it.amt,0);
+  stat.textContent = '已执行 ' + doneList.length + '/' + PLAN.length + ' 笔 · ' +
+    money(doneAmt) + ' / ' + money(totalAmt) + ' 元';
+  bar.style.width = (doneList.length/PLAN.length*100).toFixed(1) + '%';
+
+  body.innerHTML = PLAN.map(it=>{
+    const k = planKey(it);
+    const on = !!planChecks[k];
+    return '<div class="plan-row' + (on?' done':'') + '">' +
+      '<input type="checkbox" class="p-chk" data-k="' + k + '"' + (on?' checked':'') + '>' +
+      '<span class="p-name">' + it.name +
+        '<span class="code" style="margin-left:6px">' + it.code + '</span>' +
+        '<span class="tag">' + it.group + '</span>' +
+        (it.reason ? '<span class="rbadge">' + it.reason + '</span>' : '') + '</span>' +
+      '<span class="p-side ' + it.side + '">' + (it.side==='sell'?'减仓':'加仓') + '</span>' +
+      '<span class="p-num">' + money(it.amt) + '</span>' +
+      '<span class="p-num">' + (it.shares!=null ? it.shares.toLocaleString('zh-CN') : '—') + '</span>' +
+      '<span class="p-num">' + (it.price!=null ? priceFmt(it.price) : '—') + '</span>' +
+    '</div>';
+  }).join('');
+
+  const sell = PLAN.filter(x=>x.side==='sell').reduce((s,x)=>s+x.amt,0);
+  const buy  = PLAN.filter(x=>x.side==='buy' && x.shares!=null).reduce((s,x)=>s+x.amt,0);
+  const pick = PLAN.filter(x=>x.needPick).reduce((s,x)=>s+x.amt,0);
+  note.innerHTML = '<b>推导依据</b>：以「组合结构」目标权重为基准，分母 = 持仓市值 + 待投现金，板块偏离 ≥3pt 才动作。<br>' +
+    '<b>减仓优先级</b>：① 清尾仓（单只占组合 &lt;2%）→ ② 重仓止盈减半（占组合 ≥4% 且盈亏比 ≥ +50%）→ ③ 剩余按板块内市值等比例分摊；股数向下取整到 100 股。<br>' +
+    '<b>金额核对</b>：减仓合计 ' + money(sell) + ' 元 ｜ 加仓合计 ' + money(buy) + ' 元' +
+    (pick ? '（另有 ' + money(pick) + ' 元待选定标的）' : '') + '。<br>' +
+    '<b>勾选状态</b>保存在本机浏览器中，重开页面会自动恢复。';
+}
+
+/* ============ 7. 交易台账（已实现盈亏 + 调仓进度） ============ */
+function renderLedger(){
+  const rows = TRADES.map(t=>{
+    const amt = t.qty * t.price;
+    const pnl = (t.price - t.cost) * t.qty;
+    const fee = amt * (FEE_COMM + (t.etf ? 0 : FEE_STAMP));
+    return {...t, amt, pnl, fee};
+  });
+  const sumAmt = rows.reduce((s,r)=>s+r.amt,0);
+  const sumPnl = rows.reduce((s,r)=>s+r.pnl,0);
+  const sumFee = rows.reduce((s,r)=>s+r.fee,0);
+
+  /* 调仓进度 = 已回收 ÷（已回收 + 当前仍待减仓金额），随行情自动重算 */
+  const sellLeft = PLAN.filter(x=>x.side==='sell').reduce((s,x)=>s+x.amt,0);
+  const pctDone = (sumAmt + sellLeft) > 0 ? sumAmt/(sumAmt + sellLeft)*100 : 100;
+
+  document.getElementById('ledgerSum').innerHTML =
+    '<div>成交笔数<i>' + rows.length + ' 笔</i></div>' +
+    '<div>累计回收<i>' + money(sumAmt) + ' 元</i></div>' +
+    '<div>已实现盈亏<i class="' + cls(sumPnl) + '">' + money(sumPnl) + ' 元</i></div>' +
+    '<div>预估税费<i>' + money(sumFee) + ' 元</i></div>' +
+    '<div>净已实现<i class="' + cls(sumPnl-sumFee) + '">' + money(sumPnl-sumFee) + ' 元</i></div>' +
+    '<div>调仓进度<i>' + pctDone.toFixed(1) + '%</i></div>';
+
+  document.getElementById('ledgerBody').innerHTML = rows.map(r=>
+    '<tr>' +
+      '<td style="text-align:left">' + r.d + '</td>' +
+      '<td class="nm" style="text-align:left">' + r.name + (r.etf ? '<span class="rbadge">ETF</span>' : '') + '</td>' +
+      '<td class="code">' + r.code + '</td>' +
+      '<td>减仓</td>' +
+      '<td>' + r.qty.toLocaleString('zh-CN') + '</td>' +
+      '<td>' + priceFmt(r.price) + '</td>' +
+      '<td>' + money(r.amt) + '</td>' +
+      '<td>' + priceFmt(r.cost) + '</td>' +
+      '<td class="' + cls(r.pnl) + '">' + money(r.pnl) + '</td>' +
+    '</tr>').join('');
+
+  document.getElementById('ledgerNote').innerHTML =
+    '<b>口径</b>：已实现盈亏 =（成交价 − 持仓成本）× 数量；预估税费 = 金额 ×（佣金 0.025% + 印花税 0.05%，印花税仅股票）。<br>' +
+    '<b>调仓进度</b>：累计回收 ' + money(sumAmt) + ' 元 ÷（累计回收 + 当前仍待减仓 ' + money(sellLeft) + ' 元）= ' +
+    pctDone.toFixed(1) + '%，随持仓与行情自动重算。<br>' +
+    '<b>维护</b>：台账为手工登记的已发生成交，新增/修改请编辑源码中的 TRADES 数组。';
+}
+
+/* 待投现金输入框 */
+const cashInEl = document.getElementById('cashIn');
+cashInEl.value = CASH;
+cashInEl.addEventListener('change', ()=>{
+  const v = parseFloat(cashInEl.value);
+  CASH = (isFinite(v) && v >= 0) ? v : 0;
+  try{ localStorage.setItem(CASH_KEY, String(CASH)); }catch(e){}
+  cashInEl.value = CASH;
+  refresh();
+});
+
+document.getElementById('planBody').addEventListener('change', e=>{
+  const t = e.target;
+  if(!t || !t.classList || !t.classList.contains('p-chk')) return;
+  if(t.checked) planChecks[t.dataset.k] = true; else delete planChecks[t.dataset.k];
+  saveChecks();
+  renderPlan();
+});
+document.getElementById('planReset').addEventListener('click', ()=>{
+  planChecks = {};
+  saveChecks();
+  renderPlan();
+});
+
+/* ============ 5. 刷新调度（缓存兜底 + 失败自动重试） ============ */
+const statusEl = document.getElementById('status');
+const errEl = document.getElementById('err');
+let loading = false;
+let failCount = 0;
+let retryTimer = null;
+
+const CACHE_KEY = 'holdings_quotes_cache_v1';
+function saveCache(quotes){
+  try{ localStorage.setItem(CACHE_KEY, JSON.stringify({ts:Date.now(), quotes})); }catch(e){}
+}
+function loadCache(){
+  try{
+    const o = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+    return (o && o.quotes && o.ts) ? o : null;
+  }catch(e){ return null; }
+}
+
+async function refresh(){
+  if(loading) return;
+  loading = true;
+  document.getElementById('refreshBtn').disabled = true;
+  statusEl.textContent = '正在加载行情…';
+  errEl.style.display = 'none';
+  try{
+    const quotes = await fetchQuotes();
+    renderAll(quotes);
+    saveCache(quotes);
+    failCount = 0;
+    if(retryTimer){ clearTimeout(retryTimer); retryTimer = null; }
+    const t = new Date();
+    const src = (quotes[Object.keys(quotes)[0]] || {}).src || '';
+    statusEl.textContent = '最后更新 ' + t.toLocaleTimeString('zh-CN',{hour12:false}) +
+      '（' + t.toLocaleDateString('zh-CN') + '）· 源：' + src;
+  }catch(e){
+    const c = loadCache();
+    if(c){
+      renderAll(c.quotes);
+      errEl.innerHTML = '⚠️ 实时行情获取失败（' + e.message + '）。当前显示 <b>上次缓存行情</b>（' +
+        new Date(c.ts).toLocaleString('zh-CN',{hour12:false}) + '），正在自动重试…';
+      errEl.style.display = 'block';
+      statusEl.textContent = '实时抓取失败 · 显示缓存';
+    }else{
+      errEl.textContent = '⚠️ 行情获取失败：' + e.message +
+        '。请检查网络（部分网络会拦截第三方行情接口），正在自动重试…';
+      errEl.style.display = 'block';
+      statusEl.textContent = '行情获取失败';
+      if(!ROWS.length){ const {totalMV,totalCost,totalAsset} = build({}); renderSummary(totalMV,totalCost,totalAsset); renderGroups(totalAsset); renderLedger(); renderTable(); }
+    }
+    failCount++;
+    if(!retryTimer){
+      const delay = Math.min(5000 * failCount, 60000);
+      retryTimer = setTimeout(()=>{ retryTimer = null; refresh(); }, delay);
+    }
+  }finally{
+    loading = false;
+    document.getElementById('refreshBtn').disabled = false;
+  }
+}
+
+/* 排序 */
+document.querySelectorAll('th[data-sort]').forEach(th=>{
+  th.addEventListener('click',()=>{
+    const k = th.dataset.sort;
+    if(sortKey === k) sortAsc = !sortAsc; else { sortKey = k; sortAsc = false; }
+    document.querySelectorAll('th').forEach(x=>x.classList.remove('sorted'));
+    th.classList.add('sorted');
+    renderTable();
+  });
+});
+
+document.getElementById('refreshBtn').addEventListener('click',refresh);
+
+/* 自动刷新：每 60 秒 */
+let autoTimer = null;
+function startAuto(){ if(!autoTimer) autoTimer = setInterval(refresh, 60000); }
+function stopAuto(){ if(autoTimer){ clearInterval(autoTimer); autoTimer = null; } }
+document.getElementById('autoChk').addEventListener('change',e=>{ e.target.checked ? (startAuto(), refresh()) : stopAuto(); });
+
+/* 打开 / 切回本页 / 网络恢复 / 从后退缓存恢复 → 立即抓最新行情 */
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) refresh(); });
+window.addEventListener('online', refresh);
+window.addEventListener('pageshow', e=>{ if(e.persisted) refresh(); });
+
+/* 每个交易日 9:26 定时刷新（集合竞价 9:25 结束后） */
+function scheduleNine(){
+  const now = new Date();
+  const t = new Date(now); t.setHours(9,26,10,0);
+  if(t <= now) t.setDate(t.getDate()+1);
+  setTimeout(()=>{
+    const d = new Date().getDay();
+    if(d>=1 && d<=5) refresh();
+    scheduleNine();
+  }, t - now);
+}
+
+/* 打开瞬间先用缓存秒显，再被实时行情覆盖 */
+const boot = loadCache();
+if(boot){
+  renderAll(boot.quotes);
+  statusEl.textContent = '显示上次缓存（' + new Date(boot.ts).toLocaleTimeString('zh-CN',{hour12:false}) +
+    '），正在抓取实时行情…';
+}
+refresh();
+startAuto();
+scheduleNine();
+</script>
+</body>
+</html>

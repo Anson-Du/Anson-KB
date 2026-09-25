@@ -1,0 +1,22 @@
+{
+  "roots": [
+    "C:\\Users\\Lenovo"
+  ],
+  "scanned_dirs": 77241,
+  "scanned_files": 75279,
+  "min_zip_size_mb": 1.0,
+  "pair_count": 1,
+  "total_mb": 1.03,
+  "pairs": [
+    {
+      "dir": "C:\\Users\\Lenovo\\RoboX\\04_听记纪要\\转写与纪要",
+      "zip": "0819FA心流资本第二轮融资策略沟通.zip",
+      "ext": ".zip",
+      "size_mb": 1.03,
+      "sibling_dir": true,
+      "siblings": [
+        "0819FA心流资本第二轮融资策略沟通\\"
+      ]
+    }
+  ]
+}

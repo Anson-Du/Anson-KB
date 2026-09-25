@@ -1,0 +1,69 @@
+<!--pages/action/action.wxml - 行动时间线页-->
+<view class="page-action">
+
+  <!-- 进度头部 -->
+  <view class="progress-header gradient-header">
+    <text class="progress-title">🗓️ 行动时间线</text>
+    <text class="progress-subtitle">2026年8月 → 2027年6月</text>
+    <view class="progress-ring">
+      <view class="ring-bg">
+        <view class="ring-fill" style="background: conic-gradient(#FFF {{progress * 3.6}}deg, rgba(255,255,255,0.2) 0deg);"></view>
+        <view class="ring-inner">
+          <text class="ring-num">{{progress}}</text>
+          <text class="ring-unit">%</text>
+        </view>
+      </view>
+    </view>
+    <text class="progress-detail">{{completedCount}} / {{totalCount}} 项已完成</text>
+  </view>
+
+  <!-- 时间线 -->
+  <view class="timeline">
+    <view wx:for="{{timeline}}" wx:key="month" class="timeline-item">
+
+      <!-- 月份节点 -->
+      <view class="month-node">
+        <text class="month-emoji">{{item.emoji}}</text>
+        <view class="month-line"></view>
+      </view>
+
+      <!-- 月份内容 -->
+      <view class="month-content card">
+        <view class="month-header">
+          <text class="month-title">{{item.month}}</text>
+          <text class="month-label">{{item.title}}</text>
+        </view>
+
+        <view class="task-list">
+          <view
+            wx:for="{{item.tasks}}"
+            wx:for-item="task"
+            wx:for-index="ti"
+            wx:key="text"
+            class="task-item {{task.done ? 'done' : ''}}"
+            bindtap="toggleTask"
+            data-mi="{{index}}"
+            data-ti="{{ti}}"
+          >
+            <view class="task-check">
+              <text class="check-icon">{{task.done ? '✅' : '⬜'}}</text>
+            </view>
+            <text class="task-text {{task.done ? 'line-through' : ''}}">{{task.text}}</text>
+          </view>
+        </view>
+      </view>
+
+    </view>
+  </view>
+
+  <!-- 重置按钮 -->
+  <view class="reset-section">
+    <view class="btn-outline reset-btn" bindtap="resetProgress">重置进度</view>
+  </view>
+
+  <!-- 底部提示 -->
+  <view class="footer">
+    <text class="footer-text">点击任务标记完成状态 · 进度自动保存</text>
+  </view>
+
+</view>

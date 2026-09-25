@@ -1,0 +1,234 @@
+/* pages/schools/schools.wxss */
+
+.page-schools {
+  padding-bottom: 40rpx;
+}
+
+/* 区域切换 */
+.region-tabs {
+  display: flex;
+  background: #FFF;
+  padding: 16rpx 24rpx;
+  gap: 16rpx;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.05);
+}
+
+.region-tab {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  border-radius: 16rpx;
+  font-size: 26rpx;
+  color: #636E72;
+  background: #F5F6FA;
+  transition: all 0.3s;
+}
+
+.region-tab.active {
+  background: linear-gradient(135deg, #6C5CE7, #A29BFE);
+  color: #FFF;
+  font-weight: 700;
+}
+
+/* 截止日期 */
+.deadline-bar {
+  display: flex;
+  align-items: center;
+  background: #FFF9E6;
+  padding: 16rpx 24rpx;
+  margin: 16rpx 24rpx;
+  border-radius: 12rpx;
+  border-left: 6rpx solid #FDCB6E;
+}
+
+.deadline-icon {
+  font-size: 28rpx;
+  margin-right: 12rpx;
+}
+
+.deadline-text {
+  font-size: 24rpx;
+  color: #D68910;
+  line-height: 1.5;
+}
+
+/* 筛选 */
+.filter-scroll {
+  white-space: nowrap;
+  padding: 16rpx 24rpx;
+}
+
+.filter-chip {
+  display: inline-block;
+  padding: 10rpx 24rpx;
+  border-radius: 24rpx;
+  font-size: 24rpx;
+  color: #636E72;
+  background: #F0F0F0;
+  margin-right: 16rpx;
+}
+
+.filter-chip.active {
+  background: #6C5CE7;
+  color: #FFF;
+}
+
+/* 院校卡片 */
+.school-card {
+  margin: 20rpx 24rpx;
+}
+
+.school-header {
+  display: flex;
+  align-items: flex-start;
+}
+
+.school-emoji {
+  font-size: 56rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
+.school-info {
+  flex: 1;
+}
+
+.school-name {
+  font-size: 32rpx;
+  font-weight: 700;
+  display: block;
+  color: #2D3436;
+}
+
+.school-en {
+  font-size: 22rpx;
+  color: #B2BEC3;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.school-meta {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  flex-wrap: wrap;
+}
+
+.school-rank {
+  font-size: 22rpx;
+  color: #6C5CE7;
+  font-weight: 600;
+  background: #F0E6FF;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+}
+
+.school-city {
+  font-size: 22rpx;
+  color: #636E72;
+}
+
+.local-badge {
+  font-size: 20rpx;
+  color: #00B894;
+  background: #D4EDDA;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  font-weight: 600;
+}
+
+.match-score {
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.match-label {
+  font-size: 20rpx;
+  color: #B2BEC3;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.star-on {
+  color: #FDCB6E;
+  font-size: 24rpx;
+}
+
+.star-off {
+  color: #DDD;
+  font-size: 24rpx;
+}
+
+/* 专业列表 */
+.programs-list {
+  margin-top: 8rpx;
+}
+
+.program-item {
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #F5F5F5;
+}
+
+.program-item:last-child {
+  border-bottom: none;
+}
+
+.program-item.hidden {
+  display: none;
+}
+
+.prog-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4rpx;
+}
+
+.prog-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #2D3436;
+}
+
+.match-mini {
+  font-size: 22rpx;
+  color: #FDCB6E;
+}
+
+.prog-en {
+  font-size: 22rpx;
+  color: #B2BEC3;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.prog-tags {
+  margin-bottom: 10rpx;
+}
+
+.prog-bottom {
+  display: flex;
+  gap: 24rpx;
+  margin-bottom: 8rpx;
+}
+
+.prog-level, .prog-ielts {
+  font-size: 24rpx;
+  color: #636E72;
+}
+
+.prog-comment {
+  background: #F8F9FA;
+  padding: 12rpx 16rpx;
+  border-radius: 12rpx;
+  margin-top: 8rpx;
+}
+
+.comment-text {
+  font-size: 24rpx;
+  color: #6C5CE7;
+  line-height: 1.5;
+}

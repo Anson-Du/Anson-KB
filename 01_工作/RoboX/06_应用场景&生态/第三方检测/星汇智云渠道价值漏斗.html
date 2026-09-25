@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<title>星汇智云渠道价值漏斗 | 睦灵科技（RoboX）</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0B1A2C;--ink2:#243447;--muted:#64748B;--line:#E4EBF4;--bg:#F5F8FC;
+  --blue:#1F6FEB;--teal:#0FA98C;--amber:#E0952C;--red:#D9534F;--violet:#6D5BF5;
+}
+body{background:#DCE5F0;font-family:"Microsoft YaHei","PingFang SC","Hiragino Sans GB","Source Han Sans SC",sans-serif;
+  color:var(--ink);-webkit-font-smoothing:antialiased;padding:26px 0;}
+.page{width:1240px;margin:0 auto;background:#fff;box-shadow:0 14px 46px rgba(11,26,44,.18);border-radius:8px;overflow:hidden;}
+.hd{background:linear-gradient(112deg,#0B1A2C 0%,#143255 52%,#0E5AA8 100%);color:#fff;padding:26px 36px 22px;position:relative;overflow:hidden;}
+.hd:after{content:"";position:absolute;right:-70px;top:-90px;width:320px;height:320px;border-radius:50%;
+  background:radial-gradient(circle,rgba(31,111,235,.42),transparent 66%);}
+.hd h1{font-size:29px;letter-spacing:.4px;font-weight:700;}
+.hd .sub{margin-top:9px;font-size:14.5px;color:#B9CEE8;letter-spacing:.2px;}
+.hd .meta{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;}
+.chip{font-size:12px;padding:5px 11px;border-radius:20px;background:rgba(255,255,255,.13);
+  border:1px solid rgba(255,255,255,.22);color:#E4EEFA;letter-spacing:.3px;}
+.body{padding:26px 36px 30px;}
+.sec-title{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:700;color:#0B1A2C;margin:0 0 14px;}
+.sec-title i{width:4px;height:16px;border-radius:2px;background:var(--blue);display:inline-block;}
+.sec-title small{font-weight:400;font-size:12.5px;color:var(--muted);letter-spacing:.2px;}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.kpi{border:1px solid var(--line);border-radius:10px;padding:15px 16px 14px;background:linear-gradient(180deg,#FBFDFF,#F4F8FD);position:relative;}
+.kpi .lb{font-size:12.5px;color:var(--muted);letter-spacing:.3px;}
+.kpi .vl{font-size:25px;font-weight:700;margin-top:7px;letter-spacing:-.3px;}
+.kpi .vl em{font-size:13px;font-weight:600;font-style:normal;color:var(--muted);margin-left:3px;}
+.kpi .tg{font-size:11.5px;margin-top:7px;color:#94A3B8;}
+.kpi.b1{border-top:3px solid var(--ink);}
+.kpi.b2{border-top:3px solid var(--blue);}
+.kpi.b3{border-top:3px solid var(--teal);}
+.kpi.b4{border-top:3px solid var(--amber);}
+.kpi.b1 .vl{color:var(--ink);}.kpi.b2 .vl{color:var(--blue);}
+.kpi.b3 .vl{color:var(--teal);}.kpi.b4 .vl{color:#C07E15;}
+.grid2{display:grid;grid-template-columns:1.42fr 1fr;gap:16px;margin-top:20px;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px;}
+.card{border:1px solid var(--line);border-radius:11px;padding:18px 19px 17px;background:#fff;}
+.card.soft{background:linear-gradient(180deg,#FBFDFF,#F6F9FD);}
+/* 阶梯条 */
+.tier{margin-bottom:13px;}
+.tier:last-child{margin-bottom:0;}
+.tier .top{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;margin-bottom:6px;}
+.tier .nm{font-weight:700;color:#16283D;}
+.tier .nm span{font-weight:400;color:var(--muted);font-size:12px;margin-left:6px;}
+.tier .vv{font-weight:700;font-size:14px;}
+.tier .bar{height:26px;border-radius:6px;position:relative;overflow:hidden;}
+.tier .bar b{position:absolute;right:9px;top:4px;font-size:11.5px;color:rgba(255,255,255,.9);font-weight:600;letter-spacing:.3px;}
+.t1 .bar{background:linear-gradient(90deg,#0B1A2C,#2B4A72);}
+.t2 .bar{background:linear-gradient(90deg,#144E8C,#1F6FEB);}
+.t3 .bar{background:linear-gradient(90deg,#0B7C68,#12BBA0);}
+.t4 .bar{background:linear-gradient(90deg,#B6761A,#EEB254);}
+.t1 .vv{color:var(--ink);}.t2 .vv{color:var(--blue);}.t3 .vv{color:var(--teal);}.t4 .vv{color:#B6761A;}
+.cap{font-size:11.5px;color:#94A3B8;margin-top:11px;padding-top:10px;border-top:1px dashed var(--line);}
+/* 列表 */
+.li{display:flex;gap:10px;font-size:13px;line-height:1.72;color:#2B3E54;margin-bottom:9px;}
+.li:last-child{margin-bottom:0;}
+.li .dot{flex:0 0 auto;width:6px;height:6px;border-radius:50%;background:var(--blue);margin-top:8px;}
+.li .dot.t{background:var(--teal);}.li .dot.a{background:var(--amber);}.li .dot.r{background:var(--red);}
+.li b{color:#0B1A2C;}
+.mini{display:flex;gap:0;margin-top:4px;}
+.mini .m{flex:1;padding:0 12px;border-right:1px solid var(--line);}
+.mini .m:first-child{padding-left:0;}
+.mini .m:last-child{border-right:0;padding-right:0;}
+.mini .m .k{font-size:11.5px;color:var(--muted);}
+.mini .m .v{font-size:17px;font-weight:700;margin-top:5px;color:var(--blue);}
+.mini .m .v.t{color:var(--teal);}.mini .m .v.a{color:#C07E15;}
+h3.ct{font-size:13.5px;font-weight:700;margin-bottom:11px;color:#0B1A2C;display:flex;align-items:center;gap:7px;}
+h3.ct .tag{font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:4px;background:#EAF1FB;color:var(--blue);}
+h3.ct .tag.a{background:#FCF2E0;color:#B6761A;}
+h3.ct .tag.t{background:#E5F6F2;color:#0B7C68;}
+.foot{padding:16px 36px 20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;
+  align-items:center;font-size:11.5px;color:#94A3B8;background:#FCFDFF;letter-spacing:.2px;}
+/* 漏斗 */
+.funnel{display:flex;flex-direction:column;gap:9px;}
+.fn{border-radius:7px;color:#fff;padding:13px 22px;display:flex;justify-content:space-between;align-items:center;gap:14px;
+  position:relative;box-shadow:0 3px 10px rgba(11,26,44,.10);}
+.fn .l{font-size:13.5px;font-weight:700;letter-spacing:.2px;}
+.fn .l em{display:block;font-style:normal;font-weight:400;font-size:11.5px;color:rgba(255,255,255,.78);margin-top:3px;letter-spacing:.2px;}
+.fn .r{font-size:15px;font-weight:700;white-space:nowrap;letter-spacing:.2px;}
+.f1{background:linear-gradient(96deg,#0B1A2C,#254563);width:100%;clip-path:polygon(0 0,100% 0,97.5% 100%,2.5% 100%);}
+.f2{background:linear-gradient(96deg,#123F73,#1F6FEB);width:87%;clip-path:polygon(0 0,100% 0,97% 100%,3% 100%);}
+.f3{background:linear-gradient(96deg,#0A6A5A,#0FA98C);width:74%;clip-path:polygon(0 0,100% 0,96.5% 100%,3.5% 100%);}
+.f4{background:linear-gradient(96deg,#9A6214,#D99A32);width:61%;clip-path:polygon(0 0,100% 0,96% 100%,4% 100%);}
+.f5{background:linear-gradient(96deg,#8C3A36,#C6564F);width:48%;clip-path:polygon(0 0,100% 0,95% 100%,5% 100%);}
+.funnel-wrap{display:flex;flex-direction:column;align-items:center;}
+.conv{font-size:11px;color:var(--muted);letter-spacing:.3px;display:flex;align-items:center;gap:7px;height:22px;}
+.conv:before,.conv:after{content:"";width:14px;height:1px;background:#D3DEEB;}
+@media print{@page{size:A4 landscape;margin:7mm}
+  body{background:#fff;padding:0}.page{box-shadow:none;width:100%;border-radius:0}}
+</style></head>
+<body>
+<div class="page">
+  <div class="hd">
+    <h1>星汇智云渠道价值漏斗</h1>
+    <div class="sub">从「覆盖上千家实验室」到「RoboX 年可得 0.05–0.6 亿元」—— 渠道价值的逐层折算</div>
+    <div class="meta">
+      <span class="chip">睦灵科技（RoboX）· 内部测算稿 v1</span>
+      <span class="chip">对象：东昇射频 / 星汇智云（集成 + 渠道）</span>
+      <span class="chip">2026-09-12</span>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="grid2" style="grid-template-columns:1.5fr 1fr;margin-top:0">
+      <div class="card">
+        <div class="sec-title"><i></i>五层折算 <small>按「实验室家数 → 项目金额 → RoboX 份额」收敛</small></div>
+        <div class="funnel-wrap">
+          <div class="funnel" style="width:100%">
+            <div class="fn f1">
+              <div class="l">① 渠道覆盖实验室<em>星汇服务过的甲方 + 乙方；官网列 21 家合作品牌</em></div>
+              <div class="r">1,000+ 家</div>
+            </div>
+          </div>
+          <div class="conv">场景筛选 · 约 30%</div>
+          <div class="funnel" style="width:100%">
+            <div class="fn f2">
+              <div class="l">② 可优先黑灯化<em>EMC/RF、电子电气、离散样品的标准化实验室</em></div>
+              <div class="r">≈ 300 家</div>
+            </div>
+          </div>
+          <div class="conv">按 5–10% / 年推进 · 5 年</div>
+          <div class="funnel" style="width:100%">
+            <div class="fn f3">
+              <div class="l">③ 5 年内可改造<em>存量改造，累计口径</em></div>
+              <div class="r">75–150 家</div>
+            </div>
+          </div>
+          <div class="conv">单项目 300–1,000 万元</div>
+          <div class="funnel" style="width:100%">
+            <div class="fn f4">
+              <div class="l">④ 年化项目金额<em>15–30 家 / 年 × 300–1,000 万元</em></div>
+              <div class="r">0.45–3 亿元 / 年</div>
+            </div>
+          </div>
+          <div class="conv">RoboX 占项目价值 10–20%（大脑 + 手）</div>
+          <div class="funnel" style="width:100%">
+            <div class="fn f5">
+              <div class="l">⑤ RoboX 年可得<em>早期 3 年，保守口径</em></div>
+              <div class="r">0.05–0.6 亿元 / 年</div>
+            </div>
+          </div>
+        </div>
+        <div class="cap">条形宽度为示意（按层级递减），非金额等比；金额已单列在每层右侧。</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="card soft">
+          <h3 class="ct">上位市场盘子 <span class="tag">权威 / 推算</span></h3>
+          <div class="mini">
+            <div class="m"><div class="k">电子电气 / 通信检测</div><div class="v">700–1,000 亿 / 年</div></div>
+            <div class="m"><div class="k">EMC / RF 测试服务</div><div class="v t">100–200 亿 / 年</div></div>
+          </div>
+          <div class="cap">星汇的「EMC/RF 系统 + TS+ 智慧实验室平台」可寻址约 150–250 亿元 / 年，其中机器人黑灯化增量为 5–20 亿元（早期）。</div>
+        </div>
+
+        <div class="card">
+          <h3 class="ct">客户结构 <span class="tag a">三类</span></h3>
+          <div class="li"><span class="dot"></span><div><b>品牌企业（甲方自建实验室）：</b>华为、中兴、OPPO、VIVO、小米、TCL、海尔、传音、海康 —— 买 EMC/RF 系统做研发验证</div></div>
+          <div class="li"><span class="dot"></span><div><b>第三方检测认证机构：</b>SGS、UL、TUV、德凯、华测检测、赛宝、泰尔实验室、广电计量、中检南方、苏试试验 —— 用东昇系统做对外检测服务</div></div>
+          <div class="li"><span class="dot"></span><div><b>长尾实验室：</b>李德健口径「上千家甲方和乙方实验室」，即渠道覆盖池</div></div>
+        </div>
+
+        <div class="card">
+          <h3 class="ct">敏感性 <span class="tag t">上行情景</span></h3>
+          <div class="li"><span class="dot t"></span><div>若单项目金额上探至 <b>2,000 万元级</b>、年改造升至 <b>50 家</b>，则 RoboX 年可得可上看 <b>1–2 亿元</b></div></div>
+          <div class="li"><span class="dot r"></span><div>反之若星汇自研机器人能力，RoboX 将从「伙伴」变「供应商」，份额与议价同时受压</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid3" style="grid-template-columns:1fr 1fr">
+      <div class="card soft">
+        <h3 class="ct">判断一：渠道价值 &gt;&gt; 直接采购价值</h3>
+        <div class="li"><span class="dot"></span><div>星汇为专精特新 / 科技型中小企业，<b>自身采购力有限</b>，不应被当作付费大户。</div></div>
+        <div class="li"><span class="dot"></span><div>真正的价值是把睦灵的获客从「一家家叩门」变成<b>批量进场</b>：一次绑定 ≈ 打开检测行业入口。</div></div>
+      </div>
+      <div class="card soft">
+        <h3 class="ct">判断二：它是「入口」，不是「客户」</h3>
+        <div class="li"><span class="dot"></span><div>官网已把「<b>机器人黑灯实验室 / 值守实验室</b>」写进产品模块，战略上明确「下一步必须做机器人操作」。</div></div>
+        <div class="li"><span class="dot t"></span><div>它出测试系统 + 仪器组网 + TS+ 平台 + 客户，睦灵出<b>大脑 + 灵巧末端</b> —— 它缺的正好是我们有的。</div></div>
+      </div>
+    </div>
+
+    <div class="card soft" style="margin-top:16px">
+      <div class="sec-title"><i></i>口径 · 来源 · 待核实</div>
+      <div class="li"><span class="dot"></span><div><b>来源：</b>星汇智云官网 tonscend.com（「覆盖上千家实验室」「21 家合作品牌」「机器人黑灯实验室 / 值守实验室」产品模块）；天溯检测李德健 0824 访谈（「服务过上千家甲方和乙方实验室」「下一步必须做机器人操作」）；黑灯实验室公开造价区间。</div></div>
+      <div class="li"><span class="dot a"></span><div><b>口径：</b>①「1,000+ 家」为渠道口径（非在营合同数）；②③④⑤ 为自建推算，项目单价取公开区间中值，改造推进比例按 5–10%/年假设。</div></div>
+      <div class="li"><span class="dot r"></span><div><b>待核实：</b>① 改名工商沿革与股权关系；② 其「机器人应用」是自研还是集成第三方（决定伙伴 / 对手）；③ 数据权属条款（参照云康三方协议：所有权归场景方、睦灵拿训练使用许可）。</div></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div>睦灵科技（RoboX）· 数据与生态 · 内部测算稿，不对外</div>
+    <div>生成脚本：codebuddy/gen_darklab_onepager.js · 2026-09-12</div>
+  </div>
+</div>
+</body></html>

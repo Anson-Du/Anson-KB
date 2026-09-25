@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#131449">
+    <meta name="description" content="Elysia 升学战略 · 香港/英国/日本三地申请攻略与重点任务提醒">
+    <title>Elysia 升学攻略</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-512.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app-container">
+        <!-- 顶部导航栏 -->
+        <header class="top-header" id="topHeader">
+            <span class="header-title" id="headerTitle">🎓 Elysia 升学攻略</span>
+            <span class="header-icon" id="headerIcon" onclick="scrollToTop()">✨</span>
+        </header>
+
+        <!-- ==================== 首页仪表盘 ==================== -->
+        <div class="page active" id="page-home">
+            <!-- 个人画像卡片 -->
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar">🌸</div>
+                    <div>
+                        <div class="profile-name">Elysia · 16岁</div>
+                        <div class="profile-subtitle">香港蔚来学校 · Year 12 · A-Level体系</div>
+                    </div>
+                </div>
+                <div class="profile-tags">
+                    <span class="tag tag-accent">IMC 金奖（UKMT）</span>
+                    <span class="tag tag-blue">数学小能手</span>
+                    <span class="tag tag-green">手绘达人</span>
+                    <span class="tag tag-yellow">ROI 60%</span>
+                    <span class="tag tag-accent">二次元🌟</span>
+                </div>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">5.5</div>
+                        <div class="stat-label">当前 IELTS</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">7.0</div>
+                        <div class="stat-label">目标 IELTS</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">26</div>
+                        <div class="stat-label">候选院校</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">50+</div>
+                        <div class="stat-label">推荐专业</div>
+                    </div>
+                </div>
+                <div style="margin-top:10px;font-size:11px;color:var(--text-muted);">
+                    🇭🇰 香港居民（优才通道）· 2027年4月续签 · 本地生身份优势
+                </div>
+            </div>
+
+            <!-- IELTS 差距提醒 -->
+            <div class="ielts-card" onclick="navigateTo('timeline')">
+                <div class="ielts-icon">⚠️</div>
+                <div class="ielts-info">
+                    <div class="ielts-title">IELTS 差距：当前 5.5 → 目标 7.0</div>
+                    <div class="ielts-desc">首次实考（8月）：听5 / 读5 / 说6 / 写6<br>短板在听读（各+2.5），说写已6.0（各+0.5）<br>点击查看细化备考计划 📋</div>
+                </div>
+                <div class="ielts-arrow">→</div>
+            </div>
+
+            <!-- 三地院校统计 -->
+            <div class="stats-grid">
+                <div class="stat-card uk" onclick="navigateTo('schools/uk')">
+                    <div class="stat-emoji">🇬🇧</div>
+                    <div class="stat-num">17</div>
+                    <div class="stat-desc">英国 QS Top 100</div>
+                </div>
+                <div class="stat-card hk" onclick="navigateTo('schools/hk')">
+                    <div class="stat-emoji">🇭🇰</div>
+                    <div class="stat-num">5</div>
+                    <div class="stat-desc">香港 QS Top 100</div>
+                </div>
+                <div class="stat-card jp" onclick="navigateTo('schools/jp')">
+                    <div class="stat-emoji">🇯🇵</div>
+                    <div class="stat-num">4</div>
+                    <div class="stat-desc">日本 QS Top 100</div>
+                </div>
+            </div>
+
+            <!-- 专业方向入口 -->
+            <div class="card">
+                <div style="font-size:15px;font-weight:700;margin-bottom:10px;">📚 四大专业方向</div>
+                <div class="profile-tags">
+                    <span class="program-tag math" onclick="navigateTo('schools/uk', 'math')">∑ 纯数学</span>
+                    <span class="program-tag datascience" onclick="navigateTo('schools/uk', 'datascience')">📊 数据科学</span>
+                    <span class="program-tag chemistry" onclick="navigateTo('schools/uk', 'chemistry')">⚗️ 化学</span>
+                    <span class="program-tag crossover" onclick="navigateTo('schools/uk', 'crossover')">🎨 数学×设计</span>
+                </div>
+            </div>
+
+            <!-- 快速行动 -->
+            <div class="card card-gradient" onclick="navigateTo('timeline')">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <span style="font-size:28px;">🗓️</span>
+                    <div>
+                        <div style="font-size:14px;font-weight:700;">立即行动：IELTS 备考规划</div>
+                        <div style="font-size:12px;color:var(--text-secondary);">听读短板（5→6.0）+2.5，10月二考保6.0冲6.5，3月冲7.0</div>
+                    </div>
+                    <span style="margin-left:auto;color:var(--primary);">→</span>
+                </div>
+            </div>
+
+            <!-- 重点任务提醒（每3天自动更新） -->
+            <div class="card" id="keyAlertsCard" onclick="navigateTo('timeline')" style="cursor:pointer;border:1px solid var(--primary);">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                    <span style="font-size:24px;">📢</span>
+                    <div style="flex:1;">
+                        <div style="font-size:14px;font-weight:700;">Elysia 重点任务提醒</div>
+                        <div style="font-size:11px;color:var(--text-secondary);" id="keyAlertsMeta">每3天自动更新</div>
+                    </div>
+                    <span style="color:var(--primary);">→</span>
+                </div>
+                <div id="keyAlertsList" style="font-size:12px;line-height:1.7;"></div>
+            </div>
+
+            <!-- 升学提醒状态卡片 -->
+            <div class="card" id="reminderHomeCard" onclick="navigateTo('timeline')" style="cursor:pointer;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <span style="font-size:26px;">🔔</span>
+                    <div style="flex:1;">
+                        <div style="font-size:14px;font-weight:700;">升学提醒</div>
+                        <div style="font-size:12px;color:var(--text-secondary);" id="reminderHomeStatus">正在加载提醒...</div>
+                    </div>
+                    <span class="reminder-badge" id="reminderHomeBadge" style="display:none;">0</span>
+                    <span style="color:var(--primary);">→</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 学校专业目录 ==================== -->
+        <div class="page" id="page-schools">
+            <!-- 搜索框 -->
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="schoolSearch" placeholder="搜索大学或专业..." oninput="renderSchoolList()">
+            </div>
+
+            <!-- 国家 Tab -->
+            <div class="country-tabs" id="countryTabs">
+                <div class="country-tab active" data-country="uk" onclick="switchCountry('uk')">🇬🇧 英国 · 17所</div>
+                <div class="country-tab" data-country="hk" onclick="switchCountry('hk')">🇭🇰 香港 · 5所</div>
+                <div class="country-tab" data-country="jp" onclick="switchCountry('jp')">🇯🇵 日本 · 4所</div>
+            </div>
+
+            <!-- 专业方向筛选 -->
+            <div class="filter-chips" id="filterChips">
+                <div class="filter-chip active" data-filter="all" onclick="switchFilter('all')">全部专业</div>
+                <div class="filter-chip" data-filter="math" onclick="switchFilter('math')">∑ 数学</div>
+                <div class="filter-chip" data-filter="datascience" onclick="switchFilter('datascience')">📊 数据科学</div>
+                <div class="filter-chip" data-filter="chemistry" onclick="switchFilter('chemistry')">⚗️ 化学</div>
+                <div class="filter-chip" data-filter="crossover" onclick="switchFilter('crossover')">🎨 交叉设计</div>
+            </div>
+
+            <!-- 学校列表 -->
+            <div id="schoolList"></div>
+            <div class="empty-state" id="schoolEmpty" style="display:none;">
+                <div class="empty-icon">🔍</div>
+                <div class="empty-text">没有找到匹配的院校</div>
+            </div>
+        </div>
+
+        <!-- ==================== 结论分析页 ==================== -->
+        <div class="page" id="page-conclusion">
+            <!-- 核心结论 -->
+            <div class="conclusion-hero">
+                <h2>🌟 核心推荐策略</h2>
+                <p>Elysia拥有独特的"<strong>数学×艺术×商业</strong>"复合背景，建议以<strong>香港本地生身份申请港三大</strong>为最佳性价比选择，搭配<strong>英国G5/王爱曼华</strong>冲刺和<strong>日本（京都iUP主力 + 东大CoD新英文通道冲刺）</strong>梯度申请，形成三地并行策略。<br><br>🔑 <strong>IELTS提分是第一优先级</strong>——目标锁定<strong>7.0（小分≥6.5）</strong>，可一举覆盖G5（UCL/帝国/LSE 7.0）、港三大（6.5）和日本（iUP 6.0/东大CoD 6.5）全部门槛。</p>
+            </div>
+
+            <!-- IELTS 差距分析 -->
+            <div class="card" id="ieltsAnalysis"></div>
+
+            <!-- 分层推荐 -->
+            <div id="tierAccordions"></div>
+
+            <!-- 核心洞察 -->
+            <div style="font-size:15px;font-weight:700;margin:16px 0 10px;">💡 四大核心洞察</div>
+            <div id="insightsList"></div>
+
+            <!-- 三地对比表 -->
+            <div style="font-size:15px;font-weight:700;margin:16px 0 10px;">📊 三地留学对比</div>
+            <div style="overflow-x:auto;">
+                <table class="comparison-table" id="comparisonTable"></table>
+            </div>
+        </div>
+
+        <!-- ==================== 行动规划时间线 ==================== -->
+        <div class="page" id="page-timeline">
+            <div class="card card-danger" style="margin-bottom:16px;">
+                <div style="font-size:14px;font-weight:700;color:var(--danger);margin-bottom:6px;">
+                    🚨 当前最紧急
+                </div>
+                <div style="font-size:12px;color:var(--text-secondary);line-height:1.7;">
+                    <strong>IELTS 备考（8月-10月）</strong>：听读是主战场（5→6.0）——每日30min精听+1篇限时阅读+背词60个；说写稳住6.5——每周2篇写作1v1精批+2次口语录音。<br>
+                    <strong>A-Level 选课确认（9月）</strong>：数学(必选)+高数(推荐)+物理/化学+艺术与设计。<br>
+                    <strong>IELTS 三考（2027年3-4月）</strong>：寒假集训+全真模考，目标冲7.0（小分≥6.5），覆盖G5全部门槛。
+                </div>
+            </div>
+
+            <!-- 截止日期提醒设置面板 -->
+            <div class="card" style="margin-bottom:16px;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+                    <div style="flex:1;">
+                        <div style="font-size:14px;font-weight:700;">🔔 截止日期提醒</div>
+                        <div style="font-size:12px;color:var(--text-secondary);">关键节点提前提醒，浏览器系统通知</div>
+                    </div>
+                    <label class="reminder-switch">
+                        <input type="checkbox" id="reminderMasterSwitch" onchange="toggleReminderMaster(this.checked)">
+                        <span class="reminder-slider"></span>
+                    </label>
+                </div>
+                <div id="reminderPermissionRow" style="margin-top:8px;"></div>
+                <div id="upcomingReminders" style="margin-top:8px;"></div>
+            </div>
+
+            <div class="timeline" id="timelineContainer"></div>
+        </div>
+
+        <!-- ==================== 专业详情页 ==================== -->
+        <div class="page" id="page-program">
+            <div class="breadcrumb" id="programBreadcrumb"></div>
+            <div id="programDetail"></div>
+            <div class="related-programs">
+                <h4 style="font-size:14px;font-weight:700;margin-bottom:10px;">🔗 相似专业推荐</h4>
+                <div class="related-scroll" id="relatedPrograms"></div>
+            </div>
+        </div>
+
+        <!-- ==================== 底部导航栏 ==================== -->
+        <nav class="bottom-nav" id="bottomNav">
+            <div class="nav-item active" data-page="home" onclick="navigateTo('home')">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">首页</span>
+            </div>
+            <div class="nav-item" data-page="schools" onclick="navigateTo('schools/uk')">
+                <span class="nav-icon">🏫</span>
+                <span class="nav-label">院校</span>
+            </div>
+            <div class="nav-item" data-page="conclusion" onclick="navigateTo('conclusion')">
+                <span class="nav-icon">📋</span>
+                <span class="nav-label">结论</span>
+            </div>
+            <div class="nav-item" data-page="timeline" onclick="navigateTo('timeline')">
+                <span class="nav-icon">📅</span>
+                <span class="nav-label">规划</span>
+            </div>
+        </nav>
+
+        <!-- 返回顶部 -->
+        <button class="btn-back-top" id="btnBackTop" onclick="scrollToTop()">↑</button>
+
+        <!-- Toast -->
+        <div class="toast" id="toast"></div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="reminders.js"></script>
+    <script>
+    // ==================== 全局状态 ====================
+    const state = {
+        currentPage: 'home',
+        currentCountry: 'uk',
+        currentFilter: 'all',
+        currentProgram: null,
+        openSheet: null,
+        searchQuery: '',
+        timelineChecks: JSON.parse(localStorage.getItem('elysia_timeline_checks') || '{}'),
+        scrollPositions: {}
+    };
+
+    // ==================== 路由系统 ====================
+    function navigateTo(route, filter) {
+        const parts = route.split('/');
+        
+        if (parts[0] === 'schools') {
+            state.currentPage = 'schools';
+            if (parts[1] && ['uk','hk','jp'].includes(parts[1])) {
+                state.currentCountry = parts[1];
+            }
+            if (filter) state.currentFilter = filter;
+            showPage('page-schools');
+            updateSchoolUI();
+            renderSchoolList();
+        } else if (route === 'program') {
+            // handled by showProgramDetail
+        } else {
+            state.currentPage = route;
+            const pageMap = {
+                'home': 'page-home',
+                'conclusion': 'page-conclusion',
+                'timeline': 'page-timeline'
+            };
+            const pageId = pageMap[route];
+            if (pageId) {
+                showPage(pageId);
+                if (route === 'conclusion') renderConclusion();
+                if (route === 'timeline') {
+                    renderTimeline();
+                    updateReminderUI();
+                }
+            }
+        }
+        
+        updateNavHighlight();
+        scrollToTop();
+    }
+
+    function showPage(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        const page = document.getElementById(pageId);
+        if (page) page.classList.add('active');
+    }
+
+    function updateNavHighlight() {
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            const p = item.dataset.page;
+            if (state.currentPage === 'schools' && p === 'schools') {
+                item.classList.add('active');
+            } else if (state.currentPage === p) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+        
+        // Update header title
+        const titles = {
+            'home': '🎓 Elysia 升学攻略',
+            'schools': '🏫 学校专业目录',
+            'conclusion': '📋 结论分析',
+            'timeline': '📅 行动规划',
+            'program': '📖 专业详情'
+        };
+        document.getElementById('headerTitle').textContent = titles[state.currentPage] || '🎓 Elysia 升学攻略';
+    }
+
+    // ==================== 学校目录 ====================
+    function switchCountry(country) {
+        state.currentCountry = country;
+        state.openSheet = null;
+        document.querySelectorAll('.country-tab').forEach(t => {
+            t.classList.toggle('active', t.dataset.country === country);
+        });
+        renderSchoolList();
+    }
+
+    function switchFilter(filter) {
+        state.currentFilter = filter;
+        state.openSheet = null;
+        document.querySelectorAll('.filter-chip').forEach(c => {
+            c.classList.toggle('active', c.dataset.filter === filter);
+        });
+        renderSchoolList();
+    }
+
+    function updateSchoolUI() {
+        // Sync country tabs
+        document.querySelectorAll('.country-tab').forEach(t => {
+            t.classList.toggle('active', t.dataset.country === state.currentCountry);
+        });
+        // Sync filter chips
+        document.querySelectorAll('.filter-chip').forEach(c => {
+            c.classList.toggle('active', c.dataset.filter === state.currentFilter);
+        });
+    }
+
+    function getFilteredProgramIds() {
+        const universities = UNIVERSITIES[state.currentCountry] || [];
+        let allProgIds = [];
+        universities.forEach(u => {
+            if (u.programs) allProgIds.push(...u.programs);
+        });
+        
+        if (state.currentFilter !== 'all') {
+            return allProgIds.filter(pid => {
+                const p = PROGRAMS.find(pr => pr.id === pid);
+                return p && p.category === state.currentFilter;
+            });
+        }
+        return allProgIds;
+    }
+
+    function renderSchoolList() {
+        const container = document.getElementById('schoolList');
+        const empty = document.getElementById('schoolEmpty');
+        const universities = UNIVERSITIES[state.currentCountry] || [];
+        const query = (document.getElementById('schoolSearch')?.value || '').toLowerCase();
+        
+        let filteredUnis = universities;
+        if (query) {
+            filteredUnis = universities.filter(u => {
+                if (u.name.toLowerCase().includes(query)) return true;
+                if (u.nameZh.includes(query)) return true;
+                const progs = (u.programs || []).map(pid => {
+                    const p = PROGRAMS.find(pr => pr.id === pid);
+                    return p ? p.name : '';
+                });
+                return progs.some(pn => pn.toLowerCase().includes(query));
+            });
+        }
+        
+        if (state.currentFilter !== 'all') {
+            filteredUnis = filteredUnis.filter(u => {
+                return (u.programs || []).some(pid => {
+                    const p = PROGRAMS.find(pr => pr.id === pid);
+                    return p && p.category === state.currentFilter;
+                });
+            });
+        }
+        
+        if (filteredUnis.length === 0) {
+            container.innerHTML = '';
+            empty.style.display = 'block';
+            return;
+        }
+        
+        empty.style.display = 'none';
+        
+        const countryNames = { uk: '英国', hk: '香港', jp: '日本' };
+        
+        container.innerHTML = filteredUnis.map((u, i) => {
+            const initials = u.nameZh || u.name.split(' ').map(w => w[0]).join('').slice(0, 3);
+            const logoUrl = u.domain ? `https://logo.clearbit.com/${u.domain}?size=88` : '';
+            const programs = (u.programs || []).map(pid => PROGRAMS.find(p => p.id === pid)).filter(Boolean);
+            const isOpen = state.openSheet === u.id;
+            
+            let programsHtml = programs.map(p => `
+                <span class="program-tag ${p.category}" onclick="event.stopPropagation();toggleProgramSheet('${u.id}', '${p.id}')">${p.name.split('(')[0].split('（')[0].trim()}</span>
+            `).join('');
+            
+            if (programs.length === 0) {
+                programsHtml = '<span style="font-size:11px;color:var(--text-muted);">暂无推荐专业数据</span>';
+            }
+            
+            // Determine which sheet to show if open
+            let sheetHtml = '';
+            if (isOpen && state.currentProgram) {
+                const sp = PROGRAMS.find(p => p.id === state.currentProgram);
+                if (sp) {
+                    const catInfo = PROGRAM_CATEGORIES[sp.category];
+                    sheetHtml = `
+                    <div class="program-sheet open">
+                        <h4>${sp.name}</h4>
+                        <div style="display:flex;gap:6px;margin-bottom:6px;">
+                            <span class="req-chip alevel">A-Level: ${sp.alevel}</span>
+                            <span class="req-chip ielts">IELTS: ${sp.ielts}</span>
+                            ${sp.portfolio ? `<span class="req-chip" style="background:#FEF3C7;color:#92400E;">${sp.portfolio}</span>` : ''}
+                        </div>
+                        <div style="font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:6px;">
+                            📖 核心课程
+                        </div>
+                        <div class="courses-list">
+                            ${(sp.courses || []).map(c => `<span class="course-chip">${c}</span>`).join('')}
+                        </div>
+                        <div class="career-text">
+                            <strong>💼 职业方向：</strong>${(sp.careers || []).join(' · ')}
+                        </div>
+                        <a href="${sp.url}" target="_blank" rel="noopener" class="btn-outlink" onclick="event.stopPropagation();">🔗 查看官网课程页面</a>
+                    </div>`;
+                }
+            }
+            
+            return `
+            <div class="school-card${u.isLocalBenefit ? ' school-card-hk' : ''}" style="animation-delay:${i * 0.05}s;">
+                ${u.isLocalBenefit ? '<div class="local-badge">💰 本地生优惠</div>' : ''}
+                <div class="rank-badge">QS #${u.rank}</div>
+                <div class="school-header">
+                    <div class="school-logo" style="background:${u.logoColor};">
+                        <span class="school-logo-text">${initials}</span>
+                        ${logoUrl ? `<img class="school-logo-img" src="${logoUrl}" onerror="this.remove();" alt="">` : ''}
+                    </div>
+                    <div>
+                        <div class="school-name">${u.name}</div>
+                        <div class="school-name-zh">${u.nameZh} · ${countryNames[state.currentCountry]}</div>
+                    </div>
+                </div>
+                <div class="school-requirements">
+                    <span class="req-chip alevel">A-Level: ${u.alevelRange}</span>
+                    <span class="req-chip ielts">IELTS: ${u.ieltsRange}</span>
+                </div>
+                <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">${u.desc}</div>
+                <div class="school-programs">${programsHtml}</div>
+                ${sheetHtml}
+            </div>`;
+        }).join('');
+        
+        // Re-apply animation
+        requestAnimationFrame(() => {
+            document.querySelectorAll('.school-card').forEach(c => c.style.opacity = '1');
+        });
+    }
+
+    function toggleProgramSheet(uniId, progId) {
+        if (state.openSheet === uniId && state.currentProgram === progId) {
+            state.openSheet = null;
+            state.currentProgram = null;
+        } else {
+            state.openSheet = uniId;
+            state.currentProgram = progId;
+        }
+        renderSchoolList();
+        
+        // Scroll to the sheet if opened
+        if (state.openSheet) {
+            setTimeout(() => {
+                const sheet = document.querySelector('.program-sheet.open');
+                if (sheet) sheet.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+    }
+
+    // ==================== 专业详情页 ====================
+    function showProgramDetail(progId) {
+        const program = PROGRAMS.find(p => p.id === progId);
+        if (!program) return;
+        
+        state.currentPage = 'program';
+        showPage('page-program');
+        updateNavHighlight();
+        
+        const uni = findUniversityByProgram(progId);
+        const countryNames = { UK: '英国', HK: '香港', JP: '日本' };
+        const catInfo = PROGRAM_CATEGORIES[program.category];
+        
+        document.getElementById('programBreadcrumb').innerHTML = `
+            <a href="#" onclick="navigateTo('schools/${(uni?.country||'uk').toLowerCase()}');return false;">${countryNames[uni?.country] || ''}</a>
+            <span class="separator">›</span>
+            <a href="#" onclick="navigateTo('schools/${(uni?.country||'uk').toLowerCase()}');return false;">${uni?.nameZh || uni?.name || ''}</a>
+            <span class="separator">›</span>
+            <span>${program.name}</span>
+        `;
+        
+        document.getElementById('programDetail').innerHTML = `
+            <div class="program-detail-card">
+                <div class="pd-name">${program.name}</div>
+                <span class="pd-category" style="background:${catInfo.color}15;color:${catInfo.color};border:1px solid ${catInfo.color}40;">
+                    ${catInfo.icon} ${catInfo.name}
+                </span>
+                
+                <div class="pd-section">
+                    <h4>📋 入学要求</h4>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <span class="req-chip alevel" style="font-size:12px;">A-Level: ${program.alevel}</span>
+                        <span class="req-chip ielts" style="font-size:12px;">IELTS: ${program.ielts}</span>
+                        ${program.portfolio ? `<span class="req-chip" style="background:#FEF3C7;color:#92400E;font-size:12px;">📁 ${program.portfolio}</span>` : ''}
+                        ${program.note ? `<span class="req-chip" style="background:#DBEAFE;color:#1D4ED8;font-size:12px;">ℹ️ ${program.note}</span>` : ''}
+                        ${program.localFee ? `<span class="req-chip" style="background:#D1FAE5;color:#065F46;font-size:12px;">💰 本地生: ${program.localFee}</span>` : ''}
+                    </div>
+                </div>
+                
+                <div class="section-divider"></div>
+                
+                <div class="pd-section">
+                    <h4>📖 核心课程</h4>
+                    <div class="courses-list">
+                        ${(program.courses || []).map(c => `<span class="course-chip">${c}</span>`).join('')}
+                    </div>
+                </div>
+                
+                <div class="section-divider"></div>
+                
+                <div class="pd-section">
+                    <h4>💼 职业前景</h4>
+                    <div class="career-text">${(program.careers || []).join(' · ')}</div>
+                </div>
+                
+                <a href="${program.url}" target="_blank" rel="noopener" class="pd-link-btn">
+                    🔗 查看官网课程页面
+                </a>
+            </div>
+        `;
+        
+        // Related programs (same category, different university)
+        const related = PROGRAMS.filter(p => p.category === program.category && p.id !== progId).slice(0, 6);
+        document.getElementById('relatedPrograms').innerHTML = related.map(r => {
+            const ru = findUniversityByProgram(r.id);
+            return `
+            <div class="related-card" onclick="showProgramDetail('${r.id}')">
+                <div class="rel-uni">${ru?.nameZh || ru?.name || ''}</div>
+                <div class="rel-name">${r.name.split('(')[0].split('（')[0].trim()}</div>
+            </div>`;
+        }).join('');
+        
+        scrollToTop();
+    }
+
+    function findUniversityByProgram(progId) {
+        for (const country of ['uk','hk','jp']) {
+            const unis = UNIVERSITIES[country] || [];
+            for (const u of unis) {
+                if ((u.programs || []).includes(progId)) return u;
+            }
+        }
+        return null;
+    }
+
+    // ==================== 结论页面 ====================
+    function renderConclusion() {
+        // IELTS 分析
+        const ieltsDiv = document.getElementById('ieltsAnalysis');
+        const bandRows = (CONCLUSIONS.ieltsGap.bandGap || []).map(b => `
+            <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px dashed #EEE;">
+                <span style="width:36px;font-size:13px;font-weight:700;color:var(--primary);">${b.band}</span>
+                <span style="width:44px;font-size:12px;color:var(--danger);font-weight:700;">${b.current}</span>
+                <span style="color:var(--text-secondary);font-size:11px;">→</span>
+                <span style="width:60px;font-size:12px;font-weight:600;color:#F59E0B;">${b.to10} (10月)</span>
+                <span style="color:var(--text-secondary);font-size:11px;">→</span>
+                <span style="width:52px;font-size:12px;font-weight:700;color:#8B5CF6;">${b.toFinal} (3月)</span>
+                <span style="font-size:11px;color:var(--text-secondary);flex:1;line-height:1.5;">${b.advice}</span>
+            </div>`).join('');
+        ieltsDiv.innerHTML = `
+            <div style="font-size:14px;font-weight:700;margin-bottom:10px;">🎯 IELTS 目标阶梯</div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                <span style="font-size:20px;font-weight:700;color:var(--danger);">5.5</span>
+                <span>→</span>
+                <span style="font-size:16px;font-weight:600;color:#F59E0B;">6.0</span>
+                <span>→</span>
+                <span style="font-size:16px;font-weight:600;color:#3B82F6;">6.5</span>
+                <span>→</span>
+                <span style="font-size:20px;font-weight:700;color:#8B5CF6;">7.0 <span style="font-size:11px;font-weight:600;color:var(--danger);">🎯 最终目标</span></span>
+            </div>
+            <div style="font-size:12px;color:var(--text-secondary);line-height:1.7;margin-bottom:8px;">${CONCLUSIONS.ieltsGap.gap}</div>
+            <div style="font-size:13px;font-weight:700;margin:10px 0 6px;">📊 小分诊断（首次实考 ${CONCLUSIONS.ieltsGap.firstExam.bands}）</div>
+            ${bandRows}
+            <div style="font-size:13px;font-weight:700;margin:12px 0 6px;">🗓️ 每周节奏</div>
+            <div style="font-size:12px;color:var(--text-secondary);line-height:1.7;background:#F8F9FC;padding:8px 10px;border-radius:8px;">
+                ${(Object.entries(IELTS_PLAN.weeklyRoutine||{})).map(([k,v]) => `<b>${k}</b>：${v}<br>`).join('')}
+            </div>
+        `;
+        
+        // 分层推荐
+        const tiersDiv = document.getElementById('tierAccordions');
+        tiersDiv.innerHTML = ['reach','match','safety'].map(tier => {
+            const d = CONCLUSIONS.tiers[tier];
+            return `
+            <div class="tier-accordion">
+                <div class="tier-header" onclick="toggleTier('${tier}')">
+                    <h3>
+                        <span class="tier-badge ${tier}">${d.title}</span>
+                    </h3>
+                    <span class="tier-arrow" id="arrow-${tier}">▼</span>
+                </div>
+                <div class="tier-content open" id="content-${tier}">
+                    <div class="tier-desc">${d.desc}</div>
+                    ${d.schools.map(s => {
+                        const uni = findUniById(s.id);
+                        return `
+                        <div class="tier-school-item" onclick="navigateTo('schools/${(uni?.country||'uk').toLowerCase()}');return false;" style="cursor:pointer;">
+                            <div class="school-dot" style="background:${tier==='reach'?'#EF4444':tier==='match'?'#3B82F6':'#10B981'};"></div>
+                            <div class="school-info">
+                                <div class="s-name">${uni?.nameZh || ''} · QS #${uni?.rank || '?'}</div>
+                                <div class="s-note">${s.note}</div>
+                            </div>
+                        </div>`;
+                    }).join('')}
+                </div>
+            </div>`;
+        }).join('');
+        
+        // 洞察
+        const insightsDiv = document.getElementById('insightsList');
+        insightsDiv.innerHTML = CONCLUSIONS.keyInsights.map(t => `
+            <div class="insight-card">${t}</div>
+        `).join('');
+        
+        // 对比表
+        const tableDiv = document.getElementById('comparisonTable');
+        const ct = CONCLUSIONS.comparisonTable;
+        tableDiv.innerHTML = `
+            <thead><tr>${ct.headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+            <tbody>${ct.rows.map(row => `
+                <tr>${row.map((cell, i) => `<td${i===0?' style="font-weight:600;color:var(--text-primary);"':''}>${cell}</td>`).join('')}</tr>
+            `).join('')}</tbody>
+        `;
+    }
+
+    function toggleTier(tier) {
+        const content = document.getElementById('content-' + tier);
+        const arrow = document.getElementById('arrow-' + tier);
+        const isOpen = content.classList.contains('open');
+        if (isOpen) {
+            content.classList.remove('open');
+            arrow.classList.remove('open');
+        } else {
+            content.classList.add('open');
+            arrow.classList.add('open');
+        }
+    }
+
+    function findUniById(id) {
+        for (const country of ['uk','hk','jp']) {
+            const unis = UNIVERSITIES[country] || [];
+            const found = unis.find(u => u.id === id);
+            if (found) return { ...found, country: country.toUpperCase() };
+        }
+        return null;
+    }
+
+    // ==================== 时间线页面 ====================
+    function renderTimeline() {
+        const container = document.getElementById('timelineContainer');
+        container.innerHTML = TIMELINE.map((t, i) => `
+            <div class="timeline-item" style="animation-delay:${i * 0.06}s;">
+                <div class="timeline-dot ${t.priority}"></div>
+                <div class="timeline-card">
+                    <div class="timeline-date">${t.date}${t.deadline ? `<span class="timeline-deadline-badge ${getDeadlineBadgeClass(t.deadline)}">⏰ ${formatDeadline(t.deadline)}</span>` : ''}</div>
+                    <div class="timeline-title">${t.title}</div>
+                    <div class="timeline-desc">${t.desc}</div>
+                    ${t.tasks && t.tasks.length > 0 ? `
+                    <ul class="timeline-tasks">
+                        ${t.tasks.map((task, j) => {
+                            const checkKey = `${t.id}_${j}`;
+                            const checked = state.timelineChecks[checkKey];
+                            return `
+                            <li class="timeline-task" onclick="toggleTaskCheck('${checkKey}', this)">
+                                <span class="check-box${checked ? ' checked' : ''}">${checked ? '✓' : ''}</span>
+                                <span style="${checked ? 'text-decoration:line-through;color:var(--text-muted);' : ''}">${task}</span>
+                            </li>`;
+                        }).join('')}
+                    </ul>` : ''}
+                </div>
+            </div>
+        `).join('');
+        
+        // Re-trigger animation
+        requestAnimationFrame(() => {
+            document.querySelectorAll('.timeline-item').forEach(c => c.style.opacity = '1');
+        });
+    }
+
+    function toggleTaskCheck(key, el) {
+        const box = el.querySelector('.check-box');
+        const text = el.querySelector('span:last-child');
+        const wasChecked = state.timelineChecks[key];
+        
+        if (wasChecked) {
+            delete state.timelineChecks[key];
+            box.classList.remove('checked');
+            box.textContent = '';
+            text.style.textDecoration = '';
+            text.style.color = '';
+        } else {
+            state.timelineChecks[key] = true;
+            box.classList.add('checked');
+            box.textContent = '✓';
+            text.style.textDecoration = 'line-through';
+            text.style.color = 'var(--text-muted)';
+        }
+        
+        localStorage.setItem('elysia_timeline_checks', JSON.stringify(state.timelineChecks));
+    }
+
+    // ==================== 工具函数 ====================
+    function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    // ==================== 提醒系统 ====================
+    const REMINDER_SETTINGS_KEY = 'elysia_reminder_settings';
+    const REMINDER_SENT_KEY = 'elysia_reminder_sent';
+    const REMINDER_INTERVAL = 60 * 60 * 1000; // 60分钟轮询
+
+    const reminderStore = {
+        settings: JSON.parse(localStorage.getItem(REMINDER_SETTINGS_KEY) || '{"enabled":true}'),
+        sent: JSON.parse(localStorage.getItem(REMINDER_SENT_KEY) || '{}')
+    };
+
+    function saveReminderSettings() {
+        localStorage.setItem(REMINDER_SETTINGS_KEY, JSON.stringify(reminderStore.settings));
+    }
+
+    function saveReminderSent() {
+        localStorage.setItem(REMINDER_SENT_KEY, JSON.stringify(reminderStore.sent));
+    }
+
+    function isNotificationSupported() {
+        return typeof Notification !== 'undefined';
+    }
+
+    function getReminderPermission() {
+        if (!isNotificationSupported()) return 'unsupported';
+        return Notification.permission;
+    }
+
+    // 解析 YYYY-MM-DD 为本地零点 Date
+    function parseDate(str) {
+        const parts = str.split('-').map(Number);
+        return new Date(parts[0], parts[1] - 1, parts[2]);
+    }
+
+    function formatDeadline(str) {
+        const d = parseDate(str);
+        return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    function getDaysLeft(str) {
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+        const target = parseDate(str);
+        return Math.round((target - now) / (1000 * 60 * 60 * 24));
+    }
+
+    function getDeadlineBadgeClass(str) {
+        const days = getDaysLeft(str);
+        if (days < 0) return 'badge-past';
+        if (days <= 14) return 'badge-urgent';
+        if (days <= 60) return 'badge-soon';
+        return 'badge-later';
+    }
+
+    // 请求通知权限
+    function requestNotificationPermission() {
+        if (!isNotificationSupported()) {
+            showToast('当前浏览器不支持系统通知');
+            return;
+        }
+        if (Notification.permission === 'granted') {
+            showToast('✅ 系统通知已开启');
+            return;
+        }
+        if (Notification.permission === 'denied') {
+            showToast('⚠️ 通知权限被拒绝，请到浏览器设置中开启');
+            return;
+        }
+        Notification.requestPermission().then(perm => {
+            reminderStore.settings.permission = perm;
+            saveReminderSettings();
+            updateReminderUI();
+            if (perm === 'granted') showToast('✅ 系统通知已开启');
+        });
+    }
+
+    // 切换提醒总开关
+    function toggleReminderMaster(checked) {
+        reminderStore.settings.enabled = checked;
+        saveReminderSettings();
+        updateReminderUI();
+        showToast(checked ? '🔔 提醒已开启' : '🔕 提醒已关闭');
+    }
+
+    // 发送提醒（系统通知或 Toast 降级）
+    function fireReminder(item, daysLeft) {
+        const title = `⏰ ${item.title.replace(/&#\d+;/g, '').replace(/⚡|🔥/g, '')}`;
+        const body = `截止日期 ${formatDeadline(item.deadline)}（${item.date}），剩余 ${daysLeft} 天`;
+
+        if (isNotificationSupported() && Notification.permission === 'granted') {
+            try {
+                new Notification(title, {
+                    body,
+                    icon: 'qrcode.png',
+                    badge: 'qrcode.png',
+                    tag: `reminder-${item.id}`,
+                    renotify: true,
+                    data: { url: './index.html#timeline', timelineId: item.id }
+                });
+            } catch (e) {
+                showToast(`${title}：${body}`);
+            }
+        } else {
+            showToast(`${title}：${body}`);
+        }
+        console.log('[Reminder] sent:', item.id, item.deadline, daysLeft);
+    }
+
+    // 核心检查：扫描 TIMELINE，触发应提醒项
+    function checkReminders(force) {
+        if (!reminderStore.settings.enabled) return;
+
+        TIMELINE.forEach(item => {
+            if (!item.deadline || !item.reminderDays) return;
+            const daysLeft = getDaysLeft(item.deadline);
+            // 只在截止前提醒；已过期不再提醒
+            if (daysLeft < 0 || daysLeft > item.reminderDays) return;
+
+            const key = `${item.id}_${item.reminderDays}`;
+            if (!force && reminderStore.sent[key]) return;
+
+            fireReminder(item, daysLeft);
+            reminderStore.sent[key] = new Date().toISOString();
+            saveReminderSent();
+        });
+
+        updateReminderUI();
+    }
+
+    // 获取未来 N 天内（含已过30天）的截止节点
+    function getUpcomingReminders(maxDays) {
+        const list = [];
+        TIMELINE.forEach(item => {
+            if (!item.deadline) return;
+            const daysLeft = getDaysLeft(item.deadline);
+            if (daysLeft < -30 || daysLeft > maxDays) return;
+            list.push({ item, daysLeft });
+        });
+        list.sort((a, b) => a.daysLeft - b.daysLeft);
+        return list;
+    }
+
+    // 更新首页卡片 + 时间线面板 UI
+    function updateReminderUI() {
+        // 首页卡片
+        const badge = document.getElementById('reminderHomeBadge');
+        const status = document.getElementById('reminderHomeStatus');
+        if (badge && status) {
+            const upcoming = getUpcomingReminders(90);
+            if (upcoming.length > 0) {
+                badge.style.display = '';
+                badge.textContent = upcoming.length;
+                const urgentCount = upcoming.filter(x => x.daysLeft >= 0 && x.daysLeft <= x.item.reminderDays).length;
+                badge.className = 'reminder-badge' + (urgentCount > 0 ? ' reminder-badge-urgent' : '');
+                const next = upcoming[0];
+                status.innerHTML = `最近截止：<strong>${next.item.title.replace(/&#\d+;/g, '')}</strong>（${next.daysLeft}天后）`;
+            } else {
+                badge.style.display = 'none';
+                status.textContent = reminderStore.settings.enabled ? '近期暂无临近截止节点' : '提醒已关闭，点击开启';
+            }
+        }
+
+        // 时间线面板
+        const switchEl = document.getElementById('reminderMasterSwitch');
+        const permRow = document.getElementById('reminderPermissionRow');
+        const listEl = document.getElementById('upcomingReminders');
+        if (!switchEl || !permRow || !listEl) return;
+
+        switchEl.checked = !!reminderStore.settings.enabled;
+
+        const perm = getReminderPermission();
+        if (perm === 'granted') {
+            permRow.innerHTML = `<div class="reminder-perm-status perm-granted">✅ 系统通知已授权 · 截止日前自动提醒</div>`;
+        } else if (perm === 'denied') {
+            permRow.innerHTML = `<div class="reminder-perm-status perm-denied">⚠️ 通知权限被拒绝，请在浏览器设置中重新开启</div>`;
+        } else if (perm === 'unsupported') {
+            permRow.innerHTML = `<div class="reminder-perm-status perm-warn">📱 当前浏览器不支持系统通知，将使用页面内提醒</div>`;
+        } else {
+            permRow.innerHTML = `<div class="reminder-perm-status perm-default">
+                <span>🔕 尚未授权系统通知</span>
+                <button class="reminder-perm-btn" onclick="requestNotificationPermission()">开启通知</button>
+            </div>`;
+        }
+
+        // 即将到来列表
+        const upcoming = getUpcomingReminders(180);
+        if (upcoming.length === 0) {
+            listEl.innerHTML = `<div class="reminder-empty">暂无未来 6 个月的截止节点</div>`;
+        } else {
+            listEl.innerHTML = upcoming.map(x => {
+                const inWindow = x.daysLeft >= 0 && x.daysLeft <= x.item.reminderDays;
+                const past = x.daysLeft < 0;
+                return `
+                <div class="reminder-item${inWindow ? ' active' : ''}">
+                    <div class="reminder-item-info">
+                        <div class="reminder-item-title">${x.item.title.replace(/&#\d+;/g, '')}</div>
+                        <div class="reminder-item-meta">${formatDeadline(x.item.deadline)} · ${x.item.date}</div>
+                    </div>
+                    <span class="reminder-item-days ${past ? 'past' : (inWindow ? 'urgent' : '')}">
+                        ${past ? '已截止' : (inWindow ? '⚠ ' + x.daysLeft + '天' : x.daysLeft + '天后')}
+                    </span>
+                </div>`;
+            }).join('');
+        }
+    }
+
+    // 渲染「重点任务提醒」（由 reminders.js 提供，每3天自动更新）
+    function renderKeyAlerts() {
+        const listEl = document.getElementById('keyAlertsList');
+        const metaEl = document.getElementById('keyAlertsMeta');
+        if (!listEl) return;
+        const alerts = (typeof KEY_ALERTS !== 'undefined') ? KEY_ALERTS : null;
+        if (!alerts || !alerts.buckets) {
+            if (listEl) listEl.innerHTML = '<div style="color:var(--text-secondary);">提醒数据尚未生成，请稍后再来查看。</div>';
+            return;
+        }
+        const bucketMeta = [
+            { key: 'current', icon: '🔴', label: '当前重点' },
+            { key: 'oneMonth', icon: '🟠', label: '一个月内' },
+            { key: 'threeMonths', icon: '🟡', label: '三个月内' }
+        ];
+        const parts = [];
+        for (const b of bucketMeta) {
+            const items = alerts.buckets[b.key] || [];
+            parts.push(`<div style="margin-top:6px;"><span style="font-weight:700;">${b.icon} ${b.label}</span></div>`);
+            if (items.length === 0) {
+                parts.push(`<div style="color:var(--text-secondary);padding-left:4px;">暂无临近事项，保持节奏</div>`);
+                continue;
+            }
+            items.forEach(it => {
+                let daysTxt;
+                if (it.daysLeft < 0) daysTxt = `<span style="color:#EF4444;">已到/过期</span>`;
+                else if (it.daysLeft === 0) daysTxt = `<span style="color:#EF4444;font-weight:700;">今天到期</span>`;
+                else if (it.daysLeft <= 14) daysTxt = `<span style="color:#EF4444;font-weight:700;">${it.daysLeft}天后</span>`;
+                else daysTxt = `${it.daysLeft}天后`;
+                const prio = it.priority === 'urgent' ? '🔥 ' : (it.priority === 'high' ? '⭐ ' : '');
+                parts.push(`<div style="padding-left:4px;">${prio}${it.title} · <span style="color:var(--text-secondary);">${it.date}</span> · ${daysTxt}</div>`);
+            });
+        }
+        listEl.innerHTML = parts.join('');
+        if (metaEl) {
+            metaEl.textContent = `更新于 ${alerts.generatedAt || '-'} · 下次 ${alerts.nextUpdate || '-'} · 每3天自动更新`;
+        }
+    }
+
+    // 注册 Service Worker
+    function registerServiceWorker() {
+        if (!('serviceWorker' in navigator)) return;
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('[Reminder] SW registered:', reg.scope))
+                .catch(err => console.log('[Reminder] SW register failed:', err));
+        });
+    }
+
+    // 启动提醒引擎
+    function initReminderEngine() {
+        registerServiceWorker();
+        // 首次立即检查
+        checkReminders(true);
+        // 每60分钟轮询
+        setInterval(() => checkReminders(false), REMINDER_INTERVAL);
+        // 回到前台时也检查一次
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) checkReminders(false);
+        });
+    }
+
+    // ==================== 滚动监听 ====================
+    let scrollTimer;
+    window.addEventListener('scroll', () => {
+        const header = document.getElementById('topHeader');
+        const backTop = document.getElementById('btnBackTop');
+        
+        if (window.scrollY > 20) {
+            header.classList.add('scrolled');
+            backTop.classList.add('visible');
+        } else {
+            header.classList.remove('scrolled');
+            backTop.classList.remove('visible');
+        }
+        
+        clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(() => {
+            state.scrollPositions[state.currentPage] = window.scrollY;
+        }, 100);
+    }, { passive: true });
+
+    // ==================== 初始加载 ====================
+    let _navigatingByHash = false; // prevent hash→navigate→hash loop
+    
+    function init() {
+        // Check URL hash
+        const hash = window.location.hash.replace('#', '');
+        if (hash) {
+            const parts = hash.split('/');
+            if (parts[0] === 'schools' && parts[1]) {
+                navigateTo(`schools/${parts[1]}`);
+            } else if (['home','conclusion','timeline'].includes(parts[0])) {
+                navigateTo(parts[0]);
+            } else {
+                navigateTo('home');
+            }
+        } else {
+            navigateTo('home');
+            renderConclusion(); // pre-render for quick switching
+        }
+        
+        // Handle browser back/forward
+        window.addEventListener('hashchange', () => {
+            if (_navigatingByHash) return;
+            _navigatingByHash = true;
+            const hash = window.location.hash.replace('#', '');
+            if (hash) {
+                const parts = hash.split('/');
+                if (parts[0] === 'schools' && parts[1]) {
+                    navigateTo(`schools/${parts[1]}`);
+                } else if (['home','conclusion','timeline'].includes(parts[0])) {
+                    navigateTo(parts[0]);
+                }
+            }
+            setTimeout(() => { _navigatingByHash = false; }, 50);
+        });
+        
+        // Wrap navigateTo to sync URL hash (one-way: nav→hash)
+        const origNavigateTo = navigateTo;
+        navigateTo = function(route, filter) {
+            origNavigateTo(route, filter);
+            // Sync hash without triggering hashchange loop
+            let hash = route;
+            if (route.startsWith('schools/')) {
+                const parts = route.split('/');
+                hash = `schools/${parts[1]}`;
+            }
+            const newUrl = hash !== 'home' ? '#' + hash : window.location.pathname;
+            if (window.location.hash !== '#' + hash && hash !== 'home') {
+                _navigatingByHash = true;
+                window.location.hash = hash;
+                setTimeout(() => { _navigatingByHash = false; }, 50);
+            } else if (hash === 'home' && window.location.hash) {
+                _navigatingByHash = true;
+                history.replaceState(null, '', window.location.pathname);
+                setTimeout(() => { _navigatingByHash = false; }, 50);
+            }
+        };
+
+        // 渲染重点任务提醒 + 启动提醒引擎（SW注册 + 首次检查 + 60分钟轮询）
+        renderKeyAlerts();
+        initReminderEngine();
+    }
+    </script>
+
+    <!-- ==================== 二维码浮窗 ==================== -->
+    <div class="qr-float-btn" id="qrFloatBtn" onclick="toggleQR()" title="手机扫码访问">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><line x1="14" y1="14" x2="14" y2="14.01"/><line x1="17" y1="14" x2="17" y2="14.01"/><line x1="14" y1="17" x2="14" y2="17.01"/><line x1="17" y1="17" x2="17" y2="17.01"/><line x1="17" y1="14" x2="21" y2="18"/><line x1="17" y1="18" x2="21" y2="14"/></svg>
+    </div>
+    <div class="qr-overlay" id="qrOverlay" onclick="toggleQR()">
+        <div class="qr-modal" onclick="event.stopPropagation()">
+            <div class="qr-title">📱 手机扫码访问</div>
+            <img src="qrcode.png" alt="二维码" class="qr-img" onerror="this.outerHTML='<div class=qr-fallback><p>请确保手机与电脑在同一WiFi</p><p style=font-size:1.2em;font-weight:700;color:#8B5CF6;margin-top:8px>http://172.17.1.203:8080</p></div>'">
+            <div class="qr-tip">扫一扫，打开 Elysia 升学攻略</div>
+            <button class="qr-close" onclick="toggleQR()">关闭</button>
+        </div>
+    </div>
+
+    <script>
+    function toggleQR() {
+        document.getElementById('qrOverlay').classList.toggle('show');
+    }
+    </script>
+
+    <!-- ==================== 启动应用 ==================== -->
+    <script>
+    document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

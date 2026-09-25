@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<title>黑灯检测实验室 · 市场规模单页图 | 睦灵科技（RoboX）</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0B1A2C;--ink2:#243447;--muted:#64748B;--line:#E4EBF4;--bg:#F5F8FC;
+  --blue:#1F6FEB;--teal:#0FA98C;--amber:#E0952C;--red:#D9534F;--violet:#6D5BF5;
+}
+body{background:#DCE5F0;font-family:"Microsoft YaHei","PingFang SC","Hiragino Sans GB","Source Han Sans SC",sans-serif;
+  color:var(--ink);-webkit-font-smoothing:antialiased;padding:26px 0;}
+.page{width:1240px;margin:0 auto;background:#fff;box-shadow:0 14px 46px rgba(11,26,44,.18);border-radius:8px;overflow:hidden;}
+.hd{background:linear-gradient(112deg,#0B1A2C 0%,#143255 52%,#0E5AA8 100%);color:#fff;padding:26px 36px 22px;position:relative;overflow:hidden;}
+.hd:after{content:"";position:absolute;right:-70px;top:-90px;width:320px;height:320px;border-radius:50%;
+  background:radial-gradient(circle,rgba(31,111,235,.42),transparent 66%);}
+.hd h1{font-size:29px;letter-spacing:.4px;font-weight:700;}
+.hd .sub{margin-top:9px;font-size:14.5px;color:#B9CEE8;letter-spacing:.2px;}
+.hd .meta{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;}
+.chip{font-size:12px;padding:5px 11px;border-radius:20px;background:rgba(255,255,255,.13);
+  border:1px solid rgba(255,255,255,.22);color:#E4EEFA;letter-spacing:.3px;}
+.body{padding:26px 36px 30px;}
+.sec-title{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:700;color:#0B1A2C;margin:0 0 14px;}
+.sec-title i{width:4px;height:16px;border-radius:2px;background:var(--blue);display:inline-block;}
+.sec-title small{font-weight:400;font-size:12.5px;color:var(--muted);letter-spacing:.2px;}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.kpi{border:1px solid var(--line);border-radius:10px;padding:15px 16px 14px;background:linear-gradient(180deg,#FBFDFF,#F4F8FD);position:relative;}
+.kpi .lb{font-size:12.5px;color:var(--muted);letter-spacing:.3px;}
+.kpi .vl{font-size:25px;font-weight:700;margin-top:7px;letter-spacing:-.3px;}
+.kpi .vl em{font-size:13px;font-weight:600;font-style:normal;color:var(--muted);margin-left:3px;}
+.kpi .tg{font-size:11.5px;margin-top:7px;color:#94A3B8;}
+.kpi.b1{border-top:3px solid var(--ink);}
+.kpi.b2{border-top:3px solid var(--blue);}
+.kpi.b3{border-top:3px solid var(--teal);}
+.kpi.b4{border-top:3px solid var(--amber);}
+.kpi.b1 .vl{color:var(--ink);}.kpi.b2 .vl{color:var(--blue);}
+.kpi.b3 .vl{color:var(--teal);}.kpi.b4 .vl{color:#C07E15;}
+.grid2{display:grid;grid-template-columns:1.42fr 1fr;gap:16px;margin-top:20px;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px;}
+.card{border:1px solid var(--line);border-radius:11px;padding:18px 19px 17px;background:#fff;}
+.card.soft{background:linear-gradient(180deg,#FBFDFF,#F6F9FD);}
+/* 阶梯条 */
+.tier{margin-bottom:13px;}
+.tier:last-child{margin-bottom:0;}
+.tier .top{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;margin-bottom:6px;}
+.tier .nm{font-weight:700;color:#16283D;}
+.tier .nm span{font-weight:400;color:var(--muted);font-size:12px;margin-left:6px;}
+.tier .vv{font-weight:700;font-size:14px;}
+.tier .bar{height:26px;border-radius:6px;position:relative;overflow:hidden;}
+.tier .bar b{position:absolute;right:9px;top:4px;font-size:11.5px;color:rgba(255,255,255,.9);font-weight:600;letter-spacing:.3px;}
+.t1 .bar{background:linear-gradient(90deg,#0B1A2C,#2B4A72);}
+.t2 .bar{background:linear-gradient(90deg,#144E8C,#1F6FEB);}
+.t3 .bar{background:linear-gradient(90deg,#0B7C68,#12BBA0);}
+.t4 .bar{background:linear-gradient(90deg,#B6761A,#EEB254);}
+.t1 .vv{color:var(--ink);}.t2 .vv{color:var(--blue);}.t3 .vv{color:var(--teal);}.t4 .vv{color:#B6761A;}
+.cap{font-size:11.5px;color:#94A3B8;margin-top:11px;padding-top:10px;border-top:1px dashed var(--line);}
+/* 列表 */
+.li{display:flex;gap:10px;font-size:13px;line-height:1.72;color:#2B3E54;margin-bottom:9px;}
+.li:last-child{margin-bottom:0;}
+.li .dot{flex:0 0 auto;width:6px;height:6px;border-radius:50%;background:var(--blue);margin-top:8px;}
+.li .dot.t{background:var(--teal);}.li .dot.a{background:var(--amber);}.li .dot.r{background:var(--red);}
+.li b{color:#0B1A2C;}
+.mini{display:flex;gap:0;margin-top:4px;}
+.mini .m{flex:1;padding:0 12px;border-right:1px solid var(--line);}
+.mini .m:first-child{padding-left:0;}
+.mini .m:last-child{border-right:0;padding-right:0;}
+.mini .m .k{font-size:11.5px;color:var(--muted);}
+.mini .m .v{font-size:17px;font-weight:700;margin-top:5px;color:var(--blue);}
+.mini .m .v.t{color:var(--teal);}.mini .m .v.a{color:#C07E15;}
+h3.ct{font-size:13.5px;font-weight:700;margin-bottom:11px;color:#0B1A2C;display:flex;align-items:center;gap:7px;}
+h3.ct .tag{font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:4px;background:#EAF1FB;color:var(--blue);}
+h3.ct .tag.a{background:#FCF2E0;color:#B6761A;}
+h3.ct .tag.t{background:#E5F6F2;color:#0B7C68;}
+.foot{padding:16px 36px 20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;
+  align-items:center;font-size:11.5px;color:#94A3B8;background:#FCFDFF;letter-spacing:.2px;}
+/* 漏斗 */
+.funnel{display:flex;flex-direction:column;gap:9px;}
+.fn{border-radius:7px;color:#fff;padding:13px 22px;display:flex;justify-content:space-between;align-items:center;gap:14px;
+  position:relative;box-shadow:0 3px 10px rgba(11,26,44,.10);}
+.fn .l{font-size:13.5px;font-weight:700;letter-spacing:.2px;}
+.fn .l em{display:block;font-style:normal;font-weight:400;font-size:11.5px;color:rgba(255,255,255,.78);margin-top:3px;letter-spacing:.2px;}
+.fn .r{font-size:15px;font-weight:700;white-space:nowrap;letter-spacing:.2px;}
+.f1{background:linear-gradient(96deg,#0B1A2C,#254563);width:100%;clip-path:polygon(0 0,100% 0,97.5% 100%,2.5% 100%);}
+.f2{background:linear-gradient(96deg,#123F73,#1F6FEB);width:87%;clip-path:polygon(0 0,100% 0,97% 100%,3% 100%);}
+.f3{background:linear-gradient(96deg,#0A6A5A,#0FA98C);width:74%;clip-path:polygon(0 0,100% 0,96.5% 100%,3.5% 100%);}
+.f4{background:linear-gradient(96deg,#9A6214,#D99A32);width:61%;clip-path:polygon(0 0,100% 0,96% 100%,4% 100%);}
+.f5{background:linear-gradient(96deg,#8C3A36,#C6564F);width:48%;clip-path:polygon(0 0,100% 0,95% 100%,5% 100%);}
+.funnel-wrap{display:flex;flex-direction:column;align-items:center;}
+.conv{font-size:11px;color:var(--muted);letter-spacing:.3px;display:flex;align-items:center;gap:7px;height:22px;}
+.conv:before,.conv:after{content:"";width:14px;height:1px;background:#D3DEEB;}
+@media print{@page{size:A4 landscape;margin:7mm}
+  body{background:#fff;padding:0}.page{box-shadow:none;width:100%;border-radius:0}}
+</style></head>
+<body>
+<div class="page">
+  <div class="hd">
+    <h1>黑灯检测实验室 · 市场规模测算</h1>
+    <div class="sub">从 4,876 亿行业池，收敛到 400–500 亿可寻址市场 —— 检测场景 TAM / SAM / SOM</div>
+    <div class="meta">
+      <span class="chip">睦灵科技（RoboX）· 内部测算稿 v1</span>
+      <span class="chip">单位：人民币 / 年（除注明外）</span>
+      <span class="chip">2026-09-12</span>
+      <span class="chip">配套：《星汇智云渠道价值漏斗》</span>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="sec-title"><i></i>核心结论 <small>四层收敛，逐层打折扣</small></div>
+    <div class="kpis">
+      <div class="kpi b1"><div class="lb">① 行业营收池（权威）</div><div class="vl">4,875.97<em>亿元</em></div>
+        <div class="tg">2024 全国检验检测 · 5.3 万家机构</div></div>
+      <div class="kpi b2"><div class="lb">② 行业人力成本池</div><div class="vl">1,600–2,300<em>亿元</em></div>
+        <div class="tg">人工成本率约 30–35%</div></div>
+      <div class="kpi b3"><div class="lb">③ 可无人化操作岗</div><div class="vl">800–1,150<em>亿元</em></div>
+        <div class="tg">约占实验室人员 50%</div></div>
+      <div class="kpi b4"><div class="lb">④ RoboX 可寻址（SAM）</div><div class="vl">400–500<em>亿元</em></div>
+        <div class="tg">第三方 + 半结构化 + 离散样品</div></div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="sec-title"><i></i>四层收敛路径 <small>条形宽度按数值等比缩放，仅示意收敛关系</small></div>
+        <div class="tier t1">
+          <div class="top"><div class="nm">① 检验检测行业营收<span>全部机构</span></div><div class="vv">4,875.97 亿</div></div>
+          <div class="bar" style="width:100%"><b>5.51 亿份报告 · 155 万从业</b></div>
+        </div>
+        <div class="tier t2">
+          <div class="top"><div class="nm">② 行业人力成本池<span>营收 × 30–35%</span></div><div class="vv">1,600–2,300 亿</div></div>
+          <div class="bar" style="width:53.5%"><b>劳动密集型</b></div>
+        </div>
+        <div class="tier t3">
+          <div class="top"><div class="nm">③ 可无人化「实验室操作岗」<span>前处理 / 分拣 / 流转 / 上机</span></div><div class="vv">800–1,150 亿</div></div>
+          <div class="bar" style="width:33%"><b>≈ 实验室人员 50%</b></div>
+        </div>
+        <div class="tier t4">
+          <div class="top"><div class="nm">④ RoboX SAM<span>第三方机构 + 标准化场景 60%</span></div><div class="vv">400–500 亿</div></div>
+          <div class="bar" style="width:21%"><b>可寻址</b></div>
+        </div>
+        <div class="cap">不含院内医学检验（机器人难以进入）；不含销售、客服、报告审核、技术负责等不可替代岗。</div>
+      </div>
+
+      <div class="card soft">
+        <div class="sec-title"><i></i>建设市场 · CAPEX <small>「卖方案」这一层</small></div>
+        <div class="mini">
+          <div class="m"><div class="k">设备市场 / 年</div><div class="v">82–138 亿</div></div>
+          <div class="m"><div class="k">渗透率（2025）</div><div class="v t">11.3%</div></div>
+        </div>
+        <div style="height:14px"></div>
+        <div class="li"><span class="dot a"></span><div>黑灯实验室<b>单项目造价 100–3,000 万元</b>（轻量单流程无人单元 → 多流程整线）</div></div>
+        <div class="li"><span class="dot a"></span><div>若 5 年内 3–5% 的机构（约 2,000–3,000 个实验室）改造：<b>累计 60–300 亿</b>，年化 <b>15–60 亿</b></div></div>
+        <div class="li"><span class="dot r"></span><div>其中<b>机器人（大脑 + 手）价值量仅占 10–20%</b>，大头是测试设备与自动化流水线 —— 这正是「做大脑、让出设备」的原因</div></div>
+        <div class="cap">渗透率起点低（≈11%）、增速 12–15%，属于「空间大、竞争不拥挤」的早期赛道。</div>
+      </div>
+    </div>
+
+    <div class="grid3">
+      <div class="card">
+        <h3 class="ct">ROI 证据 <span class="tag t">可验证</span></h3>
+        <div class="li"><span class="dot t"></span><div><b>盛虹石化</b>黑灯实验室投用后：直接释放近 <b>50 名质检人员</b>、年节约人力成本约 <b>600 万元</b>（人均 ≈12 万元/年）</div></div>
+        <div class="li"><span class="dot t"></span><div>单实验室改造投 2,000–3,000 万元 → <b>回本周期约 3–5 年</b></div></div>
+        <div class="cap">这是对领投方最有效的「可算 ROI」证据，而不是演示视频。</div>
+      </div>
+      <div class="card">
+        <h3 class="ct">竞争格局 <span class="tag a">真实但不拥挤</span></h3>
+        <div class="li"><span class="dot"></span><div><b>戴纳科技</b>：AI + 黑灯实验室全生命周期服务（化工/石化首个无人值守检测实验室）</div></div>
+        <div class="li"><span class="dot"></span><div><b>睿科集团</b>：无人化智能实验室技术与应用实践</div></div>
+        <div class="li"><span class="dot r"></span><div>两者路线均为<b>刚性自动化流水线</b>；RoboX 的楔子是<b>柔性灵巧操作（异构 / 非标 / 触觉）</b>—— 做它们做不了的「最后 5%」</div></div>
+      </div>
+      <div class="card">
+        <h3 class="ct">场景契合度 <span class="tag">8 特征规则</span></h3>
+        <div class="li"><span class="dot t"></span><div>半结构化环境 ✓ &nbsp;物体非标 ✓ &nbsp;高频重复 ✓</div></div>
+        <div class="li"><span class="dot t"></span><div>结果可自动判定 ✓ &nbsp;支付方明确、ROI 可算 ✓</div></div>
+        <div class="li"><span class="dot t"></span><div>可回退性 ✓（人机协同 / 单元回退）</div></div>
+        <div class="cap">检测实验室是目前少数能同时满足 8 特征、且已有渠道在手的场景。</div>
+      </div>
+    </div>
+
+    <div class="card soft" style="margin-top:16px">
+      <div class="sec-title"><i></i>口径 · 假设 · 来源 · 风险</div>
+      <div class="li"><span class="dot"></span><div><b>来源：</b>市场监管总局《2024 / 2025 年度全国检验检测服务业统计简报》（机构数、营收、报告数、从业人数）；观研天下（实验室自动化市场规模与渗透率）；盛虹石化公开案例；华测检测年报（人均营收 45.86 万元，员工 1.35–1.43 万人）。</div></div>
+      <div class="li"><span class="dot a"></span><div><b>口径与假设：</b>「黑灯实验室」无权威统计，②③④ 均为自建 TAM / SAM 推算。假设链：人工成本率 30–35% → 可替代「操作岗」占实验室人员 50% → 第三方机构 + 半结构化标准化场景占 60%。</div></div>
+      <div class="li"><span class="dot r"></span><div><b>风险：</b>检测行业报告单价与产能利用率存在下行压力；院内医学检验不在可寻址范围；「可替代比例」为经验估计，需以实际 POC 标定。</div></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div>睦灵科技（RoboX）· 数据与生态 · 内部测算稿，不对外</div>
+    <div>生成脚本：codebuddy/gen_darklab_onepager.js · 2026-09-12</div>
+  </div>
+</div>
+</body></html>

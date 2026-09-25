@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<title>炸鸡场景 · 附件（分析过程与 TAM/SAM/SOM 漏斗）| 睦灵科技（RoboX）</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0B1A2C;--ink2:#243447;--muted:#64748B;--line:#E4EBF4;--bg:#F5F8FC;
+  --blue:#1F6FEB;--teal:#0FA98C;--amber:#E0952C;--red:#D9534F;--violet:#6D5BF5;
+}
+body{background:#DCE5F0;font-family:"Microsoft YaHei","PingFang SC","Hiragino Sans GB","Source Han Sans SC",sans-serif;
+  color:var(--ink);-webkit-font-smoothing:antialiased;padding:26px 0;}
+.page{width:1260px;margin:0 auto 26px;background:#fff;box-shadow:0 14px 46px rgba(11,26,44,.18);border-radius:8px;overflow:hidden;}
+.hd{background:linear-gradient(112deg,#0B1A2C 0%,#143255 52%,#0E5AA8 100%);color:#fff;padding:26px 36px 22px;position:relative;overflow:hidden;}
+.hd:after{content:"";position:absolute;right:-70px;top:-90px;width:320px;height:320px;border-radius:50%;
+  background:radial-gradient(circle,rgba(31,111,235,.42),transparent 66%);}
+.hd h1{font-size:29px;letter-spacing:.4px;font-weight:700;position:relative;}
+.hd .sub{margin-top:9px;font-size:14.5px;color:#B9CEE8;letter-spacing:.2px;position:relative;}
+.hd .meta{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;position:relative;}
+.chip{font-size:12px;padding:5px 11px;border-radius:20px;background:rgba(255,255,255,.13);
+  border:1px solid rgba(255,255,255,.22);color:#E4EEFA;letter-spacing:.3px;}
+.body{padding:24px 36px 28px;}
+.sec-title{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:700;color:#0B1A2C;margin:0 0 13px;}
+.sec-title i{width:4px;height:16px;border-radius:2px;background:var(--blue);display:inline-block;}
+.sec-title small{font-weight:400;font-size:12.5px;color:var(--muted);letter-spacing:.2px;}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;}
+.kpi{border:1px solid var(--line);border-radius:10px;padding:14px 15px 13px;background:linear-gradient(180deg,#FBFDFF,#F4F8FD);}
+.kpi .lb{font-size:12.5px;color:var(--muted);letter-spacing:.3px;}
+.kpi .vl{font-size:22px;font-weight:700;margin-top:7px;letter-spacing:-.3px;}
+.kpi .vl em{font-size:12.5px;font-weight:600;font-style:normal;color:var(--muted);margin-left:3px;}
+.kpi .tg{font-size:11.5px;margin-top:7px;color:#94A3B8;line-height:1.55;}
+.kpi.b1{border-top:3px solid var(--ink);}
+.kpi.b2{border-top:3px solid var(--blue);}
+.kpi.b3{border-top:3px solid var(--teal);}
+.kpi.b4{border-top:3px solid var(--amber);}
+.kpi.b1 .vl{color:var(--ink);}.kpi.b2 .vl{color:var(--blue);}
+.kpi.b3 .vl{color:var(--teal);}.kpi.b4 .vl{color:#C07E15;}
+.card{border:1px solid var(--line);border-radius:11px;padding:17px 18px 16px;background:#fff;}
+.card.soft{background:linear-gradient(180deg,#FBFDFF,#F6F9FD);}
+.grid2{display:grid;grid-template-columns:1.35fr 1fr;gap:15px;margin-top:15px;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-top:15px;}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-top:15px;}
+li,ul{list-style:none}
+.li{display:flex;gap:9px;font-size:13px;line-height:1.7;color:#2B3E54;margin-bottom:8px;}
+.li:last-child{margin-bottom:0;}
+.li .dot{flex:0 0 auto;width:6px;height:6px;border-radius:50%;background:var(--blue);margin-top:8px;}
+.li .dot.t{background:var(--teal);}.li .dot.a{background:var(--amber);}.li .dot.r{background:var(--red);}
+.li b{color:#0B1A2C;}
+h3.ct{font-size:13.5px;font-weight:700;margin-bottom:10px;color:#0B1A2C;display:flex;align-items:center;gap:7px;}
+h3.ct .tag{font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:4px;background:#EAF1FB;color:var(--blue);}
+h3.ct .tag.a{background:#FCF2E0;color:#B6761A;}
+h3.ct .tag.t{background:#E5F6F2;color:#0B7C68;}
+h3.ct .tag.r{background:#FDECEC;color:#B23A36;}
+/* 表格 */
+table{width:100%;border-collapse:collapse;font-size:12.5px;}
+th{background:#0B1A2C;color:#fff;font-weight:600;padding:8px 10px;text-align:left;font-size:12px;letter-spacing:.3px;}
+td{padding:7px 10px;border-bottom:1px solid var(--line);color:#2B3E54;vertical-align:top;line-height:1.6;}
+tr:nth-child(even) td{background:#F8FBFE;}
+td.num{font-weight:700;color:#0B1A2C;white-space:nowrap;}
+td.win{color:#0B7C68;font-weight:700;}
+td.lose{color:#B23A36;font-weight:700;}
+tr.hl td{background:#FFF8E8 !important;}
+tr.hl td:first-child{border-left:3px solid var(--amber);}
+/* gate */
+.gate{border:1px solid var(--line);border-radius:10px;padding:14px 15px 13px;background:#fff;position:relative;overflow:hidden;}
+.gate:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;}
+.g0:before{background:#0B1A2C;}.g1:before{background:var(--blue);}
+.g2:before{background:var(--amber);}.g3:before{background:var(--teal);}
+.gate .gt{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:8px;}
+.gate .gt .nm{font-size:13px;font-weight:700;color:#0B1A2C;}
+.gate .gt .tm{font-size:11px;color:#94A3B8;white-space:nowrap;}
+.gate .row{font-size:12px;line-height:1.62;color:#2B3E54;margin-bottom:6px;}
+.gate .row:last-child{margin-bottom:0;}
+.gate .row .k{color:var(--muted);}
+.gate .pass{color:#0B7C68;font-weight:700;}
+.gate .fail{color:#B23A36;font-weight:700;}
+.gate .pill{display:inline-block;font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:4px;background:#EAF1FB;color:var(--blue);margin-left:6px;}
+/* 漏斗 */
+.funnel-wrap{display:flex;flex-direction:column;align-items:center;}
+.funnel{width:100%;display:flex;justify-content:center;}
+.fn{border-radius:7px;color:#fff;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;gap:14px;
+  position:relative;box-shadow:0 3px 10px rgba(11,26,44,.10);}
+.fn .l{font-size:13px;font-weight:700;letter-spacing:.2px;}
+.fn .l em{display:block;font-style:normal;font-weight:400;font-size:11px;color:rgba(255,255,255,.78);margin-top:3px;letter-spacing:.2px;}
+.fn .r{font-size:14.5px;font-weight:700;white-space:nowrap;letter-spacing:.2px;}
+.f1{background:linear-gradient(96deg,#0B1A2C,#254563);width:100%;clip-path:polygon(0 0,100% 0,97.5% 100%,2.5% 100%);}
+.f2{background:linear-gradient(96deg,#123F73,#1F6FEB);width:86%;clip-path:polygon(0 0,100% 0,97% 100%,3% 100%);}
+.f3{background:linear-gradient(96deg,#0A6A5A,#0FA98C);width:72%;clip-path:polygon(0 0,100% 0,96.5% 100%,3.5% 100%);}
+.f4{background:linear-gradient(96deg,#9A6214,#D99A32);width:58%;clip-path:polygon(0 0,100% 0,96% 100%,4% 100%);}
+.f5{background:linear-gradient(96deg,#8C3A36,#C6564F);width:44%;clip-path:polygon(0 0,100% 0,95% 100%,5% 100%);}
+.conv{font-size:11px;color:var(--muted);letter-spacing:.3px;display:flex;align-items:center;gap:7px;height:21px;}
+.conv:before,.conv:after{content:"";width:13px;height:1px;background:#D3DEEB;}
+.fn-card{border:1px solid var(--line);border-radius:11px;padding:16px 16px 15px;background:linear-gradient(180deg,#FBFDFF,#F6F9FD);}
+.fn-hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:13px;padding-bottom:9px;border-bottom:1px dashed var(--line);}
+.fn-hd .fn-name{font-size:14px;font-weight:700;color:#0B1A2C;}
+.fn-hd .fn-meta{font-size:11px;color:var(--muted);}
+.cap{font-size:11.5px;color:#94A3B8;margin-top:10px;padding-top:9px;border-top:1px dashed var(--line);line-height:1.6;}
+.foot{padding:15px 36px 18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;
+  align-items:center;font-size:11.5px;color:#94A3B8;background:#FCFDFF;letter-spacing:.2px;}
+.pgnum{font-size:11.5px;color:#94A3B8;letter-spacing:.3px;margin:0 0 10px;text-align:right;}
+@media print{@page{size:A4 landscape;margin:7mm}
+  body{background:#fff;padding:0}
+  .page{box-shadow:none;width:100%;border-radius:0;margin:0}
+  .pb{page-break-before:always}
+  .noprint{display:none}}
+</style></head>
+<body>
+<div class="page">
+  <div class="hd">
+    <h1>炸鸡场景 · 附件：分析过程与 TAM/SAM/SOM 漏斗</h1>
+    <div class="sub">从「炸蒸涮」品类营收，收敛到 RoboX 可寻址的设备市场 —— 含两个必须点破的口径陷阱</div>
+    <div class="meta">
+      <span class="chip">睦灵科技（RoboX）· 内部评估 v1</span>
+      <span class="chip">配套：《炸鸡场景_一页版》</span>
+      <span class="chip">2026-09-13</span>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="sec-title"><i></i>一、分析过程 <small>先定口径，再算数字</small></div>
+
+    <div class="grid2" style="margin-top:0">
+      <div class="card">
+        <h3 class="ct">1. 口径陷阱：两个「市场规模」不能混 <span class="tag r">最常见错误</span></h3>
+        <table>
+          <tr><th style="width:30%">口径</th><th style="width:40%">含义</th><th style="width:30%">量级</th></tr>
+          <tr><td><b>餐饮营收口径</b></td><td>这些店一年卖出去的菜值多少钱</td><td class="num">炸鸡 1,050 亿</td></tr>
+          <tr class="hl"><td><b>设备口径（我们的 TAM）</b></td><td>这些店会花多少钱买机器人 —— <b>RoboX 只吃门店的资本开支</b></td><td class="num">数十亿，小两个数量级</td></tr>
+        </table>
+        <div class="cap">把「炸鸡市场 1,050 亿」当成自己的 TAM，是路演里会被一句话戳穿的写法。本附件所有漏斗均采用<b>设备口径</b>。</div>
+      </div>
+
+      <div class="card">
+        <h3 class="ct">2. 三业态基础数据与来源 <span class="tag">营收口径</span></h3>
+        <table>
+          <tr><th style="width:26%">品类</th><th style="width:26%">2025 市场规模</th><th style="width:22%">门店数</th><th style="width:26%">来源</th></tr>
+          <tr><td><b>炸鸡</b></td><td class="num">约 1,050 亿元</td><td class="num">16.4 万家</td><td>红餐产业研究院《炸鸡品类发展报告 2025》</td></tr>
+          <tr><td>涮 · 火锅</td><td class="num">约 6,390 亿元</td><td class="num">44.8 万家</td><td>红餐产业研究院（2026 预计破 6,700 亿）</td></tr>
+          <tr><td>涮 · 麻辣烫</td><td class="num">约 1,488 亿元</td><td class="num">约 15 万家</td><td>行业报道，需复核</td></tr>
+          <tr><td>蒸 · <b>无独立口径</b></td><td class="num">—</td><td class="num">—</td><td>见下方陷阱二</td></tr>
+          <tr><td>中式正餐（蒸的宿主）</td><td class="num">—</td><td class="num">近 136 万家</td><td>红餐大数据 2025.03</td></tr>
+          <tr><td>餐饮大盘（参照）</td><td class="num">57,982 亿元（+3.2%）</td><td class="num">近 800 万家</td><td>国家统计局 2025</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h3 class="ct">3. 陷阱一：火锅的「涮」不在后厨，在餐桌上 <span class="tag r">必读</span></h3>
+        <div class="li"><span class="dot r"></span><div>这是火锅能给 6,390 亿营收、44.8 万家门店，却<b>几乎不构成 RoboX 市场</b>的原因 —— 涮的动作由顾客自己完成。</div></div>
+        <div class="li"><span class="dot"></span><div>火锅后厨需要的是<b>切配、备菜、传菜</b>，不是「涮」。这是<b>能力错位</b>，不是市场大小问题。</div></div>
+        <div class="li"><span class="dot t"></span><div>结论：「涮」对 RoboX 的真实战场是<b>麻辣烫 / 冒菜 / 煮面（约 15 万家）</b>，不是火锅（44.8 万家）。<b>把火锅门店数写进 TAM，会被投资人一句话戳穿。</b></div></div>
+      </div>
+
+      <div class="card">
+        <h3 class="ct">4. 陷阱二：蒸没有 TAM，因为蒸不是品类 <span class="tag r">必读</span></h3>
+        <div class="li"><span class="dot r"></span><div>炸鸡是<b>品类</b>（有专门店、有独立营收统计）；涮是<b>品类</b>（火锅 / 麻辣烫）；但<b>蒸是工序</b>，分散在中式正餐 136 万家门店里。</div></div>
+        <div class="li"><span class="dot"></span><div>拿不到「蒸菜市场规模」，只能反推：</div></div>
+        <div class="li"><span class="dot a"></span><div><b>蒸的 SAM ≈ 有蒸柜且需自动化的门店数 × 可渗透率 × 单台价值</b></div></div>
+        <div class="li"><span class="dot t"></span><div>反向优势：蒸菜师傅工资最高（杭州 10–15k/月），<b>售价上限 23–35 万</b>，是三业态中经济性最好的 —— 值得作为炸鸡之后的第二站。</div></div>
+      </div>
+    </div>
+
+    <div class="grid3" style="grid-template-columns:1.1fr 1fr 1fr">
+      <div class="card soft">
+        <h3 class="ct">5. 换算公式与统一假设 <span class="tag">设备口径</span></h3>
+        <div class="li"><span class="dot"></span><div><b>公式：</b>SAM = 门店数 × 可渗透率 × 单店台数 × 单价</div></div>
+        <div class="li"><span class="dot"></span><div><b>可渗透率 25–30%：</b>连锁品牌 + 标准化 + 有支付能力</div></div>
+        <div class="li"><span class="dot"></span><div><b>单价：</b>炸鸡 / 涮煮 10 万元，蒸柜工位 12 万元（结构更复杂）</div></div>
+        <div class="li"><span class="dot"></span><div><b>SOM 份额 2–3%（3 年）：</b>早期渠道 + 单点复制速度倒推</div></div>
+        <div class="cap">三轮打折后，三个细分的 SAM 均落在 <b>41–72 亿元</b>，不是万亿赛道。</div>
+      </div>
+
+      <div class="card">
+        <h3 class="ct">6. 必须扣减项 <span class="tag a">否则高估</span></h3>
+        <div class="li"><span class="dot r"></span><div><b>自动炸炉</b>已覆盖炸鸡的控温控时环节 80%+</div></div>
+        <div class="li"><span class="dot r"></span><div><b>煮面机 / 麻辣烫烫煮机</b>已在涮煮品类大量铺开</div></div>
+        <div class="li"><span class="dot r"></span><div><b>蒸柜</b>本身即专机，多数门店没有「需要手」的蒸制动作</div></div>
+        <div class="cap">上表 SAM 已纳入「专机未覆盖」的折扣；若专机进一步成熟，SAM 需再次下修。</div>
+      </div>
+
+      <div class="card">
+        <h3 class="ct">7. 分析结论 <span class="tag t">三句</span></h3>
+        <div class="li"><span class="dot"></span><div><b>市场够做业务，不够撑叙事。</b>三业态 SAM 合计 158 亿，SOM 合计约 4 亿元 / 3 年。</div></div>
+        <div class="li"><span class="dot t"></span><div><b>真实价值在密度不在规模：</b>16.4 万家炸鸡店挤在一个市场，单城几百家，维保半径极短 —— 这是海外给不了的。</div></div>
+        <div class="li"><span class="dot a"></span><div><b>三业态 SOM 量级相当（1.2–1.5 亿），但炸鸡进入成本最低</b> —— 这才是「先做炸鸡」的真实理由，不是因为它赚钱。</div></div>
+      </div>
+    </div>
+
+    <div class="sec-title" style="margin-top:22px"><i></i>二、三个细分的 TAM / SAM / SOM 漏斗 <small>统一设备口径，逐层打折扣</small></div>
+    <div class="grid3">
+      <div class="fn-card"><div class="fn-hd"><span class="fn-name">① 炸鸡（炸）</span><span class="fn-meta">单位：设备市场 / 人民币</span></div><div class="funnel-wrap"><div class="funnel"><div class="fn f1"><div class="l">TAM · 全部门店<em>16.4 万家 × 10 万 / 台（红餐产业研究院 2025.11 门店数）</em></div><div class="r">164 亿</div></div></div><div class="conv">× 60%</div><div class="funnel"><div class="fn f2"><div class="l">有效门店<em>扣除小镇单店、无标准化与自动化需求（× 60%）</em></div><div class="r">98 亿</div></div></div><div class="conv">× 25%</div><div class="funnel"><div class="fn f3"><div class="l">SAM · 可渗透<em>连锁品牌 + 有支付能力 + 专机未覆盖（× 25%）</em></div><div class="r">41 亿</div></div></div><div class="conv">× 3%（3 年）</div><div class="funnel"><div class="fn f4"><div class="l">SOM · 3 年可得<em>约 120 台 / 年 × 3 年（× 3%）</em></div><div class="r">1.2 亿</div></div></div></div><div class="cap">炸鸡品类营收约 1,050 亿元（2025，红餐），但那是<b>营收口径</b>，不是我们的可寻址市场。RoboX 只吃门店的资本开支，两者相差两个数量级。</div></div>
+      <div class="fn-card"><div class="fn-hd"><span class="fn-name">② 涮（麻辣烫 / 冒菜 / 煮面）</span><span class="fn-meta">单位：设备市场 / 人民币</span></div><div class="funnel-wrap"><div class="funnel"><div class="fn f1"><div class="l">TAM · 全部门店<em>15 万家 × 10 万 / 台（麻辣烫门店口径）</em></div><div class="r">150 亿</div></div></div><div class="conv">× 60%</div><div class="funnel"><div class="fn f2"><div class="l">有效门店<em>扣除夫妻店、燃气明火小档（× 60%）</em></div><div class="r">90 亿</div></div></div><div class="conv">× 30%</div><div class="funnel"><div class="fn f3"><div class="l">SAM · 可渗透<em>连锁 + 标准化汤底 + 有支付能力（× 30%）</em></div><div class="r">45 亿</div></div></div><div class="conv">× 3%（3 年）</div><div class="funnel"><div class="fn f4"><div class="l">SOM · 3 年可得<em>约 135 台 / 年 × 3 年（× 3%）</em></div><div class="r">1.35 亿</div></div></div></div><div class="cap"><b>注意口径陷阱：</b>火锅（44.8 万家、6,390 亿元）<b>不能计入此漏斗</b>——火锅的「涮」发生在顾客餐桌上，后厨不需要涮。涮煮机器人的真实战场是麻辣烫 / 冒菜 / 煮面这类<b>出餐动作在后厨或前场档口</b>的品类。粉面馆门店数尚无权威口径，暂未计入，属保守估计。</div></div>
+      <div class="fn-card"><div class="fn-hd"><span class="fn-name">③ 蒸（蒸菜 / 蒸柜工位）</span><span class="fn-meta">单位：设备市场 / 人民币</span></div><div class="funnel-wrap"><div class="funnel"><div class="fn f1"><div class="l">TAM · 有蒸柜的门店<em>中式正餐 136 万家 × 蒸柜渗透 15% ≈ 20 万家 × 12 万 / 台</em></div><div class="r">240 亿</div></div></div><div class="conv">× 50%</div><div class="funnel"><div class="fn f2"><div class="l">有效门店<em>扣除专机蒸柜已满足需求、无自动化必要（× 50%）</em></div><div class="r">120 亿</div></div></div><div class="conv">× 30%</div><div class="funnel"><div class="fn f3"><div class="l">SAM · 可渗透<em>连锁 + 高工资地区 + 有支付能力（× 30%）</em></div><div class="r">72 亿</div></div></div><div class="conv">× 2%（3 年）</div><div class="funnel"><div class="fn f4"><div class="l">SOM · 3 年可得<em>约 120 台 / 年 × 3 年（× 2%）</em></div><div class="r">1.44 亿</div></div></div></div><div class="cap"><b>蒸没有独立品类口径。</b>蒸不是品类，是<b>工序</b>——它分散在中式正餐（近 136 万家门店）、湘菜、粤菜与蒸菜专门店里，拿不到权威的「蒸菜市场规模」。上表为自建推算，蒸柜渗透率与单台价值均需实地标定。<b>但蒸菜师傅工资最高（10–15k），是三业态中经济性最好的一个。</b></div></div>
+    </div>
+
+    <div class="card soft" style="margin-top:15px">
+      <div class="sec-title"><i></i>三、口径 · 假设 · 来源 · 风险</div>
+      <div class="li"><span class="dot"></span><div><b>来源：</b>红餐产业研究院《炸鸡品类发展报告 2025》（炸鸡 1,050 亿元 / 16.4 万家门店）、《中国餐饮品类发展报告 2025》（火锅 6,390 亿元 / 44.8 万家、中式正餐近 136 万家）、《中式小炒品类发展报告 2026》；国家统计局（2025 全国餐饮收入 57,982 亿元、同比 +3.2%）；蚂蚁 HR《2025 中国餐饮业人力资源白皮书》（从业约 2,150 万人、岗位缺口率 20%+）；09-11 餐饮（炸鸡）场景会议（岗位工资：蒸菜 10–15k、涮锅 7–8k、炸鸡 6–7k；18–24 个月回本上限；餐饮人工成本约占营收 20%；香港洗碗工 2–3 万港币/月）。</div></div>
+      <div class="li"><span class="dot a"></span><div><b>口径与假设：</b>「炸蒸涮」无统一的设备市场统计，TAM / SAM / SOM <b>全部为自建推算</b>。假设链：全部门店 → 有效门店（× 50–60%）→ 可渗透（× 25–30%）→ 3 年份额（× 2–3%）；单价按 10–12 万元/台。餐饮营收口径与设备口径<b>不可混用</b>。</div></div>
+      <div class="li"><span class="dot r"></span><div><b>风险与待核实：</b>① 麻辣烫门店数（15 万家）与市场规模（1,488 亿元）来自行业报道，需以红餐最新报告复核；② 粉面馆门店数无权威口径，未计入，属保守估计；③ 蒸柜渗透率 15% 为经验假设，需实地标定；④ <b>自动炸炉 / 煮面机 / 蒸柜等专机的成熟速度，是本测算最大的下行变量</b> —— 专机每多覆盖一个环节，SAM 就下修一次。</div></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div>睦灵科技（RoboX）· 内部评估稿，不对外 · 本页为《炸鸡场景_一页版》配套附件</div>
+    <div>生成脚本：codebuddy/gen_fried_chicken_onepager.js · 2026-09-13</div>
+  </div>
+</div>
+</body></html>

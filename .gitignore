@@ -1,0 +1,47 @@
+# ===== 知识库 Git 瘦身规则 =====
+# 原则：文档文本层入库；大体积媒体与工作区缓存留本地不入库
+
+# macOS
+.DS_Store
+*.DS_Store
+._*
+
+# 音频大文件（1.8G：转写/纪要文本均已入库，证据链不断）
+*.mp3
+*.m4a
+*.wav
+*.aac
+*.flac
+
+# 视频大文件
+*.mov
+*.mp4
+*.avi
+
+# CodeBuddy 历史工作区（1.1G：脚本、node_modules、构建产物）
+01_工作/RoboX/codebuddy/
+
+# 通用缓存与构建产物
+npm-cache/
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+dist/
+.next/
+.vite/
+*.log
+
+# Obsidian 界面配置（机器相关的界面状态，不随仓库同步）
+.obsidian/
+
+# 超大单文件（>50M，超过 GitHub 单文件上限；留本地不进库）
+01_工作/RoboX/02_股权融资/BP/RoboX Robotics - 1.0.1.pptx
+01_工作/RoboX/05_具身智能行业与竞对/有鹿BP2025.pdf
+01_工作/Datawhale/01_公司介绍与背景资料/9月19日 Datawhale分享.pptx
+01_工作/Datawhale/05_星河WORLD合作/01-【完整版】星河产业集团介绍.pptx
+
+# 临时文件
+*~
+*.tmp
+*.swp

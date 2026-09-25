@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Elysia 升学攻略看板</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+:root {
+  --primary: #6C5CE7; --primary-light: #A29BFE; --accent: #FD79A8;
+  --success: #00B894; --warning: #FDCB6E; --danger: #E74C3C;
+  --bg: #F5F6FA; --card: #FFF; --text: #2D3436; --text2: #636E72; --text3: #B2BEC3;
+  --radius: 16px; --shadow: 0 2px 12px rgba(108,92,231,0.08);
+}
+html, body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.6; overflow-x: hidden; }
+body { padding-bottom: 70px; max-width: 480px; margin: 0 auto; }
+
+/* Tab Bar */
+.tab-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: #FFF; display: flex; border-top: 1px solid #EEE; z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
+.tab-item { flex: 1; text-align: center; padding: 10px 0 8px; font-size: 12px; color: #999; cursor: pointer; transition: color 0.2s; }
+.tab-item.active { color: var(--primary); font-weight: 700; }
+.tab-item .tab-icon { font-size: 22px; display: block; margin-bottom: 2px; }
+
+/* Pages */
+.page { display: none; }
+.page.active { display: block; }
+
+/* Gradient Header */
+.gradient-header { background: linear-gradient(135deg, #6C5CE7 0%, #A29BFE 50%, #FD79A8 100%); padding: 32px 20px 28px; color: #FFF; border-radius: 0 0 28px 28px; }
+.header-greeting { font-size: 26px; font-weight: 700; display: block; margin-bottom: 4px; }
+.header-subtitle { font-size: 14px; opacity: 0.85; display: block; margin-bottom: 20px; }
+.header-stats { display: flex; justify-content: space-around; }
+.stat-num { font-size: 28px; font-weight: 700; display: block; }
+.stat-label { font-size: 12px; opacity: 0.8; }
+
+/* Card */
+.card { background: var(--card); border-radius: var(--radius); padding: 20px; margin: 12px 16px; box-shadow: var(--shadow); }
+
+/* Profile */
+.profile-card { margin-top: -10px; position: relative; z-index: 2; }
+.profile-header { display: flex; align-items: center; margin-bottom: 16px; }
+.profile-emoji { font-size: 36px; margin-right: 12px; }
+.profile-name { font-size: 20px; font-weight: 700; display: block; }
+.profile-school { font-size: 13px; color: var(--text2); }
+.detail-row { display: flex; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+.detail-label { font-size: 13px; color: var(--text2); width: 55px; flex-shrink: 0; }
+.detail-value { font-size: 14px; font-weight: 500; }
+.detail-value.highlight { color: var(--success); font-weight: 700; }
+.detail-note { font-size: 12px; color: var(--text3); margin-left: 8px; }
+.progress-bar { width: 100px; height: 6px; background: #EEE; border-radius: 3px; margin-left: 8px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent)); border-radius: 3px; }
+.strength-tags { border-top: 1px solid #F0F0F0; padding-top: 12px; margin-top: 4px; }
+.strength-title { font-size: 13px; color: var(--text2); display: block; margin-bottom: 8px; }
+.tags-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+.strength-tag { background: linear-gradient(135deg, #F0E6FF, #FFE6F0); color: var(--primary); font-size: 13px; padding: 4px 12px; border-radius: 12px; }
+
+/* Section */
+.section-title { font-size: 16px; font-weight: 700; display: block; margin-bottom: 12px; }
+.divider { height: 1px; background: #EEE; margin: 14px 0; }
+
+/* Conclusion */
+.conclusion-card { background: linear-gradient(135deg, #FFF9E6, #FFF0F5); border: 1px solid rgba(253,203,110,0.25); }
+.conclusion-text { font-size: 14px; line-height: 1.8; display: block; }
+.strategy-text { font-size: 14px; color: var(--primary); line-height: 1.8; display: block; font-weight: 500; }
+
+/* Top Picks */
+.pick-item { padding: 12px 0; border-bottom: 1px solid #F5F5F5; }
+.pick-item:last-child { border-bottom: none; }
+.pick-left { display: flex; align-items: flex-start; }
+.priority-badge { font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 8px; margin-right: 10px; flex-shrink: 0; margin-top: 2px; }
+.pick-info { flex: 1; }
+.pick-school { font-size: 15px; font-weight: 600; display: block; margin-bottom: 3px; }
+.pick-reason { font-size: 13px; color: var(--text2); line-height: 1.5; }
+
+/* Region Grid */
+.region-grid { display: flex; gap: 10px; padding: 0 16px; }
+.region-card { flex: 1; text-align: center; padding: 16px 8px; cursor: pointer; transition: transform 0.2s; }
+.region-card:active { transform: scale(0.96); }
+.region-emoji { font-size: 32px; display: block; margin-bottom: 6px; }
+.region-name { font-size: 15px; font-weight: 700; display: block; }
+.region-desc { font-size: 11px; color: var(--text3); display: block; margin: 4px 0; }
+.region-count { font-size: 12px; color: var(--primary); font-weight: 600; }
+
+/* Action Preview */
+.action-item { display: flex; align-items: flex-start; margin-bottom: 10px; }
+.action-num { width: 24px; height: 24px; background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #FFF; border-radius: 50%; text-align: center; line-height: 24px; font-size: 13px; font-weight: 700; flex-shrink: 0; margin-right: 10px; }
+.action-text { font-size: 14px; line-height: 1.6; }
+.btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #FFF; border: none; border-radius: 12px; padding: 12px 24px; font-size: 14px; text-align: center; width: 100%; cursor: pointer; }
+
+/* ===== Schools Page ===== */
+.region-tabs { display: flex; background: #FFF; padding: 10px 16px; gap: 10px; position: sticky; top: 0; z-index: 10; box-shadow: 0 1px 6px rgba(0,0,0,0.05); }
+.region-tab { flex: 1; text-align: center; padding: 10px 0; border-radius: 10px; font-size: 14px; color: var(--text2); background: var(--bg); cursor: pointer; transition: all 0.3s; }
+.region-tab.active { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #FFF; font-weight: 700; }
+.deadline-bar { display: flex; align-items: center; background: #FFF9E6; padding: 10px 16px; margin: 10px 16px; border-radius: 8px; border-left: 3px solid var(--warning); font-size: 13px; color: #D68910; }
+.filter-scroll { display: flex; padding: 10px 16px; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.filter-chip { padding: 6px 14px; border-radius: 14px; font-size: 13px; color: var(--text2); background: #F0F0F0; white-space: nowrap; cursor: pointer; flex-shrink: 0; }
+.filter-chip.active { background: var(--primary); color: #FFF; }
+
+.school-card { margin: 12px 16px; }
+.school-header { display: flex; align-items: flex-start; }
+.school-emoji { font-size: 32px; margin-right: 12px; flex-shrink: 0; }
+.school-info { flex: 1; }
+.school-name { font-size: 17px; font-weight: 700; display: block; }
+.school-en { font-size: 12px; color: var(--text3); display: block; margin-bottom: 4px; }
+.school-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.school-rank { font-size: 12px; color: var(--primary); font-weight: 600; background: #F0E6FF; padding: 2px 8px; border-radius: 6px; }
+.school-city { font-size: 12px; color: var(--text2); }
+.local-badge { font-size: 11px; color: var(--success); background: #D4EDDA; padding: 2px 8px; border-radius: 6px; font-weight: 600; }
+.match-score { text-align: center; flex-shrink: 0; }
+.match-label { font-size: 11px; color: var(--text3); display: block; margin-bottom: 2px; }
+.star-on { color: var(--warning); font-size: 14px; }
+.star-off { color: #DDD; font-size: 14px; }
+
+.program-item { padding: 12px 0; border-bottom: 1px solid #F5F5F5; cursor: pointer; }
+.program-item:last-child { border-bottom: none; }
+.program-item.hidden { display: none; }
+.prog-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
+.prog-name { font-size: 15px; font-weight: 600; }
+.match-mini { font-size: 12px; color: var(--warning); }
+.prog-en { font-size: 12px; color: var(--text3); display: block; margin-bottom: 6px; }
+.prog-tags { margin-bottom: 6px; display: flex; flex-wrap: wrap; gap: 4px; }
+.tag { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 12px; }
+.tag-math { background: #DFE6E9; color: #2D3436; }
+.tag-datascience { background: #C4E0F9; color: #0984E3; }
+.tag-chemistry { background: #FFEAA7; color: #D68910; }
+.tag-mathdesign { background: #FDDEDE; color: #E74C3C; }
+.prog-bottom { display: flex; gap: 14px; margin-bottom: 4px; }
+.prog-level, .prog-ielts { font-size: 13px; color: var(--text2); }
+.prog-comment { background: #F8F9FA; padding: 8px 12px; border-radius: 10px; margin-top: 6px; }
+.comment-text { font-size: 13px; color: var(--primary); line-height: 1.5; }
+
+/* ===== Detail Page ===== */
+.detail-header { padding: 28px 20px; border-radius: 0 0 28px 28px; }
+.header-top { display: flex; align-items: center; margin-bottom: 16px; }
+.header-emoji { font-size: 36px; margin-right: 12px; }
+.header-school { font-size: 20px; font-weight: 700; display: block; color: #FFF; }
+.header-en { font-size: 13px; color: rgba(255,255,255,0.8); display: block; margin-bottom: 4px; }
+.header-meta { display: flex; gap: 8px; }
+.header-rank { font-size: 12px; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 6px; color: #FFF; }
+.header-city { font-size: 12px; color: rgba(255,255,255,0.8); }
+.header-match { text-align: center; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.2); }
+.header-match .match-label { color: rgba(255,255,255,0.8); font-size: 13px; }
+.header-match .match-stars { font-size: 20px; color: var(--warning); letter-spacing: 4px; }
+.program-card { margin-top: -10px; position: relative; z-index: 2; }
+.program-name-cn { font-size: 20px; font-weight: 700; display: block; margin-bottom: 2px; }
+.program-name-en { font-size: 13px; color: var(--text3); display: block; margin-bottom: 10px; }
+.req-item { display: flex; margin-bottom: 12px; align-items: flex-start; }
+.req-label { font-size: 13px; color: var(--text2); width: 85px; flex-shrink: 0; }
+.req-value { font-size: 14px; flex: 1; line-height: 1.5; }
+.req-value.highlight { color: var(--danger); font-weight: 700; }
+.comment-section { background: linear-gradient(135deg, #F0E6FF, #FFE6F0); padding: 14px; border-radius: 12px; margin-bottom: 14px; }
+.comment-title { font-size: 14px; font-weight: 700; display: block; margin-bottom: 6px; color: var(--primary); }
+.comment-body { font-size: 14px; line-height: 1.8; }
+.link-btn { display: block; }
+.back-btn { background: none; border: none; color: #FFF; font-size: 14px; cursor: pointer; margin-bottom: 12px; padding: 4px 0; }
+.back-btn::before { content: '← '; }
+
+/* ===== Action Page ===== */
+.progress-header { padding: 28px 20px; border-radius: 0 0 28px 28px; text-align: center; }
+.progress-title { font-size: 22px; font-weight: 700; display: block; color: #FFF; margin-bottom: 4px; }
+.progress-subtitle { font-size: 14px; color: rgba(255,255,255,0.8); display: block; margin-bottom: 20px; }
+.progress-ring { display: flex; justify-content: center; margin-bottom: 12px; }
+.ring-bg { width: 100px; height: 100px; border-radius: 50%; position: relative; display: flex; align-items: center; justify-content: center; }
+.ring-fill { position: absolute; width: 100%; height: 100%; border-radius: 50%; }
+.ring-inner { width: 78px; height: 78px; border-radius: 50%; background: rgba(108,92,231,0.8); display: flex; align-items: center; justify-content: center; position: relative; z-index: 1; }
+.ring-num { font-size: 26px; font-weight: 700; color: #FFF; }
+.ring-unit { font-size: 13px; color: rgba(255,255,255,0.8); }
+.progress-detail { font-size: 13px; color: rgba(255,255,255,0.8); }
+
+.timeline { padding: 16px 16px 0; }
+.timeline-item { display: flex; margin-bottom: 0; }
+.month-node { display: flex; flex-direction: column; align-items: center; width: 44px; flex-shrink: 0; }
+.month-emoji { font-size: 22px; margin-bottom: 4px; }
+.month-line { width: 2px; flex: 1; background: linear-gradient(to bottom, var(--primary), var(--accent)); border-radius: 1px; min-height: 20px; }
+.month-content { flex: 1; margin-left: 10px; margin-bottom: 14px; padding: 16px; }
+.month-header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+.month-title { font-size: 16px; font-weight: 700; }
+.month-label { font-size: 13px; color: var(--primary); background: #F0E6FF; padding: 2px 8px; border-radius: 6px; }
+.task-item { display: flex; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid #F8F8F8; cursor: pointer; transition: opacity 0.3s; }
+.task-item:last-child { border-bottom: none; }
+.task-item.done { opacity: 0.5; }
+.task-check { margin-right: 10px; flex-shrink: 0; font-size: 18px; }
+.task-text { font-size: 14px; line-height: 1.6; flex: 1; }
+.task-text.line-through { text-decoration: line-through; color: var(--text3); }
+.reset-section { text-align: center; padding: 16px; }
+.reset-btn { font-size: 13px; color: var(--text3); border: 1px solid #DDD; background: none; border-radius: 10px; padding: 8px 20px; cursor: pointer; }
+
+.footer { text-align: center; padding: 16px; }
+.footer-text { font-size: 12px; color: var(--text3); }
+</style>
+</head>
+<body>
+
+<!-- ===== PAGE: INDEX ===== -->
+<div id="page-index" class="page active">
+  <div class="gradient-header">
+    <span class="header-greeting">Hi Elysia ✨</span>
+    <span class="header-subtitle">你的专属升学攻略看板</span>
+    <div class="header-stats">
+      <div style="text-align:center"><span class="stat-num">14</span><span class="stat-label">目标院校</span></div>
+      <div style="text-align:center"><span class="stat-num" id="stat-programs">30</span><span class="stat-label">匹配专业</span></div>
+      <div style="text-align:center"><span class="stat-num">3</span><span class="stat-label">申请区域</span></div>
+    </div>
+  </div>
+
+  <div class="card profile-card">
+    <div class="profile-header">
+      <span class="profile-emoji">🎀</span>
+      <div>
+        <span class="profile-name">Elysia</span>
+        <span class="profile-school">香港蔚来学校 11年级</span>
+      </div>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">雅思</span>
+      <span class="detail-value">5.5 → 目标 7.0</span>
+      <div class="progress-bar"><div class="progress-fill" style="width:78%"></div></div>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">港居民</span>
+      <span class="detail-value highlight">✓ 已获优才</span>
+      <span class="detail-note">续签: 2027年4月</span>
+    </div>
+    <div class="strength-tags">
+      <span class="strength-title">核心优势</span>
+      <div class="tags-wrap">
+        <span class="strength-tag">数学(AMC奖牌)</span>
+        <span class="strength-tag">美术/手绘</span>
+        <span class="strength-tag">二次元文化</span>
+        <span class="strength-tag">商业直觉(模拟交易ROI 60%)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card conclusion-card">
+    <span class="section-title">📌 核心结论</span>
+    <span class="conclusion-text">Elysia的核心竞争力是"数学+设计"的稀缺交叉能力。AMC奖牌证明数学实力，美术功底和二次元文化敏感度是独特差异化优势。建议以数据科学/数学为主线，以数学+设计交叉为特色，构建"理性思维+创意表达"的申请叙事。</span>
+    <div class="divider"></div>
+    <span class="section-title">🎯 策略建议</span>
+    <span class="strategy-text">建议采用"3+2+1"策略: 3所港校(本地学费优势) + 2所英国G5(冲刺) + 1所日本英语项目(备选)。港校是性价比最高的选择，本地学费每年仅HK$4.7万 vs 非本地HK$20万+，四年节省超60万港币。</span>
+  </div>
+
+  <div class="card">
+    <span class="section-title">🏆 推荐申请组合</span>
+    <div id="top-picks"></div>
+  </div>
+
+  <div class="region-grid" id="region-grid"></div>
+
+  <div class="card">
+    <span class="section-title">⚡ 关键行动 (Top 5)</span>
+    <div id="key-actions"></div>
+    <button class="btn-primary" style="margin-top:12px" onclick="switchTab('action')">查看完整时间线 →</button>
+  </div>
+
+  <div class="footer"><span class="footer-text">为 Elysia 量身定制 · 2026年8月</span></div>
+</div>
+
+<!-- ===== PAGE: SCHOOLS ===== -->
+<div id="page-schools" class="page">
+  <div class="region-tabs" id="region-tabs"></div>
+  <div class="deadline-bar" id="deadline-bar"></div>
+  <div class="filter-scroll" id="filter-scroll"></div>
+  <div id="schools-list"></div>
+</div>
+
+<!-- ===== PAGE: DETAIL ===== -->
+<div id="page-detail" class="page">
+  <div class="gradient-header detail-header" id="detail-header"></div>
+  <div id="detail-content"></div>
+</div>
+
+<!-- ===== PAGE: ACTION ===== -->
+<div id="page-action" class="page">
+  <div class="gradient-header progress-header">
+    <span class="progress-title">🗓️ 行动时间线</span>
+    <span class="progress-subtitle">2026年8月 → 2027年6月</span>
+    <div class="progress-ring">
+      <div class="ring-bg">
+        <div class="ring-fill" id="ring-fill"></div>
+        <div class="ring-inner">
+          <span class="ring-num" id="ring-num">0</span>
+          <span class="ring-unit">%</span>
+        </div>
+      </div>
+    </div>
+    <span class="progress-detail" id="progress-detail">0 / 0 项已完成</span>
+  </div>
+  <div class="timeline" id="timeline"></div>
+  <div class="reset-section"><button class="reset-btn" onclick="resetProgress()">重置进度</button></div>
+  <div class="footer"><span class="footer-text">点击任务标记完成状态 · 进度自动保存</span></div>
+</div>
+
+<!-- Tab Bar -->
+<div class="tab-bar">
+  <div class="tab-item active" onclick="switchTab('index')"><span class="tab-icon">🏠</span>总览</div>
+  <div class="tab-item" onclick="switchTab('schools')"><span class="tab-icon">🏫</span>院校库</div>
+  <div class="tab-item" onclick="switchTab('action')"><span class="tab-icon">🗓️</span>行动线</div>
+</div>
+
+<script>
+// ===== DATA =====
+const schoolsData = {
+  uk: {
+    region: '英国 G5', flag: '🇬🇧',
+    deadline_note: '牛剑UCAS截止: 2026年10月15日 | 其他G5: 2027年1月15日',
+    schools: [
+      { id:'cambridge', name:'剑桥大学', nameEn:'University of Cambridge', qsRank:'#5', emoji:'🏛️', city:'Cambridge', matchScore:4, programs:[
+        { id:'cam-math', name:'Mathematics', nameCn:'数学', tags:['math'], level:'A*A*A - A*A*A*', subjects:'必须: Math + Further Math', test:'TMUA (11月) + STEP (6月)', ielts:'7.5 (单项≥7.0)', deadline:'2026-10-15', url:'https://www.undergraduate.study.cam.ac.uk/courses/mathematics', match:5, comment:'Elysia数学强项+AMC奖牌高度匹配，STEP需额外准备' },
+        { id:'cam-ns', name:'Natural Sciences (Physical)', nameCn:'自然科学(物理方向，含化学)', tags:['chemistry','math'], level:'A*A*A', subjects:'必须: Math + 两门理科(含Chemistry)', test:'NSAA (11月)', ielts:'7.5 (单项≥7.0)', deadline:'2026-10-15', url:'https://www.undergraduate.study.cam.ac.uk/courses/natural-sciences', match:3, comment:'可兼顾数学和化学，但需通过NSAA' }
+      ]},
+      { id:'oxford', name:'牛津大学', nameEn:'University of Oxford', qsRank:'#3', emoji:'🎓', city:'Oxford', matchScore:4, programs:[
+        { id:'ox-math', name:'Mathematics', nameCn:'数学', tags:['math'], level:'A*A*A', subjects:'必须: Math + Further Math', test:'MAT (11月，68分满分)', ielts:'7.5 (单项≥7.0)', deadline:'2026-10-15', url:'https://www.ox.ac.uk/admissions/undergraduate/courses-listing/mathematics', match:5, comment:'AMC奖牌证明数学思维强，MAT需针对性训练' },
+        { id:'ox-stats', name:'Mathematics and Statistics', nameCn:'数学与统计', tags:['math','datascience'], level:'A*A*A', subjects:'必须: Math', test:'MAT (11月)', ielts:'7.5 (单项≥7.0)', deadline:'2026-10-15', url:'https://www.ox.ac.uk/admissions/undergraduate/courses-listing/mathematics-and-statistics', match:5, comment:'数学+数据科学完美交叉，强烈推荐' },
+        { id:'ox-chem', name:'Chemistry', nameCn:'化学', tags:['chemistry'], level:'A*A*A', subjects:'必须: Math + Chemistry', test:'Chemistry Admissions Test', ielts:'7.5 (单项≥7.0)', deadline:'2026-10-15', url:'https://www.ox.ac.uk/admissions/undergraduate/courses-listing/chemistry', match:2, comment:'需A-Level Chemistry，且非Elysia核心方向' }
+      ]},
+      { id:'imperial', name:'帝国理工学院', nameEn:'Imperial College London', qsRank:'#2', emoji:'🔬', city:'London', matchScore:5, programs:[
+        { id:'imp-math', name:'Mathematics', nameCn:'数学', tags:['math'], level:'A*A*A* - A*A*A', subjects:'必须: Math + Further Math', test:'TMUA (11月)', ielts:'7.0 (单项≥6.5)', deadline:'2027-01-15', url:'https://www.imperial.ac.uk/study/courses/mathematics/', match:5, comment:'QS全球#2理工校，数学系极强，TMUA比STEP更易准备' },
+        { id:'imp-ds', name:'Economics, Finance and Data Science', nameCn:'经济、金融与数据科学', tags:['datascience','math'], level:'A*A*A', subjects:'必须: Math', test:'TMUA (mandatory)', ielts:'7.0 (单项≥6.5)', deadline:'2027-01-15', url:'https://www.imperial.ac.uk/study/courses/economics-finance-data-science/', match:4, comment:'数据科学方向+商科思维，与Elysia模拟交易经历契合' },
+        { id:'imp-computing', name:'Computing (with Data Science pathway)', nameCn:'计算(数据科学方向)', tags:['datascience','math'], level:'A*A*A* - A*A*A', subjects:'必须: Math + Further Math', test:'TMUA', ielts:'7.0 (单项≥6.5)', deadline:'2027-01-15', url:'https://www.imperial.ac.uk/study/courses/computing/', match:4, comment:'CS+数据科学，就业面极广' }
+      ]},
+      { id:'ucl', name:'伦敦大学学院', nameEn:'University College London', qsRank:'#9', emoji:'🌐', city:'London', matchScore:4, programs:[
+        { id:'ucl-math', name:'Mathematics', nameCn:'数学', tags:['math'], level:'A*A*A', subjects:'必须: Math + Further Math', test:'STEP (建议)', ielts:'7.0 (单项≥6.5)', deadline:'2027-01-15', url:'https://www.ucl.ac.uk/prospective-students/undergraduate/degree-programmes/mathematics-bsc', match:4, comment:'伦敦核心地段，数学系实力强' },
+        { id:'ucl-ds', name:'Statistical Science', nameCn:'统计科学', tags:['datascience','math'], level:'A*A*A', subjects:'必须: Math', test:'无额外入学考', ielts:'7.0 (单项≥6.5)', deadline:'2027-01-15', url:'https://www.ucl.ac.uk/prospective-students/undergraduate/degree-programmes/statistical-science-bsc', match:5, comment:'无额外入学考，数据科学核心专业，强烈推荐' },
+        { id:'ucl-arts', name:'Arts and Sciences BASc', nameCn:'艺术与科学(跨学科)', tags:['mathdesign','datascience'], level:'ABB', subjects:'建议: Math', test:'无额外入学考', ielts:'7.0 (单项≥6.5)', deadline:'2027-01-15', url:'https://www.ucl.ac.uk/prospective-students/undergraduate/degree-programmes/arts-and-sciences-basc', match:5, comment:'完美匹配数学+设计交叉! Elysia的美术功底+数学能力在此独特融合' }
+      ]},
+      { id:'lse', name:'伦敦政治经济学院', nameEn:'London School of Economics', qsRank:'#50', emoji:'📊', city:'London', matchScore:3, programs:[
+        { id:'lse-ds', name:'Economics and Data Science', nameCn:'经济与数据科学', tags:['datascience','math'], level:'A*AA', subjects:'必须: Math', test:'TMUA (强烈建议)', ielts:'7.0 (单项≥6.5)', deadline:'2027-01-15', url:'https://www.lse.ac.uk/study-at-lse/undergraduate/degrees/BSc-Economics-and-Data-Science', match:4, comment:'2026新专业，数据科学+经济，LSE品牌加持' },
+        { id:'lse-stats', name:'Data Science', nameCn:'数据科学', tags:['datascience','math'], level:'A*AA', subjects:'必须: Math', test:'TMUA (强烈建议)', ielts:'7.0 (单项≥6.5)', deadline:'2027-01-15', url:'https://www.lse.ac.uk/study-at-lse/undergraduate/degrees/BSc-Data-Science', match:4, comment:'纯数据科学专业，LSE统计学系全球顶尖' }
+      ]}
+    ]
+  },
+  hk: {
+    region: '中国香港', flag: '🇭🇰',
+    deadline_note: '主轮截止: 2026年11月-2027年2月 | 港居民享本地学费(约HK$4.7万/年 vs 非本地HK$20万+/年)',
+    schools: [
+      { id:'hku', name:'香港大学', nameEn:'The University of Hong Kong', qsRank:'#17', emoji:'🏔️', city:'Pokfulam', matchScore:5, localFee:true, programs:[
+        { id:'hku-math', name:'BSc Mathematics', nameCn:'数学学士', tags:['math'], level:'2A*1A - 3A*', subjects:'必须: Math', test:'无额外入学考', ielts:'6.5 (单项≥6.0)', deadline:'2027-02', url:'https://admissions.hku.hk/programme/bachelor-of-science-mathematics', match:4, comment:'港大数学系，本地学费优势巨大' },
+        { id:'hku-ds', name:'BSc Computer Science & Data Science', nameCn:'计算机科学与数据科学', tags:['datascience','math'], level:'2A*1A - 3A*', subjects:'建议: Math + Physics/CS', test:'无额外入学考', ielts:'6.5 (单项≥6.0)', deadline:'2027-02', url:'https://admissions.hku.hk/programme/bachelor-of-science-computer-science-and-data-science', match:5, comment:'CS+数据科学，港大王牌，本地生录取率远高于非本地' },
+        { id:'hku-design', name:'BA Design+', nameCn:'设计+(跨学科)', tags:['mathdesign'], level:'3A', subjects:'无硬性科目要求', test:'需提交作品集 + 面试', ielts:'6.5 (单项≥6.0)', deadline:'2027-01', url:'https://design.hku.hk/programme/ba-design', match:5, comment:'数学+设计完美交叉! Elysia美术功底+二次元审美是巨大优势，需准备作品集' }
+      ]},
+      { id:'hkust', name:'香港科技大学', nameEn:'HKUST', qsRank:'#47', emoji:'🚀', city:'Clear Water Bay', matchScore:5, localFee:true, programs:[
+        { id:'hkust-math', name:'BSc in Mathematics', nameCn:'数学学士', tags:['math'], level:'AAB - AAA', subjects:'必须: Math', test:'无额外入学考', ielts:'6.5 (单项≥6.0)', deadline:'2027-01', url:'https://join.ust.hk/programs/bachelor-of-science-in-mathematics', match:4, comment:'科大数学系研究实力强，本地学费' },
+        { id:'hkust-ds', name:'BSc in Data Science and Technology', nameCn:'数据科学与科技', tags:['datascience','math'], level:'A*A*A - AAA', subjects:'必须: Math + 一门理科/CS', test:'无额外入学考', ielts:'6.5 (单项≥6.0)', deadline:'2027-01', url:'https://join.ust.hk/programs/bachelor-of-science-in-data-science-and-technology', match:5, comment:'数据科学核心专业，科大CS/DS排名亚洲顶尖' },
+        { id:'hkust-isd', name:'BEng in Integrative Systems and Design', nameCn:'综合系统与设计', tags:['mathdesign','datascience'], level:'AAB - AAA', subjects:'建议: Math', test:'无额外入学考', ielts:'6.5 (单项≥6.0)', deadline:'2027-01', url:'https://join.ust.hk/programs/bachelor-of-engineering-in-integrative-systems-and-design', match:4, comment:'工程+设计思维+AI，跨学科项目，适合数学+设计兴趣' }
+      ]},
+      { id:'cuhk', name:'香港中文大学', nameEn:'CUHK', qsRank:'#36', emoji:'🦅', city:'Sha Tin', matchScore:4, localFee:true, programs:[
+        { id:'cuhk-math', name:'BSc in Mathematics', nameCn:'数学学士', tags:['math'], level:'AAA', subjects:'必须: Math', test:'无额外入学考', ielts:'6.0', deadline:'2027-01', url:'https://www.math.cuhk.edu.hk/programmes/undergraduate/major/math/', match:4, comment:'中大数学系传统强校，沙田校园优美' },
+        { id:'cuhk-ds', name:'BSc in Data Science and Analytics', nameCn:'数据科学与分析', tags:['datascience','math'], level:'AAA - AAB', subjects:'必须: Math', test:'无额外入学考', ielts:'6.0', deadline:'2027-01', url:'https://www.dsaa.cuhk.edu.hk/', match:5, comment:'数据科学专业，IELTS要求仅6.0，对Elysia友好' }
+      ]},
+      { id:'cityu', name:'香港城市大学', nameEn:'CityU', qsRank:'#62', emoji:'🏙️', city:'Kowloon Tong', matchScore:3, localFee:true, programs:[
+        { id:'cityu-ds', name:'BSc in Data Science', nameCn:'数据科学', tags:['datascience','math'], level:'ABB - AAA', subjects:'建议: Math', test:'无额外入学考', ielts:'6.5', deadline:'2027-02', url:'https://www.cityu.edu.hk/ds/', match:4, comment:'保底选择，数据科学专业扎实，九龙塘市中心' },
+        { id:'cityu-creative', name:'BA in Creative Media', nameCn:'创意媒体', tags:['mathdesign'], level:'ABB', subjects:'无硬性要求', test:'需提交作品集', ielts:'6.5', deadline:'2027-02', url:'https://www.cityu.edu.hk/sccm/', match:3, comment:'创意媒体+数字艺术，可作为设计方向保底' }
+      ]},
+      { id:'polyu', name:'香港理工大学', nameEn:'PolyU', qsRank:'#57', emoji:'🎨', city:'Hung Hom', matchScore:3, localFee:true, programs:[
+        { id:'polyu-ds', name:'BSc in Data Science and Analytics', nameCn:'数据科学与分析', tags:['datascience','math'], level:'BBB - AAB', subjects:'建议: Math', test:'无额外入学考', ielts:'6.0', deadline:'2027-02', url:'https://www.polyu.edu.hk/dsaa/', match:3, comment:'保底选择，入学门槛较友好' },
+        { id:'polyu-design', name:'BA in Design', nameCn:'设计学士', tags:['mathdesign'], level:'BBB', subjects:'无硬性要求', test:'需提交作品集 + 面试', ielts:'6.0', deadline:'2027-02', url:'https://www.polyu.edu.hk/sd/', match:4, comment:'理大设计学院亚洲顶尖! Elysia美术功底极具竞争力' }
+      ]}
+    ]
+  },
+  japan: {
+    region: '日本', flag: '🇯🇵',
+    deadline_note: '多数需先考EJU(日本留学考试) | 英语项目可直接申请 | 日语项目需N1-N2',
+    schools: [
+      { id:'utokyo', name:'东京大学', nameEn:'University of Tokyo', qsRank:'#28', emoji:'🗼', city:'Tokyo', matchScore:3, programs:[
+        { id:'utokyo-science', name:'Faculty of Science - Mathematics', nameCn:'理学部 数学科', tags:['math'], level:'A-Level A*AA + EJU高分', subjects:'EJU: 数学Course2 + 理科2科目', test:'EJU + 东大二次试验', ielts:'日语N1或TOEFL 80+', deadline:'EJU: 6月/11月', url:'https://www.u-tokyo.ac.jp/en/prospective-students/undergraduate.html', match:2, comment:'日本最高学府，需日语N1+东大二次试验，难度极高' },
+        { id:'utokyo-peak', name:'PEAK International Program', nameCn:'PEAK英语国际项目', tags:['datascience'], level:'A-Level AAA + 面试', subjects:'无硬性科目', test:'面试 + 文书', ielts:'TOEFL 80+ / IELTS 6.5+', deadline:'2026-12', url:'https://www.c.u-tokyo.ac.jp/en/peak/', match:3, comment:'英语授课，但偏环境/社会方向' }
+      ]},
+      { id:'kyoto', name:'京都大学', nameEn:'Kyoto University', qsRank:'#46', emoji:'⛩️', city:'Kyoto', matchScore:3, programs:[
+        { id:'kyoto-science', name:'Faculty of Science - Mathematics', nameCn:'理学部 数学科', tags:['math'], level:'A-Level A*AA + EJU高分', subjects:'EJU: 数学Course2 + 理科', test:'EJU + 京大二次试验', ielts:'日语N1或TOEFL 85+', deadline:'EJU: 6月/11月', url:'https://www.kyoto-u.ac.jp/en/education-campus/international-undergraduate', match:2, comment:'京大数学自由度高，但需日语+二次试验' },
+        { id:'kyoto-iup', name:'iUP International Program', nameCn:'国际本科项目(英语)', tags:['math','datascience'], level:'A-Level AAA + 面试', subjects:'无硬性科目', test:'面试 + 文书', ielts:'TOEFL 80+ / IELTS 6.5+', deadline:'2026-12', url:'https://www.kyoto-u.ac.jp/en/education-campus/iup', match:3, comment:'英语授课国际项目，含日语培训' }
+      ]},
+      { id:'tsukuba', name:'筑波大学', nameEn:'University of Tsukuba', qsRank:'#201', emoji:'🌸', city:'Tsukuba', matchScore:3, programs:[
+        { id:'tsukuba-gs', name:'Global Science Course', nameCn:'全球科学课程', tags:['datascience','math'], level:'A-Level AAB + 面试', subjects:'建议: Math + Science', test:'面试 + 文书', ielts:'TOEFL 80+ / IELTS 6.0+', deadline:'2026-12', url:'https://www.tsukuba.ac.jp/en/education/global-science-course/', match:3, comment:'英语授课，筑波科学城环境好' },
+        { id:'tsukuba-it', name:'College of Information Science', nameCn:'情报学群', tags:['datascience','math'], level:'A-Level AAB + EJU', subjects:'EJU: 数学Course2', test:'EJU + 校内考', ielts:'日语N2或TOEFL 80+', deadline:'EJU: 6月/11月', url:'https://www.tsukuba.ac.jp/en/education/college-of-information-science/', match:3, comment:'CS/数据科学方向' }
+      ]},
+      { id:'waseda', name:'早稻田大学', nameEn:'Waseda University', qsRank:'#193', emoji:'🎌', city:'Tokyo', matchScore:4, programs:[
+        { id:'waseda-sils', name:'School of International Liberal Studies', nameCn:'国际教养学部(SILS)', tags:['datascience','mathdesign'], level:'A-Level AAB + 面试', subjects:'无硬性科目', test:'面试 + 文书', ielts:'TOEFL 85+ / IELTS 6.5+', deadline:'2026-09', url:'https://www.waseda.jp/fp/sils/en/', match:4, comment:'英语授课，可修数据科学+媒体研究，新宿校区便利' },
+        { id:'waseda-ese', name:'School of Fundamental Science and Engineering', nameCn:'基干理工学部', tags:['datascience','math'], level:'A-Level AAA + EJU', subjects:'EJU: 数学Course2 + 物理', test:'EJU + 校内考', ielts:'日语N2或TOEFL 80+', deadline:'EJU: 6月/11月', url:'https://www.waseda.jp/fst/en/', match:3, comment:'理工科核心，需日语或EJU' }
+      ]}
+    ]
+  }
+};
+
+const conclusions = {
+  topPicks: [
+    { school:'UCL Arts & Sciences BASc', reason:'完美匹配数学+设计交叉，A-level要求ABB(可达)，无额外入学考', priority:'冲刺', color:'#E74C3C' },
+    { school:'HKU BSc CS & Data Science', reason:'港校本地学费(省80%)，数据科学王牌，IELTS仅6.5', priority:'主攻', color:'#F39C12' },
+    { school:'HKUST BSc Data Science & Technology', reason:'亚洲DS顶尖，本地学费，与模拟交易经历契合', priority:'主攻', color:'#F39C12' },
+    { school:'Imperial Mathematics', reason:'QS全球#2理工，TMUA比STEP更易准备', priority:'冲刺', color:'#E74C3C' },
+    { school:'Oxford Mathematics & Statistics', reason:'数学+统计完美交叉，MAT考试适合数学强项', priority:'冲刺', color:'#E74C3C' },
+    { school:'CUHK BSc Data Science & Analytics', reason:'IELTS仅6.0(对Elysia友好)，数据科学核心专业', priority:'稳妥', color:'#27AE60' }
+  ],
+  keyActions: [
+    '雅思从5.5提升到6.5+(10月前) → 决定能否申请港校/英校',
+    'TMUA/MAT备考(9月开始) → 决定能否冲刺牛剑/帝国',
+    '作品集启动(9月开始) → 决定能否申请Design+/创意媒体',
+    '优才续签(2027年4月) → 决定能否享受港校本地学费(省80%)',
+    'A-Level选课确认: Math + Further Math + 1-2门 → 决定申请范围'
+  ]
+};
+
+const actionTimeline = [
+  { month:'2026年8月', title:'启动准备', emoji:'🚀', tasks:[
+    { text:'确定A-Level选课: Math, Further Math, + 1-2门(建议Physics/CS/Chemistry)' },
+    { text:'雅思目标: 从5.5提升到6.5+(港校)/7.0+(英校)' },
+    { text:'开始TMUA/MAT备考(牛剑/帝国/LSE必须)' },
+    { text:'注册UCAS账号，了解申请流程' }
+  ]},
+  { month:'2026年9月', title:'正式开学', emoji:'📚', tasks:[
+    { text:'香港蔚来学校11年级开学，全力A-Level课程' },
+    { text:'每周TMUA/MAT真题练习(至少3套/月)' },
+    { text:'开始准备作品集(如目标Design+/设计类专业)' },
+    { text:'参加AMC/BMO等数学竞赛，积累奖牌' }
+  ]},
+  { month:'2026年10月', title:'牛剑冲刺', emoji:'🎯', tasks:[
+    { text:'10月15日前: 提交牛剑UCAS申请(如目标Cambridge/Oxford)' },
+    { text:'10月底: 参加TMUA考试(帝国/LSE也需要)' },
+    { text:'11月初: 参加MAT考试(牛剑数学必须)' },
+    { text:'准备牛剑面试(12月初)' }
+  ]},
+  { month:'2026年11月', title:'考试月', emoji:'📝', tasks:[
+    { text:'11月: TMUA/MAT考试' },
+    { text:'11月: EJU考试(如目标日本)' },
+    { text:'提交港校申请(HKU/HKUST/CUHK主轮)' }
+  ]},
+  { month:'2026年12月', title:'面试与文书', emoji:'🎤', tasks:[
+    { text:'12月初: 牛剑面试' },
+    { text:'完成所有港校申请文书' },
+    { text:'提交日本大学英语项目申请' },
+    { text:'作品集定稿(如申请设计类)' }
+  ]},
+  { month:'2027年1月', title:'全面申请', emoji:'📮', tasks:[
+    { text:'1月15日前: 提交帝国/UCL/LSE UCAS申请' },
+    { text:'提交CityU/PolyU申请' },
+    { text:'准备AS/A-Level模拟考试' }
+  ]},
+  { month:'2027年2-3月', title:'等待与补充', emoji:'⏳', tasks:[
+    { text:'等待港校offer' },
+    { text:'补充UCAS申请(如有剩余名额)' },
+    { text:'继续雅思刷分(如未达标)' }
+  ]},
+  { month:'2027年4月', title:'关键节点', emoji:'⚠️', tasks:[
+    { text:'优才计划续签(确保香港居民身份有效)' },
+    { text:'确认港校本地生学费资格' },
+    { text:'A-Level AS考试(如学校安排)' }
+  ]},
+  { month:'2027年5-6月', title:'最终冲刺', emoji:'🏆', tasks:[
+    { text:'A-Level A2最终考试' },
+    { text:'6月: STEP考试(如目标Cambridge/UCL数学)' },
+    { text:'收到offer，做出最终选择' }
+  ]}
+];
+
+// ===== RENDER FUNCTIONS =====
+const tagMap = { math:'数学', datascience:'数据科学', chemistry:'化学', mathdesign:'数学+设计' };
+const stars = n => '★'.repeat(n) + '☆'.repeat(5-n);
+
+function renderIndex() {
+  // Top picks
+  let html = '';
+  conclusions.topPicks.forEach(p => {
+    html += `<div class="pick-item"><div class="pick-left">
+      <span class="priority-badge" style="background:${p.color}20;color:${p.color}">${p.priority}</span>
+      <div class="pick-info"><span class="pick-school">${p.school}</span><span class="pick-reason">${p.reason}</span></div>
+    </div></div>`;
+  });
+  document.getElementById('top-picks').innerHTML = html;
+
+  // Region grid
+  const regions = [
+    { key:'uk', emoji:'🇬🇧', name:'英国 G5', desc:'剑桥/牛津/帝国/UCL/LSE', count:5 },
+    { key:'hk', emoji:'🇭🇰', name:'中国香港', desc:'港大/科大/中大/城大/理大', count:5 },
+    { key:'japan', emoji:'🇯🇵', name:'日本', desc:'东大/京大/筑波/早稻田', count:4 }
+  ];
+  html = '';
+  regions.forEach(r => {
+    html += `<div class="card region-card" onclick="switchTab('schools','${r.key}')">
+      <span class="region-emoji">${r.emoji}</span>
+      <span class="region-name">${r.name}</span>
+      <span class="region-desc">${r.desc}</span>
+      <span class="region-count">${r.count} 所院校</span>
+    </div>`;
+  });
+  document.getElementById('region-grid').innerHTML = html;
+
+  // Key actions
+  html = '';
+  conclusions.keyActions.forEach((a,i) => {
+    html += `<div class="action-item"><span class="action-num">${i+1}</span><span class="action-text">${a}</span></div>`;
+  });
+  document.getElementById('key-actions').innerHTML = html;
+
+  // Count programs
+  let total = 0;
+  Object.values(schoolsData).forEach(r => r.schools.forEach(s => total += s.programs.length));
+  document.getElementById('stat-programs').textContent = total;
+}
+
+let currentRegion = 'uk';
+let currentFilter = 'all';
+
+function renderSchools(region) {
+  currentRegion = region || currentRegion;
+  const data = schoolsData[currentRegion];
+
+  // Tabs
+  const tabs = [{ key:'uk', name:'🇬🇧 英国G5' }, { key:'hk', name:'🇭🇰 香港' }, { key:'japan', name:'🇯🇵 日本' }];
+  document.getElementById('region-tabs').innerHTML = tabs.map(t =>
+    `<div class="region-tab ${t.key===currentRegion?'active':''}" onclick="renderSchools('${t.key}')">${t.name}</div>`
+  ).join('');
+
+  // Deadline
+  document.getElementById('deadline-bar').innerHTML = `<span style="margin-right:8px">⏰</span>${data.deadline_note}`;
+
+  // Filters
+  const filters = [{ key:'all', name:'全部' }, { key:'math', name:'数学' }, { key:'datascience', name:'数据科学' }, { key:'chemistry', name:'化学' }, { key:'mathdesign', name:'数学+设计' }];
+  document.getElementById('filter-scroll').innerHTML = filters.map(f =>
+    `<div class="filter-chip ${f.key===currentFilter?'active':''}" onclick="setFilter('${f.key}')">${f.name}</div>`
+  ).join('');
+
+  // Schools
+  let html = '';
+  data.schools.forEach(s => {
+    html += `<div class="school-card card">
+      <div class="school-header">
+        <span class="school-emoji">${s.emoji}</span>
+        <div class="school-info">
+          <span class="school-name">${s.name}</span>
+          <span class="school-en">${s.nameEn}</span>
+          <div class="school-meta">
+            <span class="school-rank">QS ${s.qsRank}</span>
+            <span class="school-city">📍 ${s.city}</span>
+            ${s.localFee ? '<span class="local-badge">本地学费</span>' : ''}
+          </div>
+        </div>
+        <div class="match-score">
+          <span class="match-label">匹配度</span>
+          <span>${stars(s.matchScore).split('').map(c => c==='★' ? '<span class="star-on">★</span>' : '<span class="star-off">★</span>').join('')}</span>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div style="padding:0 4px">`;
+
+    s.programs.forEach(p => {
+      const hidden = currentFilter !== 'all' && !p.tags.includes(currentFilter);
+      html += `<div class="program-item ${hidden?'hidden':''}" onclick="showDetail('${s.id}','${p.id}')">
+        <div class="prog-top">
+          <span class="prog-name">${p.nameCn}</span>
+          <span class="match-mini">${stars(p.match)}</span>
+        </div>
+        <span class="prog-en">${p.name}</span>
+        <div class="prog-tags">${p.tags.map(t => `<span class="tag tag-${t}">${tagMap[t]}</span>`).join('')}</div>
+        <div class="prog-bottom">
+          <span class="prog-level">🎯 ${p.level}</span>
+          <span class="prog-ielts">🗣️ ${p.ielts}</span>
+        </div>
+        ${p.comment ? `<div class="prog-comment"><span class="comment-text">${p.comment}</span></div>` : ''}
+      </div>`;
+    });
+
+    html += `</div></div>`;
+  });
+  document.getElementById('schools-list').innerHTML = html;
+}
+
+function setFilter(tag) {
+  currentFilter = tag;
+  renderSchools();
+}
+
+function findProgram(schoolId, programId) {
+  for (const r of Object.values(schoolsData)) {
+    for (const s of r.schools) {
+      if (s.id === schoolId) {
+        const p = s.programs.find(p => p.id === programId);
+        return { school: s, program: p, region: r };
+      }
+    }
+  }
+  return null;
+}
+
+function showDetail(schoolId, programId) {
+  const data = findProgram(schoolId, programId);
+  if (!data) return;
+  const { school: s, program: p } = data;
+
+  document.getElementById('detail-header').innerHTML = `
+    <button class="back-btn" onclick="switchTab('schools')">返回院校库</button>
+    <div class="header-top">
+      <span class="header-emoji">${s.emoji}</span>
+      <div>
+        <span class="header-school">${s.name}</span>
+        <span class="header-en">${s.nameEn}</span>
+        <div class="header-meta">
+          <span class="header-rank">QS ${s.qsRank}</span>
+          <span class="header-city">📍 ${s.city}</span>
+        </div>
+      </div>
+    </div>
+    <div class="header-match">
+      <span class="match-label">Elysia匹配度</span>
+      <span class="match-stars">${stars(p.match)}</span>
+    </div>`;
+
+  const otherProgs = s.programs.filter(op => op.id !== programId);
+  let otherHtml = '';
+  if (otherProgs.length > 0) {
+    otherHtml = `<div class="card"><span class="section-title">📚 ${s.name}其他专业</span>`;
+    otherProgs.forEach(op => {
+      otherHtml += `<div style="padding:10px 0;border-bottom:1px solid #F5F5F5" onclick="showDetail('${s.id}','${op.id}')">
+        <span style="font-size:15px;font-weight:600;display:block">${op.nameCn}</span>
+        <span style="font-size:12px;color:#B2BEC3;display:block">${op.name}</span>
+        <span style="font-size:13px;color:#636E72">${op.level}</span>
+      </div>`;
+    });
+    otherHtml += '</div>';
+  }
+
+  document.getElementById('detail-content').innerHTML = `
+    <div class="card program-card">
+      <span class="program-name-cn">${p.nameCn}</span>
+      <span class="program-name-en">${p.name}</span>
+      <div class="prog-tags" style="margin-bottom:12px">${p.tags.map(t => `<span class="tag tag-${t}">${tagMap[t]}</span>`).join('')}</div>
+      <div class="divider"></div>
+      <span class="section-title">📋 申请要求</span>
+      <div class="req-item"><span class="req-label">A-Level成绩</span><span class="req-value highlight">${p.level}</span></div>
+      <div class="req-item"><span class="req-label">必修科目</span><span class="req-value">${p.subjects}</span></div>
+      <div class="req-item"><span class="req-label">入学考试</span><span class="req-value">${p.test}</span></div>
+      <div class="req-item"><span class="req-label">语言要求</span><span class="req-value">${p.ielts}</span></div>
+      <div class="req-item"><span class="req-label">申请截止</span><span class="req-value">${p.deadline}</span></div>
+      <div class="divider"></div>
+      ${p.comment ? `<div class="comment-section"><span class="comment-title">💡 Elysia专属分析</span><span class="comment-body">${p.comment}</span></div>` : ''}
+      <a href="${p.url}" target="_blank" rel="noopener" class="btn-primary link-btn" style="display:block;text-decoration:none">🔗 打开官网链接</a>
+    </div>
+    ${otherHtml}`;
+
+  switchTab('detail');
+}
+
+// ===== ACTION PAGE =====
+let actionState = {};
+try { actionState = JSON.parse(localStorage.getItem('elysia_action') || '{}'); } catch(e) {}
+
+function renderAction() {
+  let total = 0, done = 0;
+  let html = '';
+  actionTimeline.forEach((m, mi) => {
+    html += `<div class="timeline-item"><div class="month-node"><span class="month-emoji">${m.emoji}</span><div class="month-line"></div></div>
+      <div class="month-content card"><div class="month-header"><span class="month-title">${m.month}</span><span class="month-label">${m.title}</span></div><div class="task-list">`;
+    m.tasks.forEach((t, ti) => {
+      const key = `${mi}-${ti}`;
+      const isDone = actionState[key] || false;
+      total++;
+      if (isDone) done++;
+      html += `<div class="task-item ${isDone?'done':''}" onclick="toggleTask('${key}',this)">
+        <span class="task-check">${isDone ? '✅' : '⬜'}</span>
+        <span class="task-text ${isDone?'line-through':''}">${t.text}</span>
+      </div>`;
+    });
+    html += `</div></div></div>`;
+  });
+  document.getElementById('timeline').innerHTML = html;
+  const pct = total > 0 ? Math.round(done/total*100) : 0;
+  document.getElementById('ring-num').textContent = pct;
+  document.getElementById('ring-fill').style.background = `conic-gradient(#FFF ${pct*3.6}deg, rgba(255,255,255,0.2) 0deg)`;
+  document.getElementById('progress-detail').textContent = `${done} / ${total} 项已完成`;
+}
+
+function toggleTask(key, el) {
+  actionState[key] = !actionState[key];
+  localStorage.setItem('elysia_action', JSON.stringify(actionState));
+  renderAction();
+}
+
+function resetProgress() {
+  if (confirm('确定要清除所有完成标记吗？')) {
+    actionState = {};
+    localStorage.removeItem('elysia_action');
+    renderAction();
+  }
+}
+
+// ===== NAVIGATION =====
+function switchTab(tab, region) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+
+  if (tab === 'detail') {
+    document.getElementById('page-detail').classList.add('active');
+    document.querySelectorAll('.tab-item')[1].classList.add('active');
+  } else {
+    document.getElementById('page-' + tab).classList.add('active');
+    const tabIdx = { index:0, schools:1, action:2 }[tab];
+    if (tabIdx !== undefined) document.querySelectorAll('.tab-item')[tabIdx].classList.add('active');
+  }
+
+  if (tab === 'schools') renderSchools(region || currentRegion);
+  if (tab === 'action') renderAction();
+  window.scrollTo(0, 0);
+}
+
+// ===== INIT =====
+renderIndex();
+renderSchools('uk');
+renderAction();
+</script>
+</body>
+</html>

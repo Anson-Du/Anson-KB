@@ -1,0 +1,90 @@
+<!--pages/detail/detail.wxml - 专业详情页-->
+<view class="page-detail" wx:if="{{school && program}}">
+
+  <!-- 院校头部 -->
+  <view class="detail-header gradient-header">
+    <view class="header-top">
+      <text class="header-emoji">{{school.emoji}}</text>
+      <view class="header-info">
+        <text class="header-school">{{school.name}}</text>
+        <text class="header-en">{{school.nameEn}}</text>
+        <view class="header-meta">
+          <text class="header-rank">QS {{school.qsRank}}</text>
+          <text class="header-city">📍 {{school.city}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="header-match">
+      <text class="match-label">Elysia匹配度</text>
+      <text class="match-stars">{{matchStars}}</text>
+    </view>
+  </view>
+
+  <!-- 专业信息卡片 -->
+  <view class="card program-card">
+    <text class="program-name-cn">{{program.nameCn}}</text>
+    <text class="program-name-en">{{program.name}}</text>
+
+    <view class="tag-row">
+      <text wx:for="{{tagLabels}}" wx:key="*this" class="tag tag-{{program.tags[index]}}">{{item}}</text>
+    </view>
+
+    <view class="divider"></view>
+
+    <!-- 申请要求 -->
+    <view class="req-section">
+      <text class="req-title">📋 申请要求</text>
+
+      <view class="req-item">
+        <text class="req-label">A-Level成绩</text>
+        <text class="req-value highlight">{{program.level}}</text>
+      </view>
+
+      <view class="req-item">
+        <text class="req-label">必修科目</text>
+        <text class="req-value">{{program.subjects}}</text>
+      </view>
+
+      <view class="req-item">
+        <text class="req-label">入学考试</text>
+        <text class="req-value">{{program.test}}</text>
+      </view>
+
+      <view class="req-item">
+        <text class="req-label">语言要求</text>
+        <text class="req-value">{{program.ielts}}</text>
+      </view>
+
+      <view class="req-item">
+        <text class="req-label">申请截止</text>
+        <text class="req-value">{{program.deadline}}</text>
+      </view>
+    </view>
+
+    <view class="divider"></view>
+
+    <!-- Elysia点评 -->
+    <view class="comment-section" wx:if="{{program.comment}}">
+      <text class="comment-title">💡 Elysia专属分析</text>
+      <text class="comment-body">{{program.comment}}</text>
+    </view>
+
+    <!-- 官方链接 -->
+    <view class="link-section">
+      <view class="btn-primary link-btn" bindtap="openUrl">
+        🔗 复制官网链接
+      </view>
+    </view>
+  </view>
+
+  <!-- 同校其他专业 -->
+  <view class="card other-programs" wx:if="{{school.programs.length > 1}}">
+    <text class="section-title">📚 {{school.name}}其他专业</text>
+    <view wx:for="{{school.programs}}" wx:key="id" wx:if="{{item.id !== programId}}" class="other-item">
+      <text class="other-name">{{item.nameCn}}</text>
+      <text class="other-en">{{item.name}}</text>
+      <text class="other-level">{{item.level}}</text>
+    </view>
+  </view>
+
+</view>

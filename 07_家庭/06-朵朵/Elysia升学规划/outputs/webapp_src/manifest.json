@@ -1,0 +1,26 @@
+{
+  "name": "Elysia 升学攻略",
+  "short_name": "Elysia升学",
+  "description": "Elysia 升学战略 · 香港/英国/日本三地申请攻略与重点任务提醒",
+  "start_url": "./?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f7fb",
+  "theme_color": "#131449",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ray 墨大专业选择规划 · 2027</title>
+<style>
+  :root{
+    --bg:#f5f6f8;
+    --card:#ffffff;
+    --ink:#1c2b3a;
+    --muted:#5b6b7b;
+    --line:#e4e8ec;
+    --navy:#1f3d5e;
+    --navy-deep:#16344f;
+    --teal:#17897b;
+    --teal-soft:#e6f4f1;
+    --gold:#c9992e;
+    --gold-soft:#faf3e2;
+    --red:#c0504d;
+    --red-soft:#faeceb;
+    --radius:16px;
+    --shadow:0 6px 24px rgba(28,43,58,.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:52px 24px}
+
+  /* Hero */
+  .hero{
+    background:linear-gradient(135deg,#16344f 0%,#175e6b 55%,#0e7a6e 100%);
+    color:#fff;padding:76px 24px 92px;position:relative;overflow:hidden;
+  }
+  .hero::before,.hero::after{
+    content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.06);
+  }
+  .hero::before{width:340px;height:340px;top:-140px;right:-80px}
+  .hero::after{width:220px;height:220px;bottom:-120px;left:-60px}
+  .hero-inner{max-width:1080px;margin:0 auto;position:relative;z-index:1}
+  .hero-badge{
+    display:inline-block;background:rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.32);padding:5px 14px;
+    border-radius:999px;font-size:13px;letter-spacing:1px;
+  }
+  .hero h1{font-size:clamp(32px,5.5vw,52px);font-weight:800;margin:20px 0 14px;line-height:1.2}
+  .hero-sub{font-size:clamp(16px,2.4vw,21px);opacity:.94;max-width:820px}
+  .hero-sub em{color:#ffd98a;font-style:normal;font-weight:600}
+  .hero-meta{margin-top:30px;font-size:13px;opacity:.72}
+
+  /* Section head */
+  .sec-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:28px}
+  .sec-no{
+    font-size:12px;font-weight:700;color:var(--gold);letter-spacing:2px;
+    border:1px solid var(--gold);border-radius:6px;padding:1px 8px;
+  }
+  .sec-head h2{font-size:clamp(22px,3vw,30px);font-weight:800}
+  .sec-head p{color:var(--muted);font-size:14px;width:100%}
+
+  /* Cards */
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;border:1px solid var(--line)}
+  .grid{display:grid;gap:16px}
+  .grid-2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+  .grid-3{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+  .card h3{font-size:18px;font-weight:800;margin-bottom:10px}
+  .card ul{padding-left:20px;color:#3a4a5a;font-size:15px}
+  .card ul li{margin:6px 0}
+  .card ol{padding-left:20px;color:#3a4a5a;font-size:15px}
+  .card ol li{margin:6px 0}
+  .tag{display:inline-block;font-size:12px;font-weight:600;border-radius:999px;padding:2px 10px;margin-bottom:10px}
+  .tag-navy{background:var(--navy);color:#fff}
+  .tag-teal{background:var(--teal);color:#fff}
+  .tag-gold{background:var(--gold-soft);color:#8a6a1a;border:1px solid #e6cf8f}
+  .tag-red{background:var(--red-soft);color:var(--red);border:1px solid #e5b9b6}
+  .tag-ok{background:var(--teal-soft);color:var(--teal);border:1px solid #b7dcd6}
+
+  /* 目标卡 */
+  .goal{position:relative;overflow:hidden}
+  .goal-navy{border-top:5px solid var(--navy)}
+  .goal-teal{border-top:5px solid var(--teal)}
+  .goal .icon{font-size:26px;margin-bottom:8px}
+  .goal .sub{font-size:13px;color:var(--muted);margin-top:4px}
+  .chip{display:inline-block;background:#f0f3f6;border-radius:8px;padding:2px 8px;font-size:12px;margin:2px 0;margin-right:4px}
+
+  /* 生态 */
+  .eco{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+  .eco .major{
+    padding:8px 14px;border-radius:10px;font-size:14px;font-weight:600;
+    background:var(--teal-soft);color:var(--teal);border:1px solid #b7dcd6;
+  }
+  .eco .major.key{background:var(--gold-soft);color:#8a6a1a;border-color:#e6cf8f}
+  .eco .major.warn{background:var(--red-soft);color:var(--red);border-color:#e5b9b6}
+  .note-box{
+    background:var(--gold-soft);border:1px solid #e6cf8f;border-radius:12px;
+    padding:14px 18px;font-size:14px;color:#6b5317;margin-top:14px;
+  }
+  .note-box b{color:#8a6a1a}
+
+  /* 星级 */
+  .stars{color:var(--gold);font-size:15px;letter-spacing:1px;white-space:nowrap}
+  .stars .off{opacity:.25}
+
+  /* 对比表 */
+  .table-wrap{overflow-x:auto;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--line)}
+  table{width:100%;border-collapse:collapse;min-width:760px;font-size:14px}
+  th,td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{background:#f0f4f7;font-size:13px;color:var(--navy-deep)}
+  tbody tr:last-child td{border-bottom:none}
+  tbody td:first-child{font-weight:700;white-space:nowrap}
+  .ok{color:var(--teal);font-weight:700}
+  .no{color:var(--red);font-weight:700}
+  .muted2{color:var(--muted);font-size:13px}
+
+  /* 方案卡 */
+  .plan{display:flex;flex-direction:column;gap:8px}
+  .plan .p-no{font-size:22px;font-weight:800;color:var(--gold)}
+  .plan .route{font-size:15px;font-weight:600;line-height:1.6}
+  .plan .route b{color:var(--navy)}
+  .plan .fit{font-size:13px;color:var(--muted);margin-top:auto;padding-top:10px;border-top:1px dashed var(--line)}
+  .plan-a{border-top:5px solid var(--gold)}
+  .plan-b{border-top:5px solid var(--teal)}
+  .plan-c{border-top:5px solid var(--navy)}
+
+  /* 时间线 */
+  .timeline{position:relative;padding-left:30px}
+  .timeline::before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:var(--line)}
+  .tl-item{position:relative;padding-bottom:22px}
+  .tl-item::before{
+    content:"";position:absolute;left:-27px;top:6px;width:12px;height:12px;
+    border-radius:50%;background:var(--card);border:3px solid var(--teal);
+  }
+  .tl-item:last-child::before{border-color:var(--gold)}
+  .tl-date{font-size:13px;font-weight:700;color:var(--teal);letter-spacing:.5px}
+  .tl-title{font-size:15px;font-weight:700;margin:2px 0}
+  .tl-desc{font-size:14px;color:var(--muted)}
+
+  /* 结论 */
+  .conclusion{
+    background:linear-gradient(135deg,var(--navy-deep),#175e6b);
+    color:#fff;border-radius:var(--radius);padding:40px;text-align:center;box-shadow:var(--shadow);
+  }
+  .conclusion .c-line{font-size:15px;opacity:.85;letter-spacing:.5px}
+  .conclusion .c-core{font-size:clamp(19px,3vw,26px);font-weight:800;margin:14px 0;color:#ffd98a;line-height:1.5}
+  .conclusion .c-sub{font-size:14px;opacity:.8}
+
+  footer{text-align:center;padding:34px 20px;color:var(--muted);font-size:13px}
+
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.on{opacity:1;transform:none}
+
+  @media(max-width:640px){
+    .wrap{padding:38px 18px}
+    .hero{padding:56px 18px 72px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Hero ===== -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">Ray 升学规划 · 配套篇 v2</div>
+    <h1>墨尔本大学 · 专业选择规划</h1>
+    <p class="hero-sub">围绕一个核心问题：在墨大读哪个专业，能<em>同时</em>最有利于——① 申请美国 Top 30 金融工程（MFE）硕士；② 毕业后移民澳洲。<b>两条腿走路，目标兼顾。</b></p>
+    <div class="hero-meta">规划日期：2026 年 8 月 &nbsp;·&nbsp; 适用：Bachelor of Commerce（2027 年 2 月 / 7 月入学）&nbsp;·&nbsp; 移民信息以 CSOL 2026 年 6 月版为准</div>
+  </div>
+</header>
+
+<!-- ===== 01 双目标拆解 ===== -->
+<section class="wrap">
+  <div class="sec-head reveal">
+    <span class="sec-no">01</span>
+    <h2>双目标拆解：先看清两条腿各要什么</h2>
+    <p>专业选择 = 两个目标的交叉点最大化</p>
+  </div>
+  <div class="grid grid-2">
+    <div class="card goal goal-navy reveal">
+      <div class="icon">🎯</div>
+      <span class="tag tag-navy">目标一 · 美国 MFE Top 30</span>
+      <h3>金融工程硕士的硬性画像</h3>
+      <ul>
+        <li><b>数学/统计</b>：微积分、线性代数、概率论、数理统计、随机过程——非商科可替代</li>
+        <li><b>编程</b>：Python / C++ / R / MATLAB，量化岗位最看重</li>
+        <li><b>金融</b>：投资学、衍生品、金融数学</li>
+        <li><b>成绩</b>：本科 GPA 3.7+（对应墨大 WAM 85+/HD）</li>
+        <li><b>考试</b>：GRE（Quant 165+），大三结束前出分</li>
+        <li><b>经历</b>：量化 / 金融实习，暑研加分</li>
+      </ul>
+      <div class="sub">代表项目：Baruch、Princeton、Columbia、NYU Tandon、CMU MSCF、Berkeley、Cornell、UChicago FinMath</div>
+    </div>
+    <div class="card goal goal-teal reveal" style="transition-delay:.1s">
+      <div class="icon">🛂</div>
+      <span class="tag tag-teal">目标二 · 澳洲移民</span>
+      <h3>现行核心技能清单（CSOL）关键结论</h3>
+      <ul>
+        <li><span class="ok">✅ 会计 Accountant</span> —— 在 CSOL，路径最成熟但竞争激烈</li>
+        <li><span class="ok">✅ 精算师 Actuary</span> —— 在 CSOL，数学含量高、相对稀缺</li>
+        <li><span class="ok">✅ 统计学家 Statistician</span> —— 在 CSOL</li>
+        <li><span class="ok">✅ 金融投资顾问 FIA</span> —— 在 CSOL</li>
+        <li><span class="no">❌ 经济学家 Economist</span> —— 不在核心清单</li>
+        <li><span class="no">❌ 金融分析师 Fin. Analyst</span> —— 不在核心清单</li>
+      </ul>
+      <div class="sub">提示：核心清单之外，州担保 190/491 由各州自定列表，仍有窗口，但不确定性更高。政策每半年变动，申请前务必以注册移民代理信息为准。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 02 墨大专业生态 ===== -->
+<section class="wrap" style="padding-top:0">
+  <div class="sec-head reveal">
+    <span class="sec-no">02</span>
+    <h2>墨大的专业生态：比想象中灵活</h2>
+    <p>墨尔本模式 = 通识本科 + 弹性组合，这恰恰是双目标的解药</p>
+  </div>
+  <div class="card reveal">
+    <span class="tag tag-navy">Bachelor of Commerce（3 年制）六大方向</span>
+    <div class="eco">
+      <span class="major key">Actuarial Studies 精算 ★</span>
+      <span class="major">Accounting 会计 ★</span>
+      <span class="major">Finance 金融</span>
+      <span class="major warn">Economics 经济 ⚠</span>
+      <span class="major">Management 管理</span>
+      <span class="major">Marketing 营销</span>
+    </div>
+    <ul style="margin-top:16px">
+      <li><b>墨尔本模式</b>：本科宽口径，研究生才细分专业——和美国"通识→细分"的研究生申请模式天然契合</li>
+      <li><b>Breadth 选课</b>：50 学分可跨学院选修，<b>能选数学、统计、计算机课</b>——这是免费补齐 MFE 先修课的关键通道</li>
+      <li><b>Concurrent Diploma</b>：可叠加 <b>Diploma in Mathematical Sciences（数学科学文凭）</b>，完成即等同"数学与统计 major"——MFE 申请的"神助攻"，名额有限、按成绩选拔</li>
+    </ul>
+    <div class="note-box">
+      <b>核心洞察：</b>在墨大，"选专业"不是单选题。主修 + Breadth + 数学科学文凭可以自由组合——你要找的是<u>数学含量高且能落在移民职业清单上</u>的那个锚点。
+    </div>
+  </div>
+</section>
+
+<!-- ===== 03 专业对比矩阵 ===== -->
+<section class="wrap" style="padding-top:0">
+  <div class="sec-head reveal">
+    <span class="sec-no">03</span>
+    <h2>专业对比矩阵：每个方向对两条腿的支撑度</h2>
+    <p>★ = 满足程度；CSOL = 是否在澳洲核心技能职业清单</p>
+  </div>
+  <div class="table-wrap reveal">
+    <table>
+      <thead>
+        <tr>
+          <th>方向 / 组合</th>
+          <th>MFE 适配（数学·编程·金融）</th>
+          <th>移民适配（职业清单）</th>
+          <th>课业负担</th>
+          <th>综合评价</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Actuarial Studies<br><span class="muted2">精算主修</span></td>
+          <td><span class="stars">★★★★★</span><br><span class="muted2">概率·统计·随机过程全套，直接对口</span></td>
+          <td><span class="ok">✅ Actuary 在 CSOL</span><br><span class="muted2">稀缺性强</span></td>
+          <td>最高</td>
+          <td><b class="ok">双引擎，首选</b></td>
+        </tr>
+        <tr>
+          <td>Finance<br><span class="muted2">金融主修</span></td>
+          <td><span class="stars">★★★★☆</span><br><span class="muted2">金融核心对口，数学需自补</span></td>
+          <td><span class="no">❌ Fin. Analyst 不在 CSOL</span><br><span class="muted2">仅州担保窗口</span></td>
+          <td>中</td>
+          <td>需搭配数学补强</td>
+        </tr>
+        <tr>
+          <td>Economics<br><span class="muted2">经济主修</span></td>
+          <td><span class="stars">★★★☆☆</span><br><span class="muted2">经济数学 OK，缺随机过程/编程</span></td>
+          <td><span class="no">❌ Economist 不在 CSOL</span></td>
+          <td>中</td>
+          <td>单独选，移民腿偏弱</td>
+        </tr>
+        <tr>
+          <td>Accounting<br><span class="muted2">会计主修</span></td>
+          <td><span class="stars">★★☆☆☆</span><br><span class="muted2">数学偏弱，需大幅补课</span></td>
+          <td><span class="ok">✅ Accountant 在 CSOL</span><br><span class="muted2">路径成熟但竞争激烈</span></td>
+          <td>中高</td>
+          <td>移民最稳的保底</td>
+        </tr>
+        <tr>
+          <td>Finance + <br>Diploma in Math Sci</td>
+          <td><span class="stars">★★★★★</span><br><span class="muted2">金融 + 数学统计 major 级配置</span></td>
+          <td><span class="ok">✅ Statistician 在 CSOL</span><br><span class="muted2">兼 FIA 可选</span></td>
+          <td>高</td>
+          <td><b class="ok">量化金融最优解</b></td>
+        </tr>
+        <tr>
+          <td>Accounting + Finance<br><span class="muted2">双主修</span></td>
+          <td><span class="stars">★★★☆☆</span><br><span class="muted2">金融 OK，数学靠 Breadth 补</span></td>
+          <td><span class="ok">✅ Accountant 在 CSOL</span></td>
+          <td>高</td>
+          <td>成熟稳妥组合</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===== 04 三个推荐方案 ===== -->
+<section class="wrap" style="padding-top:0">
+  <div class="sec-head reveal">
+    <span class="sec-no">04</span>
+    <h2>三个推荐方案</h2>
+    <p>按"双目标兼顾度"排序，入学后可在第 1–2 年根据成绩与兴趣调整</p>
+  </div>
+  <div class="grid grid-3">
+    <div class="card plan plan-a reveal">
+      <div class="p-no">方案 A · 双引擎</div>
+      <span class="tag tag-gold">最推荐</span>
+      <div class="route"><b>主修 Actuarial Studies（精算）</b>，辅修 / Breadth 选 Finance 或 Economics</div>
+      <div class="fit">✅ MFE：精算的数学配置（概率·统计·随机过程）完全对口<br>✅ 移民：Actuary 在 CSOL，稀缺性强<br>⚠️ 课业最重；精算考试可选考（读课程即可，考试不影响学位）</div>
+    </div>
+    <div class="card plan plan-b reveal" style="transition-delay:.1s">
+      <div class="p-no">方案 B · 量化金融</div>
+      <span class="tag tag-teal">MFE 适配最强</span>
+      <div class="route"><b>主修 Finance</b> + <b>Concurrent Diploma in Mathematical Sciences</b></div>
+      <div class="fit">✅ MFE：金融 + 数学统计"major 级"配置，标准 MFE 画像<br>✅ 移民：Statistician 在 CSOL（VETASSESS 职业评估）<br>⚠️ 数学文凭名额有限、按成绩选拔，第一年 GPA 要硬</div>
+    </div>
+    <div class="card plan plan-c reveal" style="transition-delay:.2s">
+      <div class="p-no">方案 C · 稳妥保底</div>
+      <span class="tag tag-navy">移民路径最成熟</span>
+      <div class="route"><b>双主修 Accounting + Finance</b>，Breadth 补数学 / 编程</div>
+      <div class="fit">✅ 移民：Accountant 在 CSOL，职业评估与雇主路径最成熟<br>✅ 金融就业面广（四大 / 券商 / 银行）<br>⚠️ MFE 数学基础弱，须主动修微积分、概率统计、Python 补强</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 05 必修课清单 ===== -->
+<section class="wrap" style="padding-top:0">
+  <div class="sec-head reveal">
+    <span class="sec-no">05</span>
+    <h2>无论选哪个方案：本科期间必须修满这张清单</h2>
+    <p>这是美国 MFE 项目的"入场券"，也是澳洲统计 / 精算职业评估的硬要求</p>
+  </div>
+  <div class="grid grid-3">
+    <div class="card reveal">
+      <span class="tag tag-navy">数学与概率（不可缺）</span>
+      <ul>
+        <li>微积分 I / II（Calculus）</li>
+        <li>线性代数（Linear Algebra）</li>
+        <li>概率论（Probability）</li>
+        <li>数理统计（Mathematical Statistics）</li>
+        <li>随机过程 / 金融数学（加分项）</li>
+      </ul>
+    </div>
+    <div class="card reveal" style="transition-delay:.1s">
+      <span class="tag tag-teal">编程与数据（拉开差距）</span>
+      <ul>
+        <li>Python（量化标配，优先）</li>
+        <li>R 或 MATLAB</li>
+        <li>C++（顶尖 MFE 加分）</li>
+        <li>SQL（金融数据实操）</li>
+        <li>数值方法 / 时间序列（加分项）</li>
+      </ul>
+    </div>
+    <div class="card reveal" style="transition-delay:.2s">
+      <span class="tag tag-gold">策略与节奏</span>
+      <ul>
+        <li>GPA 是硬通货：WAM 保 85+（HD 比例越高越好）</li>
+        <li>GRE Quant 165+，大三结束前出分</li>
+        <li>大二起申请数学科学文凭（方案 B）</li>
+        <li>每年暑期：回国量化 / 券商实习 + 澳洲本地实习各安排一次</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 06 移民路径 ===== -->
+<section class="wrap" style="padding-top:0">
+  <div class="sec-head reveal">
+    <span class="sec-no">06</span>
+    <h2>毕业后的移民路径：三扇门 + 一句实话</h2>
+    <p>选择专业时就要想清楚出口，但不必现在锁死</p>
+  </div>
+  <div class="grid grid-2">
+    <div class="card reveal">
+      <span class="tag tag-teal">三扇门（按稳妥度排序）</span>
+      <ol>
+        <li><b>雇主担保（最实操）</b>：CSOL 清单职业 → 482 Skills in Demand 签证 → 2 年后转 186 DE 绿卡。会计 / 精算 / 统计均适用</li>
+        <li><b>州担保 190 / 491</b>：各州自定职业列表，金融 / 经济类仍有部分窗口，需关注目标州的年度清单</li>
+        <li><b>技术移民 189</b>：积分制 EOI，会计分数极高（85–95+），精算 / 统计相对友好；毕业工签 485 期间攒分</li>
+      </ol>
+    </div>
+    <div class="card reveal" style="transition-delay:.1s">
+      <span class="tag tag-red">一句实话</span>
+      <ul>
+        <li>2024–2026 澳洲移民持续收紧，"留学即移民"不再是确定项</li>
+        <li>CSOL 每半年更新，经济学 / 金融分析师的清单状态可能变化，需动态跟踪</li>
+        <li>职业评估（VETASSESS / CAANZ / CPAA）与课程认证挂钩，选课阶段就应核对</li>
+        <li><b>最稳的策略</b>：把"专业选择"做成数学含量高 + 清单内职业的组合——政策怎么变，你的双腿都不会同时落空</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 07 时间线 ===== -->
+<section class="wrap" style="padding-top:0">
+  <div class="sec-head reveal">
+    <span class="sec-no">07</span>
+    <h2>行动时间线：2027 入学 → 2031 双出口</h2>
+    <p>从选课第一天起，两条腿同时走</p>
+  </div>
+  <div class="card reveal">
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-date">2027 大一</div>
+        <div class="tl-title">打数学地基</div>
+        <div class="tl-desc">必修选数学量化 Option 2（较难路径）；修 Python；目标是第一年 WAM 85+ 为申请数学科学文凭留名额。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">2028 大二</div>
+        <div class="tl-title">定主修 + 叠加文凭</div>
+        <div class="tl-desc">确认方案 A / B / C；申请 Diploma in Mathematical Sciences（方案 B）；修概率论、数理统计；开始 GRE 词汇与数学。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">2029 大三</div>
+        <div class="tl-title">冲刺 GPA + 第一份量化实习</div>
+        <div class="tl-desc">修随机过程 / 金融数学；暑期回国券商量化或私募实习；GRE 首考目标 325+（Quant 165+）。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">2030 大三下–大四上</div>
+        <div class="tl-title">双线申请</div>
+        <div class="tl-desc">递交美国 MFE（墨大 7 月毕业可衔接次年秋季入学）；同步启动澳洲职业评估与 EOI / 雇主资源积累。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">2031 毕业</div>
+        <div class="tl-title">双出口决策</div>
+        <div class="tl-desc">MFE 录取 → 赴美（2 年后可再回澳）；未录 / 或想先安顿 → 485 工签留澳工作攒分，随时再申美研。两条路都不锁死。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 08 结论 ===== -->
+<section class="wrap" style="padding-top:0">
+  <div class="conclusion reveal">
+    <div class="c-line">专业选择的核心逻辑</div>
+    <div class="c-core">数学，是最安全的那条腿。<br>首选：主修精算（Actuarial Studies）<br>次选：金融 + 数学科学文凭 · 保底：会计 + 金融</div>
+    <div class="c-sub">美研 MFE 要数学，澳洲移民要清单内的职业——精算是唯一同时踩中两点的锚点。<br>入学后第 1–2 年按成绩与兴趣动态微调，出口始终保留"赴美 / 留澳"双选项。</div>
+  </div>
+</section>
+
+<footer>
+  <div class="note">本规划基于墨大课程结构与 CSOL（2026 年 6 月版）整理，移民政策动态变化，递交前请以注册移民代理信息为准。建议每半年复盘一次。</div>
+  <div>Ray 墨大专业选择规划 · 配套篇 v2 · 2026 年 8 月</div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('on');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>

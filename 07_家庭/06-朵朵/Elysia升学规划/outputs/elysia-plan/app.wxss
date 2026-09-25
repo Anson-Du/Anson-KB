@@ -1,0 +1,80 @@
+/* app.wxss - 全局样式 */
+page {
+  background-color: #F5F6FA;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  color: #2D3436;
+  font-size: 28rpx;
+  line-height: 1.6;
+}
+
+/* 通用卡片 */
+.card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  margin: 20rpx 24rpx;
+  box-shadow: 0 4rpx 20rpx rgba(108, 92, 231, 0.08);
+}
+
+/* 渐变头部 */
+.gradient-header {
+  background: linear-gradient(135deg, #6C5CE7 0%, #A29BFE 50%, #FD79A8 100%);
+  padding: 48rpx 32rpx;
+  color: #FFFFFF;
+  border-radius: 0 0 40rpx 40rpx;
+}
+
+/* 标签 */
+.tag {
+  display: inline-block;
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 22rpx;
+  margin-right: 12rpx;
+  margin-bottom: 8rpx;
+}
+
+.tag-math { background: #DFE6E9; color: #2D3436; }
+.tag-datascience { background: #C4E0F9; color: #0984E3; }
+.tag-chemistry { background: #FFEAA7; color: #D68910; }
+.tag-mathdesign { background: #FDDEDE; color: #E74C3C; }
+
+/* 优先级标签 */
+.priority-stretch { background: #FFE0E0; color: #E74C3C; }
+.priority-main { background: #FFF3CD; color: #F39C12; }
+.priority-safe { background: #D4EDDA; color: #27AE60; }
+
+/* 匹配度星星 */
+.stars {
+  color: #FDCB6E;
+  font-size: 28rpx;
+  letter-spacing: 4rpx;
+}
+
+/* 分隔线 */
+.divider {
+  height: 1rpx;
+  background: #EEE;
+  margin: 24rpx 0;
+}
+
+/* 按钮 */
+.btn-primary {
+  background: linear-gradient(135deg, #6C5CE7, #A29BFE);
+  color: #FFF;
+  border: none;
+  border-radius: 16rpx;
+  padding: 20rpx 40rpx;
+  font-size: 28rpx;
+  text-align: center;
+}
+
+.btn-outline {
+  background: transparent;
+  color: #6C5CE7;
+  border: 2rpx solid #6C5CE7;
+  border-radius: 16rpx;
+  padding: 18rpx 38rpx;
+  font-size: 28rpx;
+  text-align: center;
+}
